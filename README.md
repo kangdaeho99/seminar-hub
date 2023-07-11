@@ -16,6 +16,13 @@
 <br/><br/>
 
 
+## 📒 현재 DB 구조 ( 회원관련쪽 진행중 )
+> Member, Member_Role, Role 회원 관련 DB 구성이 완료된 상태입니다.
+
+![DB 배포구조](https://github.com/kangdaeho99/seminar-hub/assets/48047377/60ebef9e-a0e5-4d58-866f-1dc20dda7dc6)
+
+<br/><br/>
+
 - 프로젝트 설명 : 세미나 관리 REST API 입니다.
 - 백엔드 기술스택 :
     - Spring Boot 3.0.2 ( JPA )
