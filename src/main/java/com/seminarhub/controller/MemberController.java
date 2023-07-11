@@ -23,7 +23,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping(value ="")
-    @Operation(summary = "Register a new member")
+    @Operation(summary = "1. Register a new member")
     public ResponseEntity<Long> register(@RequestBody MemberDTO memberDTO) throws DuplicateMemberException {
         log.info("-----------------register--------------");
         log.info(memberDTO);
@@ -33,7 +33,7 @@ public class MemberController {
     }
 
     @GetMapping(value ="/{member_no}")
-    @Operation(summary = "Get member information by member_no")
+    @Operation(summary = "2. Get member information by member_no")
     public ResponseEntity<MemberDTO> read(@PathVariable("member_no") long member_no){
         log.info("-------------------read----------------------");
         log.info(member_no);
@@ -42,7 +42,7 @@ public class MemberController {
     }
 
     @DeleteMapping(value = "/{member_no}", produces= MediaType.TEXT_PLAIN_VALUE)
-    @Operation(summary = "Remove a member by member_no")
+    @Operation(summary = "3. Remove a member by member_no")
     public ResponseEntity<String> remove(@PathVariable("member_no") Long member_no){
         log.info("-------------------remove---------------------");
         log.info(member_no);
@@ -51,7 +51,7 @@ public class MemberController {
     }
 
     @PutMapping(value ="/{member_no}", produces = MediaType.TEXT_PLAIN_VALUE)
-    @Operation(summary = "Modify a member")
+    @Operation(summary = "4. Modify a member")
     public ResponseEntity<String> modify(@RequestBody MemberDTO memberDTO){
         log.info("-----------------modify----------------");
         log.info(memberDTO);
