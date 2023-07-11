@@ -35,8 +35,9 @@
     -  https://passionfruit200.tistory.com/392 ( JUnit, Mock으로 단위테스트 작성해보기, 단위테스트의 필요성, JUnit LifeCycle )
     -  https://passionfruit200.tistory.com/389 ( BaseEntity란, @EntityListeners로 엔티티의 변화를 감지하는 방법, Persistence Context란 )
     -  https://passionfruit200.tistory.com/386 ( [Spring Boot]JPA의 findById vs getReferenceById 의 차이점과 언제사용하는것이 맞는지에 대하여 )
- 
 
+ <br/>
+ 
 ## 📒 현재 DB 구조 ( 회원관련쪽 진행중 )
 > Member, Member_Role, Role 회원 관련 DB 구성이 완료된 상태입니다.
 
