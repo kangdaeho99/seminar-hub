@@ -53,7 +53,7 @@ public class MemberControllerTests {
         when(memberService.register(memberDTO)).thenReturn(123L);
 
         // When
-        mockMvc.perform(post("/member")
+        mockMvc.perform(post("/api/v1/member")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(memberDTO)))
                 .andExpect(status().isOk())
@@ -83,7 +83,7 @@ public class MemberControllerTests {
         when(memberService.get(member_no)).thenReturn(memberDTO);
 
         // When
-        mockMvc.perform(get("/member/"+member_no)
+        mockMvc.perform(get("/api/v1/member/"+member_no)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(memberDTO)))
                 .andExpect(status().isOk())
