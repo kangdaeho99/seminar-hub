@@ -69,9 +69,17 @@ dependencies {
 			"jakarta.annotation:jakarta.annotation-api",
 			"com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
 
-	implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time', version: '3.0.4.RELEASE'
-	implementation group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '3.2.0'
-	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.12'
+	// https://mvnrepository.com/artifact/org.json/json
+	implementation group: 'org.json', name: 'json', version: '20160810'
+
+	//jwt
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'javax.xml.bind:jaxb-api:2.3.0'
+
+	// https://mvnrepository.com/artifact/org.javassist/javassist
+	implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
+
 }
 
 tasks.named('test') {
