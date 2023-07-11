@@ -5,7 +5,7 @@
 - **깃허브 README & 소스코드 :**    
     [https://github.com/kangdaeho99/seminar-hub](https://github.com/kangdaeho99/seminar-hub)
 
-![Swagger 화면](https://github.com/kangdaeho99/seminar-hub/assets/48047377/764ea046-0d35-4fbf-a64b-d75a3018e3f2)
+![Swagger 화면](https://github.com/kangdaeho99/seminar-hub/assets/48047377/b79d0c1b-e853-4079-882f-6b0e8678539e)
 
 
 ## 📕 프로젝트 배포 구조
