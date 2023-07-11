@@ -46,16 +46,16 @@ public class Member extends BaseEntity{
         member_role_set.add(member_role);
     }
 
-    @Override
-    public String toString() {
-        return "Member(member_no=" + member_no +
-                ", member_id=" + member_id +
-                ", member_password=" + member_password +
-                ", member_nickname=" + member_nickname +
-                ", member_from_social=" + member_from_social +
-                ", del_dt=" + del_dt +
-                ")";
-    }
+//    @Override
+//    public String toString() {
+//        return "Member(member_no=" + member_no +
+//                ", member_id=" + member_id +
+//                ", member_password=" + member_password +
+//                ", member_nickname=" + member_nickname +
+//                ", member_from_social=" + member_from_social +
+//                ", del_dt=" + del_dt +
+//                ")";
+//    }
 
 
 }

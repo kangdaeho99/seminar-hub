@@ -3,6 +3,7 @@ package com.seminarhub.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,5 +23,8 @@ public class Role extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
     private RoleType role_type;
+
+    @Column(nullable=true)
+    private LocalDateTime del_dt;
 
 }

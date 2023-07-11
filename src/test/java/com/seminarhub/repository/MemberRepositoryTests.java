@@ -4,6 +4,7 @@ import com.seminarhub.entity.Member;
 import com.seminarhub.entity.Member_Role;
 import com.seminarhub.entity.Role;
 import com.seminarhub.entity.RoleType;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class MemberRepositoryTests {
     private PasswordEncoder passwordEncoder;
 
     private Member member;
-    private final String member_id= "daeho.kang@naver.com";
+    private final String member_id= "daeho.kang2@naver.com";
     private final String member_password= "123123123";
     private final String member_nickname = "hello";
     private final boolean member_from_social = false;
@@ -48,17 +49,19 @@ public class MemberRepositoryTests {
             // Create member
             Member member = Member.builder()
                     .member_id(member_id)
-                    .member_password(member_password)
+                    .member_password(passwordEncoder.encode(member_password))
                     .member_nickname(member_nickname)
                     .member_from_social(member_from_social)
                     .build();
 
-            // Create role
-            Role adminRole = Role.builder()
-                    .role_type(RoleType.ADMIN)
-                    .build();
-            roleRepository.save(adminRole);
-
+//            Role userRole = Role.builder()
+//                    .role_type(RoleType.USER)
+//                    .build();
+//            roleRepository.save(userRole);
+            Role adminRole = roleRepository.findByRole_type(RoleType.ADMIN)
+                    .orElseGet(() -> roleRepository.save(Role.builder().role_type(RoleType.ADMIN).build()));
+            Role userRole = roleRepository.findByRole_type(RoleType.USER)
+                    .orElseGet(() -> roleRepository.save(Role.builder().role_type(RoleType.USER).build()));
 
             // Create member_role
             Member_Role memberRole = Member_Role.builder()
@@ -93,5 +96,7 @@ public class MemberRepositoryTests {
         assertNotNull(member.get());
         System.out.println(member.get());
     }
+
+
 
 }
