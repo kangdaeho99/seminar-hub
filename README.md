@@ -14,7 +14,10 @@
     - JWT
     - Spring Docs OPENAPI 3.0 를 활용하여 Swagger DOC 작성
     - JUnit & Mock 을 활용한 단위테스트 진행
-
+    - AWS EC2
+    - AWS RDS
+    - Docker & DockerHub
+    - Jenkins
     
 - 백엔드에 개발 중 고려한점들 글 정리 :
     -  https://passionfruit200.tistory.com/419 ( 회원권한 테이블 (Member, Member_Role, Role)을 @ManyToMany 사용하지않고 Bridge Table 사용하여 설계해보기 )
@@ -23,10 +26,9 @@
     -  https://passionfruit200.tistory.com/395 ( soft delete 처리하는 과정, @SQLDelete, @Where 을 사용안하는이유, BaseEntity에 deleted_at을 추가안하는이유 )
     -  https://passionfruit200.tistory.com/392 ( JUnit, Mock으로 단위테스트 작성해보기, 단위테스트의 필요성, JUnit LifeCycle )
     -  https://passionfruit200.tistory.com/389 ( BaseEntity란, @EntityListeners로 엔티티의 변화를 감지하는 방법, Persistence Context란 )
-    - 	https://passionfruit200.tistory.com/386 ( [Spring Boot]JPA의 findById vs getReferenceById 의 차이점과 언제사용하는것이 맞는지에 대하여 )
+    -  https://passionfruit200.tistory.com/386 ( [Spring Boot]JPA의 findById vs getReferenceById 의 차이점과 언제사용하는것이 맞는지에 대하여 )
 
 
-<br/>
 <br/>
 
 
