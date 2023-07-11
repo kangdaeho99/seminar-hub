@@ -42,13 +42,15 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info("attemptAuthentication");
 
         String member_id = request.getParameter("member_id");
-        String member_pw = request.getParameter("member_pw");
+        String member_password = request.getParameter("member_password");
 
+        System.out.println("MEMBER_ID"+member_id);
+        System.out.println("MEMBER_PW"+member_password);
 
         if(member_id == null){
             throw new BadCredentialsException("member_id cannot be null");
         }
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(member_id, member_pw);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(member_id, member_password);
 
         return getAuthenticationManager().authenticate(authToken);
     }
@@ -63,7 +65,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
      * @param response
      * @param chain
      * @param authResult the object returned from the <tt>attemptAuthentication</tt> : 성공한 사용자의 인증정보를 가지고 있는 Authentication 객체.
-     *                   이를 통해 인증에 성고한 사용자의 정보를 로그에서 확인합니다. '/api/login?member_id=ewqeqw&&member_pw=1111'
+     *                   이를 통해 인증에 성고한 사용자의 정보를 로그에서 확인합니다. '/api/login?member_id=ewqeqw&&member_password=1111'
      * method.
      * @throws IOException
      * @throws ServletException
