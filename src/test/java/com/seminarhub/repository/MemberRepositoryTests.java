@@ -33,7 +33,7 @@ public class MemberRepositoryTests {
     private PasswordEncoder passwordEncoder;
 
     private Member member;
-    private final String member_id= "daeho.kang2@naver.com";
+    private final String member_id= "daeho.kang@naver.com";
     private final String member_password= "123123123";
     private final String member_nickname = "hello";
     private final boolean member_from_social = false;
@@ -80,9 +80,39 @@ public class MemberRepositoryTests {
     }
 
     /**
-     * [ 2023-06-28 daeho.kang ]
+     * [ 2023-07-11 daeho.kang ]
      * Description : memberRepository getWithMember_id Test
      * Find Member by member_id
+     *
+     * select
+     *         m1_0.member_no,
+     *         m1_0.del_dt,
+     *         m1_0.inst_dt,
+     *         m1_0.member_from_social,
+     *         m1_0.member_id,
+     *         m1_0.member_nickname,
+     *         m1_0.member_password,
+     *         m2_0.member_no,
+     *         m2_0.member_role_no,
+     *         m2_0.inst_dt,
+     *         r1_0.role_no,
+     *         r1_0.del_dt,
+     *         r1_0.inst_dt,
+     *         r1_0.role_type,
+     *         r1_0.updt_dt,
+     *         m2_0.updt_dt,
+     *         m1_0.updt_dt
+     *     from
+     *         member m1_0
+     *     left join
+     *         member_role m2_0
+     *             on m1_0.member_no=m2_0.member_no
+     *     left join
+     *         role r1_0
+     *             on r1_0.role_no=m2_0.role_no
+     *     where
+     *         m1_0.member_id=?
+     *         and m1_0.del_dt is null
      */
     @DisplayName("findByMember_id Test")
     @Test
