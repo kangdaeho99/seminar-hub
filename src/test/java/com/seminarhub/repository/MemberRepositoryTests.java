@@ -1,11 +1,15 @@
 package com.seminarhub.repository;
 
 import com.seminarhub.entity.Member;
+import com.seminarhub.entity.Member_Role;
+import com.seminarhub.entity.Role;
+import com.seminarhub.entity.RoleType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -21,6 +25,12 @@ public class MemberRepositoryTests {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private Member member;
     private final String member_id= "daeho.kang@naver.com";
     private final String member_password= "123123123";
@@ -35,14 +45,33 @@ public class MemberRepositoryTests {
     @BeforeEach
     public void setup() throws Exception{
         if(memberRepository.countByMember_id(member_id) == 0){
-            member = memberRepository.save(
-                    Member.builder()
-                            .member_id(member_id)
-                            .member_password(member_password)
-                            .member_nickname(member_nickname)
-                            .member_from_social(member_from_social)
-                            .build()
-            );
+            // Create member
+            Member member = Member.builder()
+                    .member_id(member_id)
+                    .member_password(member_password)
+                    .member_nickname(member_nickname)
+                    .member_from_social(member_from_social)
+                    .build();
+
+            // Create role
+            Role adminRole = Role.builder()
+                    .role_type(RoleType.ADMIN)
+                    .build();
+            roleRepository.save(adminRole);
+
+
+            // Create member_role
+            Member_Role memberRole = Member_Role.builder()
+                    .member(member)
+                    .role(adminRole)
+                    .build();
+
+            // ADD Set member_role in member
+            member.addMemberRole(memberRole);
+
+            //Save Member
+            memberRepository.save(member);
+
         }
 
     }
@@ -54,17 +83,15 @@ public class MemberRepositoryTests {
      */
     @DisplayName("findByMember_id Test")
     @Test
+//    @Transactional
+//    @Rollback(false)
     public void testGetWithMember_id(){
         // given, when
         Optional<Member> member = memberRepository.findByMember_id(member_id);
 
         // then
         assertNotNull(member.get());
-
-        System.out.println(member);
+        System.out.println(member.get());
     }
-
-
-
 
 }
