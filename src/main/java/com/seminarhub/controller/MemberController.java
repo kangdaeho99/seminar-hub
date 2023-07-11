@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Log4j2
-@RequestMapping("/member")
+@RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
-@Tag(name = "Member API")
+@Tag(name = "2. Member API")
 public class MemberController {
     private final MemberService memberService;
 
@@ -51,7 +51,6 @@ public class MemberController {
     }
 
     @PutMapping(value ="/{member_no}", produces = MediaType.TEXT_PLAIN_VALUE)
-
     @Operation(summary = "Modify a member")
     public ResponseEntity<String> modify(@RequestBody MemberDTO memberDTO){
         log.info("-----------------modify----------------");
