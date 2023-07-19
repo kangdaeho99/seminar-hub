@@ -25,7 +25,7 @@ public class SwaggerController {
 
         }
 
-        @PostMapping("/api/v1/logout")
+        @GetMapping("/api/v1/logout")
         @Operation(summary = "2. 로그아웃")
         public void fakeLogout() {
 
