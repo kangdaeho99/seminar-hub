@@ -2,6 +2,8 @@ package com.seminarhub.controller;
 
 
 import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.RoleType;
+import com.seminarhub.security.annotation.CheckRole;
 import com.seminarhub.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,8 @@ public class MemberController {
         return new ResponseEntity<>(member_no, HttpStatus.OK);
     }
 
+
+    @CheckRole(roles = {RoleType.USER})
     @GetMapping(value ="/{member_no}")
     @Operation(summary = "2. Get member information by member_no")
     public ResponseEntity<MemberDTO> read(@PathVariable("member_no") long member_no){

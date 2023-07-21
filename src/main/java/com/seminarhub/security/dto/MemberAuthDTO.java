@@ -37,6 +37,7 @@ public class MemberAuthDTO extends User {
      */
     public MemberAuthDTO(Long member_no, String member_id, String member_password, String member_nickname, boolean member_from_social, Collection<? extends GrantedAuthority> authorities){
         super(member_id, member_password, authorities);
+        this.member_id = member_id;
         this.member_no = member_no;
         this.member_nickname = member_nickname;
         this.member_from_social = member_from_social;

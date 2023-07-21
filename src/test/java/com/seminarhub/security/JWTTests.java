@@ -1,10 +1,15 @@
 package com.seminarhub.security;
 
 
+import com.seminarhub.security.dto.JwtTokenPayloadDTO;
 import com.seminarhub.security.util.JWTUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class JWTTests {
@@ -29,8 +34,13 @@ public class JWTTests {
     @DisplayName("JWTUTIL Generated Token Check")
     @Test
     public void testEncode() throws Exception{
+        // given
         String member_id = "hello@hello.com";
+
+        // when
         String str = jwtUtil.generateToken(member_id);
+
+        // then
         System.out.println(str);
     }
 
@@ -44,11 +54,57 @@ public class JWTTests {
     @DisplayName("JWTUTIL Generated Token Encoding")
     @Test
     public void testValidate() throws Exception{
+        // given
         String member_id = "hello@hello.com";
+
+        // when
         String str = jwtUtil.generateToken(member_id);
         Thread.sleep(5000);
         String resultEmail = jwtUtil.validateAndExtract(str);
+
+        // then
         System.out.println(resultEmail);
+    }
+
+    /**
+     * [ 2023-07-21 daeho.kang ]
+     * Description : generateTokenWithJwtTokenPayloadDTO TEST
+     * JWT 값 테스트
+     * 결과 : eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2ODk5Mjc2NDcsImV4cCI6 ...
+     */
+    @DisplayName("JWTUTil Generate Token Check")
+    @Test
+    public void testEncodeWithJwtTokenPayloadDTO() throws Exception{
+        Set<SimpleGrantedAuthority> member_role_set = new HashSet<>();
+        member_role_set.add(new SimpleGrantedAuthority("ROLE_USER"));
+        member_role_set.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        JwtTokenPayloadDTO jwtTokenPayloadDTO = JwtTokenPayloadDTO.builder()
+                .member_id("daeho.kang@naver.com")
+                .member_role(member_role_set)
+                .build();
+        String str = jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
+        System.out.println(str);
+    }
+
+    /**
+     * [ 2023-07-21 daeho.kang ]
+     * Description : validateAndExtractAndReturnJwtTokenPayloadDTO TEST
+     * 결과 : JwtTokenPayloadDTO(member_no=null, member_id=daeho.kang@naver.com, member_role=[ROLE_USER, ROLE_ADMIN])
+     */
+    @DisplayName("JWTUTIL Generated Token Encoding")
+    @Test
+    public void testValidateWithJwtTokenPayloadDTO() throws Exception{
+        Set<SimpleGrantedAuthority> member_role_set = new HashSet<>();
+        member_role_set.add(new SimpleGrantedAuthority("ROLE_USER"));
+        member_role_set.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        JwtTokenPayloadDTO jwtTokenPayloadDTO = JwtTokenPayloadDTO.builder()
+                .member_id("daeho.kang@naver.com")
+                .member_role(member_role_set)
+                .build();
+        String str = jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
+        Thread.sleep(5000);
+        JwtTokenPayloadDTO resultJwtTokenPayloadDTO = jwtUtil.validateAndExtractAndReturnJwtTokenPayloadDTO(str);
+        System.out.println(resultJwtTokenPayloadDTO);
     }
 
 
