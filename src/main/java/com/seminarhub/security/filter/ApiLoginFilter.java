@@ -21,6 +21,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * [ 2023-07-30 daeho.kang ]
+ * Description : Filter에서 로그인처리 ( extends AbstractAuthenticationProcessingFilter )
+ * UsernamePasswordAuthenticationFilter 를 대체함
+ */
 @Log4j2
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -98,6 +103,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         String token = null;
         try{
             token = jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
+            jwtUtil.generateRefreshTokenInRedisWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
             response.setContentType("text/plain");
             response.getOutputStream().write(token.getBytes());
             log.info(token);
