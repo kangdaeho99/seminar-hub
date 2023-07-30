@@ -1,8 +1,9 @@
 package com.seminarhub.config;
 
-import com.seminarhub.security.filter.ApiCheckFilter;
 import com.seminarhub.security.filter.ApiLoginFilter;
 import com.seminarhub.security.handler.ApiLoginFailHandler;
+import com.seminarhub.security.handler.SeminarLogoutSuccessHandler;
+import com.seminarhub.security.service.RedisRefreshTokenService;
 import com.seminarhub.security.service.SeminarUserDetailsService;
 import com.seminarhub.security.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
@@ -11,13 +12,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,7 +26,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Description : Security Config
  *
  */
-
 @Configuration
 @EnableWebSecurity
 @Log4j2
@@ -36,6 +34,13 @@ public class SecurityConfig {
     @Autowired
     private SeminarUserDetailsService seminarUserDetailsService;
 
+    @Autowired
+    private RedisRefreshTokenService refreshTokenService;
+
+    /**
+     * [ 2023-07-30 daeho.kang ]
+     * Description : password 암호화에 사용되는 Bean 등록
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -46,6 +51,10 @@ public class SecurityConfig {
 //        return new ApiCheckFilter("/api/v1/member/**", jwtUtil());
 //    }
 
+    /**
+     * [ 2023-07-30 daeho.kang ]
+     * Description : JwtUtil Bean 등록
+     */
     @Bean
     public JWTUtil jwtUtil(){
         return new JWTUtil();
@@ -63,7 +72,7 @@ public class SecurityConfig {
 
         http.formLogin();
         http.csrf().disable();
-        http.logout().logoutUrl("/api/v1/logout");
+        http.logout().logoutUrl("/api/v1/logout").logoutSuccessHandler(new SeminarLogoutSuccessHandler(jwtUtil()));
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.rememberMe().tokenValiditySeconds(60*60*24*7).userDetailsService(seminarUserDetailsService);

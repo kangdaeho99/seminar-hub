@@ -1,5 +1,6 @@
-package com.seminarhub.security;
+package com.seminarhub.security.util;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,11 @@ public class PasswordTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * [ 2023-07-28 daeho.kang ]
+     * Description : PasswordEcndoer Test
+     */
+    @DisplayName("Test PasswordEncoder")
     @Test
     public void testEncode(){
         String password = "1111";

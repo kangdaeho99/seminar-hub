@@ -100,13 +100,15 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
                 .member_id(memberAuthDTO.getMember_id())
                 .member_role(simpleAuthorities)
                 .build();
-        String token = null;
+        String accessToken = null;
+        String refreshToken = null;
         try{
-            token = jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
-            jwtUtil.generateRefreshTokenInRedisWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
+            accessToken = jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
+            refreshToken = jwtUtil.generateRefreshTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO);
+                jwtUtil.setRefreshTokenInRedisWithJwtTokenPayloadDTO(jwtTokenPayloadDTO, refreshToken);
             response.setContentType("text/plain");
-            response.getOutputStream().write(token.getBytes());
-            log.info(token);
+            response.getOutputStream().write(accessToken.getBytes());
+            log.info(accessToken);
         }catch(Exception e){
             e.printStackTrace();
         }

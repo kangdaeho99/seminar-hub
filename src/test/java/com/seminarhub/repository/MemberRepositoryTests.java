@@ -4,7 +4,6 @@ import com.seminarhub.entity.Member;
 import com.seminarhub.entity.Member_Role;
 import com.seminarhub.entity.Role;
 import com.seminarhub.entity.RoleType;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,10 +53,6 @@ public class MemberRepositoryTests {
                     .member_from_social(member_from_social)
                     .build();
 
-//            Role userRole = Role.builder()
-//                    .role_type(RoleType.USER)
-//                    .build();
-//            roleRepository.save(userRole);
             Role adminRole = roleRepository.findByRole_type(RoleType.ADMIN)
                     .orElseGet(() -> roleRepository.save(Role.builder().role_type(RoleType.ADMIN).build()));
             Role userRole = roleRepository.findByRole_type(RoleType.USER)
@@ -116,8 +111,6 @@ public class MemberRepositoryTests {
      */
     @DisplayName("findByMember_id Test")
     @Test
-//    @Transactional
-//    @Rollback(false)
     public void testGetWithMember_id(){
         // given, when
         Optional<Member> member = memberRepository.findByMember_id(member_id);

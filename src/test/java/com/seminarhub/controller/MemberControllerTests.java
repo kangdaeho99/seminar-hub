@@ -2,15 +2,26 @@ package com.seminarhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.RoleType;
+import com.seminarhub.security.dto.JwtTokenPayloadDTO;
+import com.seminarhub.security.service.RedisRefreshTokenService;
+import com.seminarhub.security.util.JWTUtil;
 import com.seminarhub.service.MemberService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,9 +46,17 @@ public class MemberControllerTests {
     @MockBean
     MemberService memberService;
 
+    @Autowired
+    private JWTUtil jwtUtil;
+
+    @BeforeEach
+    public void testBefore(){
+        System.out.println("testBefore......");
+    }
+
     /**
      * [ 2023-07-04 daeho.kang ]
-     * Description : '/member' Register Test
+     * Description : '/api/v1/member' Register Test
      */
     @Test
     @DisplayName("Register a new member")
@@ -66,10 +85,10 @@ public class MemberControllerTests {
 
     /**
      * [ 2023-07-04 daeho.kang ]
-     * Description : '/member/{member_no}' get Test
+     * Description : '/api/v1/member/{member_no}' get Test
      */
     @Test
-    @DisplayName("Register a new member")
+    @DisplayName("Get a Member Test")
     void getMemberTest() throws Exception {
         // Given
         MemberDTO memberDTO = MemberDTO.builder()
@@ -82,8 +101,11 @@ public class MemberControllerTests {
         Long member_no = 123L;
         when(memberService.get(member_no)).thenReturn(memberDTO);
 
+        JwtTokenPayloadDTO jwtTokenPayloadDTO = jwtUtil.mockJwtTokenPayloadDTO();
+
         // When
         mockMvc.perform(get("/api/v1/member/"+member_no)
+                        .header("Authorization", "Bearer "+ jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(memberDTO)))
                 .andExpect(status().isOk())
