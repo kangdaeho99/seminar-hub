@@ -1,19 +1,14 @@
 package com.seminarhub.security.Interceptor;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seminarhub.entity.RoleType;
 import com.seminarhub.security.annotation.CheckRole;
 import com.seminarhub.security.dto.JwtTokenPayloadDTO;
 import com.seminarhub.security.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import javassist.Loader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.tomcat.websocket.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -21,7 +16,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.*;
+import java.util.Set;
 
 
 /**
@@ -54,9 +49,14 @@ public class CheckRoleInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("CheckRole Request URL: "+ request.getRequestURI());
 
+
+        // ResourceHttpRequestHandler : handler가 ResourceHttpRequestHandler의 인스턴스인 경우, Swagger UI와 같은 정적 리소스 처리기
+        // HandlerMethod : @Controller인지 확인
+        if( handler instanceof HandlerMethod == false ) return true;
+
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         CheckRole checkRole = handlerMethod.getMethodAnnotation(CheckRole.class);
-        if(checkRole == null) return HandlerInterceptor.super.preHandle(request, response, handler);
+        if(checkRole == null) return true;
 
         RoleType[] annotationRoleType = checkRole.roles();
         System.out.println("annotationRoleType:"+annotationRoleType);

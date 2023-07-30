@@ -1,6 +1,7 @@
 package com.seminarhub.config;
 
 import com.seminarhub.security.Interceptor.CheckRoleInterceptor;
+import com.seminarhub.security.Interceptor.JwtTokenInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
     private final CheckRoleInterceptor checkRoleInterceptor;
 
+    private final JwtTokenInterceptor jwtTokenInterceptor;
 
     /**
      * [ 2023-07-21 daeho.kang ]
@@ -25,6 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 //        WebMvcConfigurer.super.addInterceptors(registry);
+        registry.addInterceptor(jwtTokenInterceptor);
         registry.addInterceptor(checkRoleInterceptor);
     }
 }
