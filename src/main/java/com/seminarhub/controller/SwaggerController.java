@@ -39,7 +39,7 @@ public class SwaggerController {
          * [ 2023-07-30 daeho.kang ]
          * Description : 로그아웃 처리
          */
-        @GetMapping("/api/v1/logout")
+        @PostMapping("/api/v1/logout")
         @Operation(summary = "2. 로그아웃")
         public void fakeLogout() {
 

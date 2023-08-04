@@ -1,5 +1,6 @@
 package com.seminarhub.config;
 
+import com.seminarhub.security.filter.ApiCheckFilter;
 import com.seminarhub.security.filter.ApiLoginFilter;
 import com.seminarhub.security.handler.ApiLoginFailHandler;
 import com.seminarhub.security.handler.SeminarLogoutSuccessHandler;
@@ -46,10 +47,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public ApiCheckFilter apiCheckFilter() {
-//        return new ApiCheckFilter("/api/v1/member/**", jwtUtil());
-//    }
+    @Bean
+    public ApiCheckFilter apiCheckFilter() {
+        return new ApiCheckFilter("/api/v1/member/test/**", jwtUtil());
+    }
 
     /**
      * [ 2023-07-30 daeho.kang ]
@@ -70,7 +71,7 @@ public class SecurityConfig {
 
         http.authorizeRequests().requestMatchers("/swagger-ui.html").permitAll();
 
-        http.formLogin();
+        http.formLogin().disable();
         http.csrf().disable();
         http.logout().logoutUrl("/api/v1/logout").logoutSuccessHandler(new SeminarLogoutSuccessHandler(jwtUtil()));
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -78,7 +79,7 @@ public class SecurityConfig {
         http.rememberMe().tokenValiditySeconds(60*60*24*7).userDetailsService(seminarUserDetailsService);
 
         //Filter 순서 조절 (패스워드 체크 이전 apiCheckFilter()) 실행되도록 설정
-//        http.addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
         //AuthenticationManager 설정
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
