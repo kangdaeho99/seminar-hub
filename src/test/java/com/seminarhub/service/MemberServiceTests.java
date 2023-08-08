@@ -72,20 +72,20 @@ public class MemberServiceTests {
     @Test
     public void getMemberTest(){
         // given
-        Member existingMember = Member.builder().member_no((long)123).member_id("member_id").member_password("member_password").member_nickname("member_nickname").member_from_social(false).build();
-        Mockito.when(memberRepository.findByMember_no((long) 123)).thenReturn(Optional.of(existingMember));
+        Member existingMember = Member.builder().member_no((long)123).member_id("daeho.kang@hello.com").member_password("member_password").member_nickname("member_nickname").member_from_social(false).build();
+        Mockito.when(memberRepository.findByMember_id("daeho.kang@hello.com")).thenReturn(Optional.of(existingMember));
 
         // when
-        MemberDTO memberDTO = memberService.get((long)123);
+        MemberDTO memberDTO = memberService.get("daeho.kang@hello.com");
 
         // then
         Assertions.assertEquals(memberDTO.getMember_no(), 123L);
-        Assertions.assertEquals(memberDTO.getMember_id(), "member_id");
+        Assertions.assertEquals(memberDTO.getMember_id(), "daeho.kang@hello.com");
         Assertions.assertEquals(memberDTO.getMember_password(), "member_password");
         Assertions.assertEquals(memberDTO.getMember_nickname(), "member_nickname");
         Assertions.assertEquals(memberDTO.isMember_from_social(), false);
 
-        verify(memberRepository).findByMember_no((long) 123);
+        verify(memberRepository).findByMember_id("daeho.kang@hello.com");
     }
 
     /**
@@ -96,11 +96,9 @@ public class MemberServiceTests {
     @Test
     public void modifyMemberTest() {
         // given
-        Member existingMember = Member.builder().member_no((long)123).member_id("member_id").member_password("member_password").member_nickname("member_nickname").member_from_social(false).build();
-
-        Mockito.when(memberRepository.findById(123L)).thenReturn(Optional.of(existingMember));
-
-        MemberDTO memberDTO = MemberDTO.builder().member_no(123L).member_nickname("modified_member_nickname").build();
+        Member existingMember = Member.builder().member_no((long)123).member_id("daeho.kang@hello.com").member_password("member_password").member_nickname("member_nickname").member_from_social(false).build();
+        Mockito.when(memberRepository.findByMember_id("daeho.kang@hello.com")).thenReturn(Optional.of(existingMember));
+        MemberDTO memberDTO = MemberDTO.builder().member_no(123L).member_id("daeho.kang@hello.com").member_nickname("modified_member_nickname").build();
         // when
         memberService.modify(memberDTO);
 
@@ -120,14 +118,14 @@ public class MemberServiceTests {
         // given
         LocalDateTime del_dt = LocalDateTime.now();
         Member existingMember = Member.builder().member_no((long)123).member_id("member_id").member_password("member_password").member_nickname("member_nickname").member_from_social(false).del_dt(del_dt).build();
-        Mockito.when(memberRepository.findById(123L)).thenReturn(Optional.of(existingMember));
+        Mockito.when(memberRepository.findByMember_id("daeho.kang@hello.com")).thenReturn(Optional.of(existingMember));
 
         // when
-        memberService.remove(123L);
+        memberService.remove("daeho.kang@hello.com");
 
         // then
-        Mockito.verify(memberRepository).deleteByMember_no(123L);
-        Assertions.assertNotNull(memberRepository.findById(123L).get().getDel_dt());
+        Mockito.verify(memberRepository).deleteByMember_id("daeho.kang@hello.com");
+        Assertions.assertNotNull(memberRepository.findByMember_id("daeho.kang@hello.com").get().getDel_dt());
     }
 
 }

@@ -45,7 +45,7 @@ public class MemberRepositoryTests {
     @BeforeEach
     public void setup() throws Exception{
         if(memberRepository.countByMember_id(member_id) == 0){
-            // Create member
+            // CREAT member
             Member member = Member.builder()
                     .member_id(member_id)
                     .member_password(passwordEncoder.encode(member_password))
@@ -58,7 +58,7 @@ public class MemberRepositoryTests {
             Role userRole = roleRepository.findByRole_type(RoleType.USER)
                     .orElseGet(() -> roleRepository.save(Role.builder().role_type(RoleType.USER).build()));
 
-            // Create member_role
+            // CREAT member_role
             Member_Role memberRole = Member_Role.builder()
                     .member(member)
                     .role(adminRole)
@@ -67,7 +67,7 @@ public class MemberRepositoryTests {
             // ADD Set member_role in member
             member.addMemberRole(memberRole);
 
-            //Save Member
+            //SAVE Member
             memberRepository.save(member);
 
         }
@@ -119,7 +119,5 @@ public class MemberRepositoryTests {
         assertNotNull(member.get());
         System.out.println(member.get());
     }
-
-
 
 }

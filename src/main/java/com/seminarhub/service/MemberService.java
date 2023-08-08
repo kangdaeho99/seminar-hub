@@ -10,11 +10,11 @@ import java.util.List;
 public interface MemberService {
     Long register(MemberDTO memberDTO) throws DuplicateMemberException;
 
-    MemberDTO get(Long member_no);
+    MemberDTO get(String member_id);
 
     void modify(MemberDTO memberDTO);
 
-    void remove(Long member_no);
+    void remove(String member_id);
 
 
     default Member dtoToEntity(MemberDTO memberDTO){

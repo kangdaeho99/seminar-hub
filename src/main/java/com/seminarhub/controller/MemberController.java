@@ -37,21 +37,21 @@ public class MemberController {
 
 
     @CheckRole(roles = {RoleType.USER})
-    @GetMapping(value ="/{member_no}")
+    @GetMapping(value ="/{member_id}")
     @Operation(summary = "2. Get member information by member_no")
-    public ResponseEntity<MemberDTO> read(@PathVariable("member_no") long member_no){
+    public ResponseEntity<MemberDTO> read(@PathVariable("member_id") String member_id){
         log.info("-------------------read----------------------");
-        log.info(member_no);
+        log.info(member_id);
 
-        return new ResponseEntity<>(memberService.get(member_no), HttpStatus.OK);
+        return new ResponseEntity<>(memberService.get(member_id), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{member_no}", produces= MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "3. Remove a member by member_no")
-    public ResponseEntity<String> remove(@PathVariable("member_no") Long member_no){
+    public ResponseEntity<String> remove(@PathVariable("member_id") String member_id){
         log.info("-------------------remove---------------------");
-        log.info(member_no);
-        memberService.remove(member_no);
+        log.info(member_id);
+        memberService.remove(member_id);
         return new ResponseEntity<>("removed", HttpStatus.OK);
     }
 

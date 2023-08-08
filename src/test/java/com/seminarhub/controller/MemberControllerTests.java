@@ -99,12 +99,13 @@ public class MemberControllerTests {
                 .member_from_social(false)
                 .build();
         Long member_no = 123L;
-        when(memberService.get(member_no)).thenReturn(memberDTO);
+        String member_id = "daeho.kang@hello.com";
+        when(memberService.get(member_id)).thenReturn(memberDTO);
 
         JwtTokenPayloadDTO jwtTokenPayloadDTO = jwtUtil.mockJwtTokenPayloadDTO();
 
         // When
-        mockMvc.perform(get("/api/v1/member/"+member_no)
+        mockMvc.perform(get("/api/v1/member/"+member_id)
                         .header("Authorization", "Bearer "+ jwtUtil.generateTokenWithJwtTokenPayloadDTO(jwtTokenPayloadDTO))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(memberDTO)))
@@ -117,7 +118,7 @@ public class MemberControllerTests {
                 .andDo(print());
 
         // Then
-        verify(memberService).get(member_no);
+        verify(memberService).get(member_id);
 
     }
 }
