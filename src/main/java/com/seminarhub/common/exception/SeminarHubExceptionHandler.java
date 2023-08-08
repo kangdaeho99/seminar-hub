@@ -41,6 +41,20 @@ public class SeminarHubExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, responseHeaders, httpStatus);
     }
 
+    @ExceptionHandler(value = DuplicateSeminarException.class)
+    public ResponseEntity<ErrorResponseDTO> DuplicateSeminarException(Exception e){
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        HttpStatus httpStatus = HttpStatus.CONFLICT;
+        log.info("-------------------Global DuplicateSeminarExceptionHandler-------------------");
+
+        errorResponseDTO.setErrorType(httpStatus.getReasonPhrase());
+        errorResponseDTO.setErrorCode(String.valueOf(httpStatus.value()));
+        errorResponseDTO.setErrorMessage(e.getMessage());
+
+        return new ResponseEntity<>(errorResponseDTO, responseHeaders, httpStatus);
+    }
+
 //    @ExceptionHandler(value = Exception.class)
 //    public ResponseEntity<Map<String, String>> ExceptionHandler(Exception e){
 //        HttpHeaders responseHeaders = new HttpHeaders();
