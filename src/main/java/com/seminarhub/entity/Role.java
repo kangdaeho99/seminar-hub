@@ -17,14 +17,13 @@ public class Role extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long role_no;
 
+    @Column(nullable=true)
+    private LocalDateTime del_dt;
+
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<Member_Role> member_list;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
     private RoleType role_type;
-
-    @Column(nullable=true)
-    private LocalDateTime del_dt;
-
 }

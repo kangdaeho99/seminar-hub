@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -13,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = {"member_role_set"})
+@ToString(exclude = {"member_role_set", "member_seminar_list"})
 public class Member extends BaseEntity{
 
     @Id
@@ -39,23 +40,15 @@ public class Member extends BaseEntity{
     @Builder.Default
     private Set<Member_Role> member_role_set  = new HashSet<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<Member_Seminar> member_seminar_list;
+
     public void setMember_nickname(String member_nickname){
         this.member_nickname = member_nickname;
     }
     public void addMemberRole(Member_Role member_role){
         member_role_set.add(member_role);
     }
-
-//    @Override
-//    public String toString() {
-//        return "Member(member_no=" + member_no +
-//                ", member_id=" + member_id +
-//                ", member_password=" + member_password +
-//                ", member_nickname=" + member_nickname +
-//                ", member_from_social=" + member_from_social +
-//                ", del_dt=" + del_dt +
-//                ")";
-//    }
 
 
 }
