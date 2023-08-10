@@ -44,7 +44,7 @@ public class MemberRepositoryTests {
      */
     @BeforeEach
     public void setup() throws Exception{
-        if(memberRepository.countByMember_id(member_id) == 0){
+        if(memberRepository.findByMember_id(member_id).isEmpty()){
             // CREAT member
             Member member = Member.builder()
                     .member_id(member_id)
@@ -71,6 +71,22 @@ public class MemberRepositoryTests {
             memberRepository.save(member);
 
         }
+
+//        if(memberRepository.findByMember_id("RemoveTestId").isEmpty()){
+//            // CREAT member
+//            Member member = Member.builder()
+//                    .member_id("RemoveTestId")
+//                    .member_password(passwordEncoder.encode(member_password))
+//                    .member_nickname(member_nickname)
+//                    .member_from_social(member_from_social)
+//                    .build();
+//
+//            //SAVE Member
+//            memberRepository.save(member);
+//
+//        }
+
+
 
     }
 
@@ -119,5 +135,27 @@ public class MemberRepositoryTests {
         assertNotNull(member.get());
         System.out.println(member.get());
     }
+
+
+    /**
+     * [ 2023-08-09 daeho.kang ]
+     * Description : testDeleteWithMember_id
+     *
+     * update
+     *     member
+     * set
+     *     del_dt=current_timestamp(6)
+     * where
+     *     member_id=?
+     */
+    @DisplayName("deleteWithMember_id Test")
+    @Test
+    public void testDeleteWithMember_id(){
+        // given, when, then
+        memberRepository.deleteByMember_id("RemoveTestId");
+
+    }
+
+
 
 }

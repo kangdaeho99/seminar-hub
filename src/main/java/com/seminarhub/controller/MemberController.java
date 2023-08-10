@@ -13,8 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -46,7 +44,7 @@ public class MemberController {
         return new ResponseEntity<>(memberService.get(member_id), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{member_no}", produces= MediaType.TEXT_PLAIN_VALUE)
+    @DeleteMapping(value = "/{member_id}", produces= MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "3. Remove a member by member_no")
     public ResponseEntity<String> remove(@PathVariable("member_id") String member_id){
         log.info("-------------------remove---------------------");
@@ -55,7 +53,7 @@ public class MemberController {
         return new ResponseEntity<>("removed", HttpStatus.OK);
     }
 
-    @PutMapping(value ="/{member_no}", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping(value ="", produces = MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "4. Modify a member")
     public ResponseEntity<String> modify(@RequestBody MemberDTO memberDTO){
         log.info("-----------------modify----------------");

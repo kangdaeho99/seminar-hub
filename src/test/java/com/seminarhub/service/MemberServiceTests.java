@@ -114,7 +114,7 @@ public class MemberServiceTests {
 
     @DisplayName("Member Service Soft Remove Test")
     @Test
-    public void removeTest() {
+    public void removeMemberTest() {
         // given
         LocalDateTime del_dt = LocalDateTime.now();
         Member existingMember = Member.builder().member_no((long)123).member_id("member_id").member_password("member_password").member_nickname("member_nickname").member_from_social(false).del_dt(del_dt).build();

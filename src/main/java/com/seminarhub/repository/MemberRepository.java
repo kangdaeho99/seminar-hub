@@ -1,13 +1,12 @@
 package com.seminarhub.repository;
 
-import com.seminarhub.dto.MemberDTO;
 import com.seminarhub.entity.Member;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -21,10 +20,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m From Member m WHERE m.member_id = :member_id AND del_dt is null")
     Optional<Member> findByMember_id(String member_id);
 
-    @Query("SELECT COUNT(*) From Member where member_id = :member_id AND del_dt is null")
-    Long countByMember_id(String member_id);
-
-    @Query("UPDATE Member SET del_dt = CURRENT_TIMESTAMP WHERE member_id = :member_id")
+    @Transactional
+    @Modifying
+    @Query("UPDATE Member m SET m.del_dt = CURRENT_TIMESTAMP WHERE m.member_id = :member_id")
     void deleteByMember_id(String member_id);
 
 }
