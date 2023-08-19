@@ -1,30 +1,66 @@
 package com.seminarhub.controller;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-/**
- * [ 2023-08-19 daeho.kang ]
- * Description : Member Controller
- *
- */
+import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.core.entity.RoleType;
+import com.seminarhub.security.annotation.CheckRole;
+import com.seminarhub.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import javassist.bytecode.DuplicateMemberException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
-@RefreshScope
+@Log4j2
+@RequestMapping("/api/v1/member")
+@RequiredArgsConstructor
+@Tag(name = "2. Member API")
 public class MemberController {
+    private final MemberService memberService;
 
-    @Value("${seminarhub.value}")
-    private String configStr;
+    @PostMapping(value ="")
+    @Operation(summary = "1. Register a new member")
+    public ResponseEntity<Long> register(@RequestBody MemberDTO memberDTO) throws DuplicateMemberException {
+        log.info("-----------------register--------------");
+        log.info(memberDTO);
 
-    /**
-     * [ 2023-08-19 daeho.kang ]
-     * Description : For Spring Cloud Config Test
-     *
-     */
-    @GetMapping("/member/test")
-    public String test(){
-        return configStr;
+        Long member_no = memberService.register(memberDTO);
+        return new ResponseEntity<>(member_no, HttpStatus.OK);
+    }
+
+
+    @CheckRole(roles = {RoleType.USER})
+    @GetMapping(value ="/{member_id}")
+    @Operation(summary = "2. Get member information by member_no")
+    public ResponseEntity<MemberDTO> read(@PathVariable("member_id") String member_id){
+        log.info("-------------------read----------------------");
+        log.info(member_id);
+
+        return new ResponseEntity<>(memberService.get(member_id), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{member_id}", produces= MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "3. Remove a member by member_no")
+    public ResponseEntity<String> remove(@PathVariable("member_id") String member_id){
+        log.info("-------------------remove---------------------");
+        log.info(member_id);
+        memberService.remove(member_id);
+        return new ResponseEntity<>("removed", HttpStatus.OK);
+    }
+
+    @PutMapping(value ="", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "4. Modify a member")
+    public ResponseEntity<String> modify(@RequestBody MemberDTO memberDTO){
+        log.info("-----------------modify----------------");
+        log.info(memberDTO);
+
+        memberService.modify(memberDTO);
+        return new ResponseEntity<>("modified", HttpStatus.OK);
     }
 
 }
