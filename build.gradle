@@ -67,7 +67,7 @@ subprojects {
 //	compileJava.dependsOn('clean')
 
 	dependencies {
-		implementation 'org.springframework.boot:spring-boot-starter'
+//		implementation 'org.springframework.boot:spring-boot-starter'
 //		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //		implementation 'org.springframework.boot:spring-boot-starter-web'
 //		implementation 'javax.persistence:javax.persistence-api:2.2'
@@ -166,11 +166,24 @@ project(':seminarhub-member-api-server') {
 	dependencies {
 		implementation project(':seminarhub-core') // 컴파일 시 velog-core project 로딩
 
+
 		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.4'
 		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.6'
-		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.0.3'
 
+
+
+		implementation 'org.springframework.boot:spring-boot-starter'
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+
+		testImplementation 'junit:junit:4.13.1'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+		implementation 'org.mariadb.jdbc:mariadb-java-client:'
+		implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
 
 	}
 }
