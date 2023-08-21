@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RefreshScope
-public class otherMemberController {
+public class TestMemberController {
 
     @Value("${seminarhub.value}")
     private String configStr;
+
+    @Value("${server.port}")
+    private String configPortStr;
 
     /**
      * [ 2023-08-19 daeho.kang ]
@@ -25,6 +28,11 @@ public class otherMemberController {
     @GetMapping("/member/test")
     public String test(){
         return configStr;
+    }
+
+    @GetMapping("/member/test/port")
+    public String testPortStr(){
+        return configPortStr;
     }
 
 }
