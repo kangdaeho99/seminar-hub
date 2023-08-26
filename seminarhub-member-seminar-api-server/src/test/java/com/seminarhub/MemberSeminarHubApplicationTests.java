@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SeminarHubApplicationTests {
-
+class MemberSeminarHubApplicationTests {
 
 	@DisplayName("Context Load Text")
 	@Test
