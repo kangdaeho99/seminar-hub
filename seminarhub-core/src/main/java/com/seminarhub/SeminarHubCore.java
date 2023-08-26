@@ -1,7 +1,6 @@
-package com.seminarhub.core;
+package com.seminarhub;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * [ 2023-08-19 daeho.kang ]

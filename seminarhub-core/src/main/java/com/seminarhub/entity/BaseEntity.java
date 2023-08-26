@@ -1,4 +1,4 @@
-package com.seminarhub.core.entity;
+package com.seminarhub.entity;
 
 
 import jakarta.persistence.Column;

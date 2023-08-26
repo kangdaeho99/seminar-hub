@@ -1,4 +1,4 @@
-package com.seminarhub.core.entity;
+package com.seminarhub.entity;
 
 public enum RoleType {
     USER, MANAGER, ADMIN

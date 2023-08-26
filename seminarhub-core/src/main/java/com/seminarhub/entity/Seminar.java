@@ -1,4 +1,4 @@
-package com.seminarhub.core.entity;
+package com.seminarhub.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,6 +29,8 @@ public class Seminar extends BaseEntity {
 
     @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval = true)
     private List<Member_Seminar> member_seminar_list;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
 
     public void setSeminar_name(String seminar_name){
         this.seminar_name = seminar_name;

@@ -1,4 +1,4 @@
-package com.seminarhub.core.entity;
+package com.seminarhub.entity;
 
 
 import jakarta.persistence.*;
@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = {"member_role_set", "member_seminar_list"})
-public class Member extends BaseEntity{
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,20 +33,29 @@ public class Member extends BaseEntity{
     @Column(nullable = false)
     private boolean member_from_social;
 
-    @Column(nullable=true)
+    @Column()
     private LocalDateTime del_dt;
 
-    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<Member_Role> member_role_set  = new HashSet<>();
+    private Set<Member_Role> member_role_set = new HashSet<>();
 
     @OneToMany(mappedBy = "member")
     private List<Member_Seminar> member_seminar_list;
 
-    public void setMember_nickname(String member_nickname){
+    public void setMember_id(String member_id) {
+        this.member_id = member_id;
+    }
+
+    public void setMember_nickname(String member_nickname) {
         this.member_nickname = member_nickname;
     }
-    public void addMemberRole(Member_Role member_role){
+
+    public void setDel_dt(LocalDateTime del_dt) {
+        this.del_dt = del_dt;
+    }
+
+    public void addMemberRole(Member_Role member_role) {
         member_role_set.add(member_role);
     }
 

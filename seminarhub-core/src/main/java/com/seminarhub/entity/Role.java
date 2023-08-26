@@ -1,4 +1,4 @@
-package com.seminarhub.core.entity;
+package com.seminarhub.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,4 +26,6 @@ public class Role extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
     private RoleType role_type;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
 }
