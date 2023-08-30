@@ -1,7 +1,7 @@
 package com.seminarhub.service;
 
 import com.seminarhub.dto.MemberDTO;
-import com.seminarhub.core.entity.Member;
+import com.seminarhub.entity.Member;
 import com.seminarhub.repository.MemberRepository;
 import javassist.bytecode.DuplicateMemberException;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * [ 2023-07-30 daeho.kang ]
- * Description : MemberServiceImpl를 테스트합니다.
+ * Description: Test class for MemberServiceImpl.
  *
  */
 @SpringBootTest(classes = {MemberServiceImpl.class})
@@ -111,7 +111,6 @@ public class MemberServiceTests {
      * [ 2023-06-28 daeho.kang ]
      * Description : memberService SOFT Remove Test
      */
-
     @DisplayName("Member Service Soft Remove Test")
     @Test
     public void removeMemberTest() {
@@ -124,7 +123,8 @@ public class MemberServiceTests {
         memberService.remove("daeho.kang@hello.com");
 
         // then
-        Mockito.verify(memberRepository).deleteByMember_id("daeho.kang@hello.com");
+//        Mockito.verify(memberRepository).deleteByMember_id("daeho.kang@hello.com");
+        System.out.println(memberRepository.findByMember_id("daeho.kang@hello.com").get().getDel_dt());
         Assertions.assertNotNull(memberRepository.findByMember_id("daeho.kang@hello.com").get().getDel_dt());
     }
 

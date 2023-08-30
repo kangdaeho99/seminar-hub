@@ -6,13 +6,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.config.server.EnableConfigServer;
 
 /**
- * [ 2023-08-18 daeho.kang ]
- * Description : SeminarHubConfig Main
- *
+ * [2023-08-18 daeho.kang]
+ * Description: Main class for SeminarHubConfig
+ * This class serves as a ConfigServer.
  */
 @SpringBootApplication
 @EnableConfigServer
-@EnableDiscoveryClient
 public class SeminarHubConfig {
     public static void main(String[] args) {
         System.out.println("Hello world!");

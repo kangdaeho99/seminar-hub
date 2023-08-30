@@ -1,15 +1,25 @@
 package com.seminarhub.service;
 
 import com.seminarhub.dto.MemberDTO;
-import com.seminarhub.core.entity.Member;
+import com.seminarhub.dto.MemberSeminarDTO;
+import com.seminarhub.entity.Member;
+import com.seminarhub.dto.MemberWithMember_SeminarDTO;
+import com.seminarhub.feign.client.Member_SeminarFeignClient;
 import com.seminarhub.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import javassist.bytecode.DuplicateMemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+/**
+ * [ 2023-08-10 daeho.kang ]
+ * Description: Implementation class for the MemberService interface.
+ */
 @Service
 @Log4j2
 @RequiredArgsConstructor
@@ -17,11 +27,16 @@ public class MemberServiceImpl implements  MemberService{
 
     private final MemberRepository memberRepository;
 
+//    @Autowired
+//    private Member_SeminarClient member_SeminarClient;
+
+    private final Member_SeminarFeignClient member_SeminarFeignClient;
+
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * member_id을 통해 이미 중복하는 아이디가 존재하는지 확인합니다. 중복일시 DuplicateSeminarException 이 발생합니다.
-     * 통과하였다면, 세미나가 저장됩니다.
+     * Description: Registers a new member by checking for duplicate member_id.
+     * If member_id is unique, saves the member information.
+     *
      */
     @Override
     public Long register(MemberDTO memberDTO) throws DuplicateMemberException {
@@ -38,9 +53,8 @@ public class MemberServiceImpl implements  MemberService{
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * member_id를 통해 seminar의 정보를 가져옵니다.
-     * 정보가 존재한다면, 해당 데이터를 DTO로 변환하여 전달합니다.
+     * Description: Retrieves member information based on the provided member_id.
+     *
      */
     @Override
     public MemberDTO get(String member_id) {
@@ -53,9 +67,7 @@ public class MemberServiceImpl implements  MemberService{
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * member_id 통해 해당 값이 존재하는지 확인하고, 존재한다면 수정합니다. (seminar_no가 아닌 member_id 통해 진행합니다.)
-     * member_id 값이 Unique 입니다.
+     * Description: Modifies member information based on the provided memberDTO.
      */
     @Override
     public void modify(MemberDTO memberDTO) {
@@ -70,15 +82,40 @@ public class MemberServiceImpl implements  MemberService{
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * member_id을 통해 값이 존재하는지 확인하고, 값이 존재한다면 SOFT DELETE 처리합니다.
+     * Description: Removes a member by marking them as deleted using SOFT DELETE approach.
+     * Using Jpd Dirty Checking
      */
+    @Transactional
     @Override
     public void remove(String member_id) {
         Optional<Member> result = memberRepository.findByMember_id(member_id);
         if(result.isPresent()){
-            memberRepository.deleteByMember_id(member_id);
+            result.get().setDel_dt(LocalDateTime.now()); //현재 시간으로 Dirty Checking
         }
+    }
+
+    /**
+     * [ 2023-08-10 daeho.kang ]
+     * Description: Retrieves member information along with associated member_seminar.
+     *
+     */
+    @Override
+    public MemberWithMember_SeminarDTO getMemberWithMember_Seminar(String member_id) {
+        Optional<Member> memberResult = memberRepository.findByMember_id(member_id);
+
+        if(memberResult.isPresent()){ //find all the seminars from the seminar micro-service
+            MemberDTO memberDTO = entityToDTO(memberResult.get());
+
+            List<MemberSeminarDTO> memberSeminarDTOList = member_SeminarFeignClient.findAllMember_SeminarByMember_id(member_id);
+
+            return MemberWithMember_SeminarDTO.builder()
+                    .memberDTO(memberDTO)
+                    .memberSeminarDTO(memberSeminarDTOList)
+                    .build();
+
+        }
+
+        return null;
     }
 
 

@@ -1,6 +1,7 @@
 package com.seminarhub.common.exception;
 
 
+import com.seminarhub.feign.exception.FeignServerErrorException;
 import javassist.bytecode.DuplicateMemberException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
@@ -11,10 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * [ 2023-08-10 daeho.kang ]
- * Description : SeminarHub에서 사용하는 Custom Excpeion 입니다.
- * 기본적으로 Java에서 제공하는 Exception 을 사용하지만, 해당 Exception 이 존재하지 않을시 새로운 에러객체를 만들어 진행합니다.
- * ( Exception 이 없을시, Exception 패키지에 새로 해당 클래스를 만듭니다. )
- *
+ * Description : Custom exception handler used in SeminarHub.
+ * While primarily utilizing standard Java exceptions, it creates new error objects if the specific exception is absent.
+ * (If the exception does not exist, you should create new exception class in the Exception package.)
  */
 @RestControllerAdvice
 @Log4j2
@@ -22,8 +22,8 @@ public class SeminarHubExceptionHandler {
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description : 기본 Exception 발생 시
-     *
+     * Description : Handling basic exceptions
+     * This handler is mainly used when creating exceptions that inherit from the Exception class.
      */
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponseDTO> ExceptionHandler(Exception e){
@@ -39,10 +39,11 @@ public class SeminarHubExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, responseHeaders, httpStatus);
     }
 
+
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description : 중복되는 회원 Exception 발생 시
-     *
+     * Description : Handling duplicate member exceptions
+     * This handler is used when DuplicateMemberException occurs.
      */
     @ExceptionHandler(value = DuplicateMemberException.class)
     public ResponseEntity<ErrorResponseDTO> DuplicateMemberExceptionHandler(Exception e){
@@ -60,8 +61,8 @@ public class SeminarHubExceptionHandler {
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description : 중복되는 Seminar Exception 발생 시
-     *
+     * Description : Handling duplicate seminar exceptions
+     * This handler is used when DuplicateSeminarException occurs.
      */
     @ExceptionHandler(value = DuplicateSeminarException.class)
     public ResponseEntity<ErrorResponseDTO> DuplicateSeminarException(Exception e){

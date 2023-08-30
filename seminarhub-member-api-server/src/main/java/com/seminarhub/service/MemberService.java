@@ -1,10 +1,15 @@
 package com.seminarhub.service;
 
 import com.seminarhub.dto.MemberDTO;
-import com.seminarhub.core.entity.Member;
+import com.seminarhub.entity.Member;
+import com.seminarhub.dto.MemberWithMember_SeminarDTO;
+import jakarta.transaction.Transactional;
 import javassist.bytecode.DuplicateMemberException;
 
-
+/**
+ * [ 2023-07-11 daeho.kang ]
+ * Description: Service interface for managing member-related operations.
+ */
 public interface MemberService {
     Long register(MemberDTO memberDTO) throws DuplicateMemberException;
 
@@ -12,8 +17,10 @@ public interface MemberService {
 
     void modify(MemberDTO memberDTO);
 
+    @Transactional
     void remove(String member_id);
 
+    MemberWithMember_SeminarDTO getMemberWithMember_Seminar(String member_id);
 
     default Member dtoToEntity(MemberDTO memberDTO){
         Member member = Member.builder()

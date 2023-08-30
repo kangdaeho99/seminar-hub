@@ -3,7 +3,7 @@ package com.seminarhub.controller;
 
 import com.seminarhub.common.exception.DuplicateSeminarException;
 import com.seminarhub.dto.SeminarDTO;
-import com.seminarhub.core.entity.RoleType;
+import com.seminarhub.entity.RoleType;
 import com.seminarhub.security.annotation.CheckRole;
 import com.seminarhub.service.SeminarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * [ 2023-08-21 daeho.kang ]
- * Description : SeminarController
- *
+ * Description: Controller class for managing seminars
  */
 @RestController
 @Log4j2
@@ -30,8 +29,7 @@ public class SeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 등록
-     *
+     * Description: Register a new seminar
      */
     @PostMapping(value ="")
     @Operation(summary = "1. Register a new seminar")
@@ -45,8 +43,8 @@ public class SeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 조회
-     * @CheckRole 어노테이션으로 USER 권한자만 사용가능합니다.
+     * Description: Retrieve seminar information by seminar_name
+     * Accessible only to users with USER role using @CheckRole annotation
      */
     @CheckRole(roles = {RoleType.USER})
     @GetMapping(value ="/{seminar_name}")
@@ -60,8 +58,7 @@ public class SeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 삭제 (SOFT)
-     *
+     * Description: Remove a seminar (SOFT delete)
      */
     @DeleteMapping(value = "/{seminar_name}", produces= MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "3. Remove a seminar by seminar_name")
@@ -74,8 +71,7 @@ public class SeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 수정
-     *
+     * Description: Modify a seminar
      */
     @PutMapping(value ="", produces = MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "4. Modify a seminar")
@@ -87,4 +83,18 @@ public class SeminarController {
         return new ResponseEntity<>("modified", HttpStatus.OK);
     }
 
+    /**
+     * [ 2023-08-21 daeho.kang ]
+     * Description: Retrieve all seminar information by seminar_name
+     * Accessible only to users with USER role using @CheckRole annotation
+     * Currently, the URL API is the same as another API, causing an error. Requires modification.
+     */
+//    @GetMapping(value ="/{seminar_name}") 현재 URL API 가 똑같아서 오류났음 수정필요.
+//    @Operation(summary = "5. Get ALL seminar information by seminar_name")
+//    public ResponseEntity<SeminarDTO> findAllSeminar(@PathVariable("seminar_name") String seminar_name){
+//        log.info("-------------------read----------------------");
+//        log.info(seminar_name);
+//
+//        return new ResponseEntity<>(seminarService.get(seminar_name), HttpStatus.OK);
+//    }
 }

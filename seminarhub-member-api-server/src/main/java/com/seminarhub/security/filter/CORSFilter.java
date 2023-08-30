@@ -14,27 +14,30 @@ import java.io.IOException;
 
 /**
  * [ 2023-07-11 daeho.kang ]
- * Description :
- * CORS 필터처리
- * 내 프로젝트는 ajax를 활용하여 API를 사용하려고 하기에 CORS(Corss-origin Resource Sharing) 문제를 해결해야합니다.
- * CORS 처리를 위한 필터를 만들거나 설정하는 방법은 여러가지가 존재합니다.
+ * Description: CORS filter for handling Cross-Origin Resource Sharing (CORS) issues.
+ * Since my project are to access APIs, CORS needs to be addressed to allow cross-origin requests.
+ * There are various ways to handle CORS, including creating or configuring a CORS filter.
  *
- * Order(Ordered.HIGHEST_PRECEDENCE) : 모든 필터중에서 가장 먼저 동작하도록 작업합니다.
+ * This filter is configured with the highest precedence using @Order(Ordered.HIGHEST_PRECEDENCE)
+ * to ensure it executes before other filters.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CORSFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin","http://ec2-3-38-238-26.ap-northeast-2.compute.amazonaws.com/");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "*");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
+        // Set CORS headers to allow cross-origin requests
+        response.setHeader("Access-Control-Allow-Origin", "*"); // Allow requests from any origin
+        response.setHeader("Access-Control-Allow-Credentials", "true"); // Allow credentials (e.g., cookies, authorization headers)
+        response.setHeader("Access-Control-Allow-Methods", "*"); // Allow all HTTP methods
+        response.setHeader("Access-Control-Max-Age", "3600"); // Cache pre-flight response for 3600 seconds
+        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization"); // Allow specified headers
 
-        if("OPTIONS".equalsIgnoreCase(request.getMethod())){
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            // Handle pre-flight requests by sending a successful response
             response.setStatus(HttpServletResponse.SC_OK);
-        } else{
+        } else {
+            // Continue with the filter chain for non pre-flight requests
             filterChain.doFilter(request, response);
         }
     }

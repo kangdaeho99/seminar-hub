@@ -1,9 +1,9 @@
 package com.seminarhub.repository;
 
-import com.seminarhub.core.entity.Member;
-import com.seminarhub.core.entity.Member_Role;
-import com.seminarhub.core.entity.Role;
-import com.seminarhub.core.entity.RoleType;
+import com.seminarhub.entity.Member;
+import com.seminarhub.entity.Member_Role;
+import com.seminarhub.entity.Role;
+import com.seminarhub.entity.RoleType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,11 +64,18 @@ public class MemberRepositoryTests {
                     .role(adminRole)
                     .build();
 
+            Member_Role member_Role_userRole = Member_Role.builder()
+                    .member(member)
+                    .role(userRole)
+                    .build();
+
             // ADD Set member_role in member
             member.addMemberRole(memberRole);
+            member.addMemberRole(member_Role_userRole);
 
             //SAVE Member
             memberRepository.save(member);
+
 
         }
 
@@ -135,27 +142,6 @@ public class MemberRepositoryTests {
         assertNotNull(member.get());
         System.out.println(member.get());
     }
-
-
-    /**
-     * [ 2023-08-09 daeho.kang ]
-     * Description : testDeleteWithMember_id
-     *
-     * update
-     *     member
-     * set
-     *     del_dt=current_timestamp(6)
-     * where
-     *     member_id=?
-     */
-    @DisplayName("deleteWithMember_id Test")
-    @Test
-    public void testDeleteWithMember_id(){
-        // given, when, then
-        memberRepository.deleteByMember_id("RemoveTestId");
-
-    }
-
 
 
 }

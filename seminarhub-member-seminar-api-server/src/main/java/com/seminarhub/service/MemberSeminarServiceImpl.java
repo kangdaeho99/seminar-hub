@@ -6,6 +6,7 @@ import com.seminarhub.dto.MemberSeminarDTO;
 import com.seminarhub.repository.MemberSeminarRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,8 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * [ 2023-08-21 daeho.kang ]
- * Description : SeminarServiceImpl 구현체
- *
+ * Description: Implementation of MemberSeminarService interface
  */
 @Service
 @Log4j2
@@ -27,9 +27,9 @@ public class MemberSeminarServiceImpl implements MemberSeminarService {
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * seminarName을 통해 이미 중복하는 아이디가 존재하는지 확인합니다. 중복일시 DuplicateSeminarException 이 발생합니다.
-     * 통과하였다면, 세미나가 저장됩니다.
+     * Description: Register a new seminar
+     * Checks if the seminarName already exists. If duplicated, throws DuplicateSeminarException.
+     * If not duplicated, saves the seminar.
      */
     @Override
     public Long register(MemberSeminarDTO memberSeminarDTO) {
@@ -40,14 +40,16 @@ public class MemberSeminarServiceImpl implements MemberSeminarService {
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * seminar_name을 통해 seminar의 정보를 가져옵니다.
-     * 정보가 존재한다면, 해당 데이터를 DTO로 변환하여 전달합니다.
+     * Description: Retrieve seminar information
+     * Retrieves seminar information based on seminar_name.
+     * If information exists, converts it to DTO and returns.
      */
     @Override
     public MemberSeminarDTO get(Long member_seminar_no) {
         Optional<Member_Seminar> result = memberSeminarRepository.findByMember_Seminar_no(member_seminar_no);
         if(result.isPresent()){
+            log.info("---------------------GET----------------------");
+            log.info(result.get());
             return entityToDTO(result.get());
         }
         return null;
@@ -55,8 +57,8 @@ public class MemberSeminarServiceImpl implements MemberSeminarService {
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * seminar_name을 통해 해당 값이 존재하는지 확인하고, 값이 존재한다면 SOFT DELETE 처리합니다.
+     * Description: Remove a seminar (SOFT deletion)
+     * Checks if the seminar_name exists and performs SOFT DELETE.
      */
     @Override
     public void remove(Long member_seminar_no) {
@@ -68,9 +70,9 @@ public class MemberSeminarServiceImpl implements MemberSeminarService {
 
     /**
      * [ 2023-08-10 daeho.kang ]
-     * Description :
-     * seminar_name을 통해 seminar의 정보를 가져옵니다.
-     * 정보가 존재한다면, 해당 데이터를 DTO로 변환하여 전달합니다.
+     * Description: Retrieve all Member_Seminar information by member_id
+     * Retrieves all seminars associated with a given member_id.
+     * Converts the retrieved entities to DTOs and returns as a list.
      */
     @Override
     public List<MemberSeminarDTO> getListByMember_id(String member_id) {

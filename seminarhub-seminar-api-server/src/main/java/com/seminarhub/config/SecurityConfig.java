@@ -20,13 +20,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *
  */
 @Configuration
-@EnableWebSecurity
 @Log4j2
 public class SecurityConfig {
 
     /**
      * [ 2023-07-30 daeho.kang ]
-     * Description : JwtUtil Bean 등록
+     * Description: Register JWTUtil as a Bean
      */
     @Bean
     public JWTUtil jwtUtil(){
@@ -35,8 +34,9 @@ public class SecurityConfig {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description :
-     * SeminarService에서는 Security에 대한 로그인/로그아웃 기능을 사용하지 않으므로 불필요한 기능은 모두 제거합니다.
+     * Description:
+     * Configures security filters to handle authentication and authorization.
+     * SeminarService doesn't require login/logout functionality, so unnecessary features are disabled.
      */
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception{

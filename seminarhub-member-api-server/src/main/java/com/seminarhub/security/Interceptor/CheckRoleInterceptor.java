@@ -1,6 +1,6 @@
 package com.seminarhub.security.Interceptor;
 
-import com.seminarhub.core.entity.RoleType;
+import com.seminarhub.entity.RoleType;
 import com.seminarhub.security.annotation.CheckRole;
 import com.seminarhub.security.dto.JwtTokenPayloadDTO;
 import com.seminarhub.security.util.JWTUtil;
@@ -20,11 +20,10 @@ import java.util.Set;
 
 
 /**
- * [ 2023-07-21 daeho.kang ]
- * Description : 권한처리 인터셉터입니다. ("ROLE_USER", "ROLE_ADMIN", "ROLE_MANAGER")
- * WebMvcConfig를 통해 등록했습니다.
+ * [2023-07-21 daeho.kang]
+ * Description: Interceptor for handling role-based authorization ("ROLE_USER", "ROLE_ADMIN", "ROLE_MANAGER").
+ * Registered through WebMvcConfig.
  */
-
 @Component
 @Log4j2
 @RequiredArgsConstructor
@@ -42,21 +41,21 @@ public class CheckRoleInterceptor implements HandlerInterceptor {
 
     /**
      * [ 2023-06-27 daeho.kang ]
-     * Description : preHandler함수는 데이터가 들어오기전에 먼저 실행되는 함수입니다.
-     * HandlerMethod ( @Controller, @RequestMapping ) 인지 확인합니다.
-     * HandlerMethod에 @CheckRole 어노테이션이 존재하는지 확인합니다. 존재하지않는다면 현재 Interceptor를 종료시킵니다.
+     * Description: preHandle function is executed before data is received.
+     * Checks if the handler is a HandlerMethod (@Controller, @RequestMapping).
+     * Checks if the HandlerMethod has the @CheckRole annotation. If not, the current interceptor is terminated.
      */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("CheckRole Request URL: "+ request.getRequestURI());
 
 
-        // ResourceHttpRequestHandler : handler가 ResourceHttpRequestHandler의 인스턴스인 경우, Swagger UI와 같은 정적 리소스 처리기
-        // HandlerMethod : @Controller인지 확인
-        if( handler instanceof HandlerMethod == false ) return true;
+        // ResourceHttpRequestHandler: If handler is an instance of ResourceHttpRequestHandler, handles static resources like 'Swagger UI'
+        // HandlerMethod: Checks if it is a @Controller
+        if( handler instanceof HandlerMethod == false ) return HandlerInterceptor.super.preHandle(request, response, handler);
 
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         CheckRole checkRole = handlerMethod.getMethodAnnotation(CheckRole.class);
-        if(checkRole == null) return true;
+        if(checkRole == null) return HandlerInterceptor.super.preHandle(request, response, handler);
 
         RoleType[] annotationRoleType = checkRole.roles();
         System.out.println("annotationRoleType:"+annotationRoleType);
@@ -68,10 +67,9 @@ public class CheckRoleInterceptor implements HandlerInterceptor {
 
     /**
      * [ 2023-07-11 daeho.kang ]
-     * Description :
-     *'Authorization' 헤더의 값을 확인하고 boolean 타입의 결과를 반환
-     * authHeader Example
-        header={alg=HS256},body={iat=1689910527, exp=1692502527, sub=daeho.kang@naver.com, roles=ROLE_USER ROLE_ADMIN },signature=tozivExke-glfw5lne0fjfC8Chs2mrB-KreYa9oX-ik
+     * Description: Validates 'Authorization' header value and returns a boolean result.
+     * Example of authHeader:
+     * header={alg=HS256}, body={iat=1689910527, exp=1692502527, sub=daeho.kang@naver.com, roles=ROLE_USER ROLE_ADMIN}, signature=tozivExke-glfw5lne0fjfC8Chs2mrB-KreYa9oX-ik
      */
     private boolean checkAuthHeaderWithJwtTokenPayloadDTO(HttpServletRequest request, RoleType[] roleType) {
         boolean checkResult = false;

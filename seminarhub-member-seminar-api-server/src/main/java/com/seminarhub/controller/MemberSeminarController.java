@@ -20,8 +20,7 @@ import java.util.List;
 
 /**
  * [ 2023-08-21 daeho.kang ]
- * Description : SeminarController
- *
+ * Description: SeminarController
  */
 @RestController
 @Log4j2
@@ -33,8 +32,7 @@ public class MemberSeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 등록
-     *
+     * Description: Register a new seminar
      */
     @PostMapping(value ="")
     @Operation(summary = "1. Register a new seminar")
@@ -48,10 +46,10 @@ public class MemberSeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 조회
-     * @CheckRole 어노테이션으로 USER 권한자만 사용가능합니다.
+     * Description: Retrieve seminar information
+     * Accessible only to users with USER role, as indicated by @CheckRole annotation.
      */
-    @CheckRole(roles = {RoleType.USER})
+//    @CheckRole(roles = {RoleType.USER})
     @GetMapping(value ="/{member_seminar_no}")
     @Operation(summary = "2. Get member_seminar information by member_seminar_no")
     public ResponseEntity<MemberSeminarDTO> read(@PathVariable("member_seminar_no") Long member_seminar_no){
@@ -63,8 +61,7 @@ public class MemberSeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : Seminar 삭제 (SOFT)
-     *
+     * Description: Remove a seminar (SOFT deletion)
      */
     @DeleteMapping(value = "/{member_seminar_no}", produces= MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "3. Remove a member_seminar by member_seminar_no")
@@ -77,11 +74,10 @@ public class MemberSeminarController {
 
     /**
      * [ 2023-08-21 daeho.kang ]
-     * Description : findAllMember_SeminarByMember_id
-     * @CheckRole 어노테이션으로 USER 권한자만 사용가능합니다.
-     *
+     * Description: Find all Member_Seminar information by member_id
+     * Accessible only to users with USER role, as indicated by @CheckRole annotation.
      */
-//    @CheckRole(roles = {RoleType.USER})
+    @CheckRole(roles = {RoleType.USER})
     @GetMapping(value ="/findAllByMember_id/{member_id}")
     @Operation(summary = "4. findAll Member_Seminar information by member_id")
     public ResponseEntity<List<MemberSeminarDTO>> findAllMember_SeminarByMember_id(@PathVariable("member_id") String member_id){

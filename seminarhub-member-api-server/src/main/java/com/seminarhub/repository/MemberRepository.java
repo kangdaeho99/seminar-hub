@@ -1,29 +1,29 @@
 package com.seminarhub.repository;
 
 
-import com.seminarhub.core.entity.Member;
-import jakarta.transaction.Transactional;
+import com.seminarhub.entity.Member;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
+/**
+ * [ 2023-08-30 daeho.kang ]
+ * Description: Repository interface for accessing Member entities using JPA.
+ */
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
      * [ 2023-06-27 daeho.kang ]
-     * Description : EntityGraph makes JOIN QUERY
-     * It Shows the All Information of Member
+     * Description: Retrieves a Member entity by member_ID while also fetching associated roles using JOIN QUERY.
+     * The result is customized using an EntityGraph to eagerly load the role information.
+     *
      */
     @EntityGraph(attributePaths = {"member_role_set.role"}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT m From Member m WHERE m.member_id = :member_id AND del_dt is null")
-    Optional<Member> findByMember_id(String member_id);
+    Optional<Member> findByMember_id(@Param("member_id") String member_id);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Member m SET m.del_dt = CURRENT_TIMESTAMP WHERE m.member_id = :member_id")
-    void deleteByMember_id(String member_id);
 
 }
