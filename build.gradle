@@ -29,7 +29,7 @@ subprojects {
 }
 
 
-project(':seminarhub-config-server') {
+project(':seminarhub-cloud-config-server') {
 	bootJar { enabled = true }
 	jar { enabled = false }
 
@@ -37,17 +37,6 @@ project(':seminarhub-config-server') {
 		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-server', version: '4.0.3'
 //		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.0.3'
 		//spring.main.web-application-type=reactive 이기에 remove spring-boot-starter-web dependency.
-	}
-}
-
-project(':seminarhub-eureka-server'){
-	bootJar { enabled = true }
-	jar { enabled = false }
-
-	dependencies {
-		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '4.0.3'
-		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.4'
-
 	}
 }
 
@@ -63,6 +52,17 @@ project(':seminarhub-cloud-gateway-server'){
 
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
+	}
+}
+
+project(':seminarhub-cloud-netflix-eureka-server'){
+	bootJar { enabled = true }
+	jar { enabled = false }
+
+	dependencies {
+		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '4.0.3'
+		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.4'
+
 	}
 }
 
