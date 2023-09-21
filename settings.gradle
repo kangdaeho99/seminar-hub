@@ -6,4 +6,5 @@ include 'seminarhub-config-server'
 include 'seminarhub-config-server'
 include 'seminarhub-eureka-server'
 include 'seminarhub-cloud-gateway-server'
+include 'seminarhub-member-seminar-api-server'
 

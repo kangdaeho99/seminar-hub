@@ -1,18 +1,3 @@
-//buildscript {
-//	ext {
-//		queryDslVersion = "5.0.0"
-//		springBootVersion = '3.0.4'
-//	}
-//	repositories {
-//		mavenCentral()
-//	}
-//	dependencies {
-//		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-//		classpath "io.spring.gradle:dependency-management-plugin:1.0.11.RELEASE"
-//	}
-//}
-
-// it is necessary for Project Versioning
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.4'
@@ -35,86 +20,11 @@ subprojects {
 	version = '0.0.1-SNAPSHOT'
 	sourceCompatibility = '17'
 
-//	java {
-//		sourceCompatibility = '17'
-//	}
-
-//	configurations {
-//		compileOnly {
-//			extendsFrom annotationProcessor
-//		}
-//	}
-
-//	jar {
-//		enabled = false
-//	}
-
-//	repositories {
-//		mavenCentral()
-//	}
-
 	tasks.named('test') {
 		useJUnitPlatform()
 	}
 
-//	sourceSets {
-//		main {
-//			java {
-//				srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
-//			}
-//		}
-//	}
-//	compileJava.dependsOn('clean')
-
 	dependencies {
-//		implementation 'org.springframework.boot:spring-boot-starter'
-//		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//		implementation 'org.springframework.boot:spring-boot-starter-web'
-//		implementation 'javax.persistence:javax.persistence-api:2.2'
-//		implementation 'org.springframework.boot:spring-boot-starter-validation'
-//		implementation 'org.mariadb.jdbc:mariadb-java-client:'
-//		testImplementation 'junit:junit:4.13.1'
-//		compileOnly 'org.projectlombok:lombok'
-//		developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//		annotationProcessor 'org.projectlombok:lombok'
-//		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-//		Swagger
-//		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-
-//		 https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-//		implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
-
-
-//		spring security
-//		implementation 'org.springframework.boot:spring-boot-starter-security'
-//		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//		testImplementation 'org.springframework.security:spring-security-test'
-
-//		oauth2
-//			implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-//		Querydsl 추가
-//		implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
-//		annotationProcessor(
-//				"jakarta.persistence:jakarta.persistence-api",
-//				"jakarta.annotation:jakarta.annotation-api",
-//				"com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
-
-//		implementation group: 'org.json', name: 'json', version: '20230618'
-
-
-//		jwt
-
-//		implementation 'io.jsonwebtoken:jjwt:0.9.1'
-//		implementation 'javax.xml.bind:jaxb-api:2.3.0'
-
-//		 https://mvnrepository.com/artifact/org.javassist/javassist
-//		implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
-
-//		redis
-//		 https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
-//		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis'
 	}
 }
 
@@ -125,7 +35,7 @@ project(':seminarhub-config-server') {
 
 	dependencies {
 		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-server', version: '4.0.3'
-		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.0.3'
+//		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.0.3'
 		//spring.main.web-application-type=reactive 이기에 remove spring-boot-starter-web dependency.
 	}
 }
@@ -198,9 +108,44 @@ project(':seminarhub-member-api-server') {
 		implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
 		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis'
+		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.0.4'
+
 
 	}
 }
+
+project(':seminarhub-member-seminar-api-server') {
+	bootJar { enabled = true }
+	jar { enabled = false }
+
+	dependencies {
+		implementation project(':seminarhub-core') // 컴파일 시 velog-core project 로딩
+
+
+		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.4'
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.6'
+		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.0.3'
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+
+		implementation 'org.springframework.boot:spring-boot-starter'
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
+		testImplementation 'junit:junit:4.13.1'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		testImplementation 'org.springframework.security:spring-security-test'
+		implementation group: 'org.json', name: 'json', version: '20230618'
+		implementation 'io.jsonwebtoken:jjwt:0.9.1'
+		implementation 'javax.xml.bind:jaxb-api:2.3.0'
+		implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis'
+
+	}
+}
+
 
 project(':seminarhub-seminar-api-server') {
 	bootJar { enabled = true }
