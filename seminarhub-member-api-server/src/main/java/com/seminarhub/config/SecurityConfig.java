@@ -73,7 +73,7 @@ public class SecurityConfig {
 
         http.formLogin().disable();
         http.csrf().disable();
-        http.logout().logoutUrl("/api/v1/logout").logoutSuccessHandler(new SeminarLogoutSuccessHandler(jwtUtil()));
+        http.logout().logoutUrl("/api/v1/member/logout").logoutSuccessHandler(new SeminarLogoutSuccessHandler(jwtUtil()));
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.rememberMe().tokenValiditySeconds(60*60*24*7).userDetailsService(seminarUserDetailsService);
@@ -91,7 +91,7 @@ public class SecurityConfig {
         http.authenticationManager(authenticationManager);
 
         //APILoginFilter
-        ApiLoginFilter apiLoginFilter =  new ApiLoginFilter("/api/v1/login", jwtUtil());
+        ApiLoginFilter apiLoginFilter =  new ApiLoginFilter("/api/v1/member/login", jwtUtil());
         apiLoginFilter.setAuthenticationManager(authenticationManager);
         apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailHandler());
         http.addFilterBefore(apiLoginFilter, UsernamePasswordAuthenticationFilter.class);

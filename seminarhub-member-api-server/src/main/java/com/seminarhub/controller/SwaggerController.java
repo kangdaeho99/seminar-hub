@@ -26,7 +26,7 @@ public class SwaggerController {
          * [ 2023-07-30 daeho.kang ]
          * Description : 로그인처리
          */
-        @PostMapping("/api/v1/login")
+        @PostMapping("/api/v1/member/login")
         @Operation(summary = "1. 로그인, 접속아이디 : daeho.kang@naver.com / 패스워드 : 123123123")
         @Parameters({
                 @Parameter(name = "member_id", description = "daeho.kang@naver.com 로 접속하세요", required = true),
@@ -40,7 +40,7 @@ public class SwaggerController {
          * [ 2023-07-30 daeho.kang ]
          * Description : 로그아웃 처리
          */
-        @PostMapping("/api/v1/logout")
+        @PostMapping("/api/v1/member/logout")
         @Operation(summary = "2. 로그아웃")
         public void fakeLogout() {
 
