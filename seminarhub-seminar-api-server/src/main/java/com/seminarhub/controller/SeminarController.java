@@ -31,7 +31,7 @@ public class SeminarController {
      * [ 2023-08-21 daeho.kang ]
      * Description: Register a new seminar
      */
-    @PostMapping(value ="")
+    @PostMapping(value ="/")
     @Operation(summary = "1. Register a new seminar")
     public ResponseEntity<Long> register(@RequestBody SeminarDTO seminarDTO) throws DuplicateSeminarException {
         log.info("-----------------register--------------");
@@ -73,7 +73,7 @@ public class SeminarController {
      * [ 2023-08-21 daeho.kang ]
      * Description: Modify a seminar
      */
-    @PutMapping(value ="", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping(value ="/", produces = MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "4. Modify a seminar")
     public ResponseEntity<String> modify(@RequestBody SeminarDTO seminarDTO){
         log.info("-----------------modify----------------");

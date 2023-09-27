@@ -51,11 +51,11 @@ public class CheckRoleInterceptor implements HandlerInterceptor {
 
         // ResourceHttpRequestHandler: If handler is an instance of ResourceHttpRequestHandler, handles static resources like 'Swagger UI'
         // HandlerMethod: Checks if it is a @Controller
-        if( handler instanceof HandlerMethod == false ) return HandlerInterceptor.super.preHandle(request, response, handler);
+        if( handler instanceof HandlerMethod == false ) return true;
 
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         CheckRole checkRole = handlerMethod.getMethodAnnotation(CheckRole.class);
-        if(checkRole == null) return HandlerInterceptor.super.preHandle(request, response, handler);
+        if(checkRole == null) return true;
 
         RoleType[] annotationRoleType = checkRole.roles();
         System.out.println("annotationRoleType:"+annotationRoleType);

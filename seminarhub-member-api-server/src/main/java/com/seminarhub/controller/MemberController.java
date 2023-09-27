@@ -33,7 +33,7 @@ public class MemberController {
      * Description: Register a new member (Accepts MemberDTO to register a new member.)
      * Utilizes the @RequestBody annotation to receive a JSON-formatted MEMBERDTO.
      */
-    @PostMapping(value ="")
+    @PostMapping(value ="/")
     @Operation(summary = "1. Register a new member")
     public ResponseEntity<Long> register(@RequestBody MemberDTO memberDTO) throws DuplicateMemberException {
         log.info("-----------------register--------------");
@@ -47,7 +47,7 @@ public class MemberController {
      * [2023-08-30 daeho.kang]
      * Description: Get member information by member_id (Retrieve user information using member_id.)
      */
-    @CheckRole(roles = {RoleType.USER})
+//    @CheckRole(roles = {RoleType.USER})
     @GetMapping(value ="/{member_id}")
     @Operation(summary = "2. Get member information by member_no")
     public ResponseEntity<MemberDTO> read(@PathVariable("member_id") String member_id){
@@ -75,7 +75,7 @@ public class MemberController {
      * [2023-08-30 daeho.kang]
      * Description: Modify member information (Modify user information using memberDTO. Utilizes JPA's Dirty Checking.)
      */
-    @PutMapping(value ="", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping(value ="/", produces = MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "4. Modify a member")
     public ResponseEntity<String> modify(@RequestBody MemberDTO memberDTO){
         log.info("-----------------modify----------------");
