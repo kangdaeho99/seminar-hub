@@ -55,7 +55,7 @@ project(':seminarhub-cloud-gateway-server'){
 		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.4'
 		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.6'
 		implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes'
-
+		implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.4.3' //
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
 	}
