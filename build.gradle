@@ -55,8 +55,10 @@ project(':seminarhub-cloud-gateway-server'){
 		implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.4'
 		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.6'
 		// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-kubernetes
-		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-kubernetes', version: '1.1.10.RELEASE'
-
+//		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-kubernetes', version: '1.1.10.RELEASE'
+//		implementation group: 'org.springframework.cloud', name: 'spring-cloud-kubernetes-discovery', version: '1.1.10.RELEASE'
+//		implementation group: 'org.springframework.cloud', name: 'spring-cloud-kubernetes-discovery', version: '3.0.4'
+		implementation group: 'io.fabric8', name: 'kubernetes-client', version: '6.5.1'
 
 
 
@@ -123,7 +125,7 @@ project(':seminarhub-member-api-server') {
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 		// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-kubernetes
-		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-kubernetes', version: '1.1.10.RELEASE'
+//		implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-kubernetes', version: '1.1.10.RELEASE'
 
 	}
 }
