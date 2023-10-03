@@ -1,3 +1,65 @@
+
+## **🤝 Seminar-Hub Service **
+
+> Seminar-Hub Provides the REST API Server
+
+## 📕 Tech Stack
+- Java
+- Spring Boot 3.0.2
+- Spring Cloud
+  - Spring Cloud Config
+  - Spring Cloud Netflix Eureka
+  - Spring Cloud Kubernetes DiscoveryServer
+  - Spring Cloud Kubernetes Discovery
+  - Spring Cloud Gateway
+  - openFeign
+- Architecture
+  - MVC Pattern 
+  - Multi Module
+- Container Orchestration
+  - Kubernetes 1.28, Docker-Compose
+- Security
+  - Spring Security 6
+  - JWT (Access Token)
+  - Redis In memory DB for Refresh Token
+- Infrastructure
+  - Ingress, Deployment, Service, Pod
+  - Docker, DockerHub
+- DB
+  - Spring Data JPA(ORM)
+- API Documentation
+  - Swagger
+- Test
+  - JUnit, Mock
+- Cloud
+  - AWS EC2, AWS RDS
+
+
+## 📕 Project Architecture
+> Multi Module 
+
+> Kubernetes
+
+ 
+## 📒 현재 DB 구조 ( 회원관련쪽 진행중 )
+> 
+
+
+![DB 배포구조](https://github.com/kangdaeho99/seminar-hub/assets/48047377/60ebef9e-a0e5-4d58-866f-1dc20dda7dc6)
+
+
+<br/><br/>
+<br/>
+
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
+<!----------------------------------------------------------------------->
 <!--
 ## **🤝 세미나 관리 REST API Server ( Seminar-Hub Service )   — (진행중)**
 
