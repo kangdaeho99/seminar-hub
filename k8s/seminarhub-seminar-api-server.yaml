@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seminarhub-seminar-api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: seminarhub-seminar-api-server
+  template:
+    metadata:
+      labels:
+        name: seminarhub-seminar-api-server
+    spec:
+      containers:
+        - image: eoghdhdls/seminarhub-seminar-api-server
+          name: seminarhub-seminar-api-server
+          ports:
+            - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seminarhub-seminar-api-server-dev
+spec:
+  ports:
+    - port: 8081
+      protocol: TCP
+      name: "httpseminar"
+      targetPort: 8081
+  selector:
+    name: seminarhub-seminar-api-server
