@@ -6,4 +6,6 @@ include 'seminarhub-cloud-config-server'
 include 'seminarhub-cloud-netflix-eureka-server'
 include 'seminarhub-cloud-gateway-server'
 include 'seminarhub-member-seminar-api-server'
+include 'seminarhub-monolithic-api-server'
+include 'seminarhub-batch'
 

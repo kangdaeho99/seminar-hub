@@ -24,18 +24,16 @@ public class Member_Seminar extends BaseEntity {
      */
     @ManyToOne(
             targetEntity = Member.class,
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL
+            fetch = FetchType.LAZY
     )
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_no")
     private Member member;
 
     @ManyToOne(
             targetEntity = Seminar.class,
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL
+            fetch = FetchType.LAZY
             )
-    @JoinColumn(name = "seminar_name")
+    @JoinColumn(name = "seminar_no")
     private Seminar seminar;
 
     @Column(nullable=true)

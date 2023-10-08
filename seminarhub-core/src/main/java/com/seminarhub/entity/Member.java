@@ -19,6 +19,7 @@ public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_no")
     private Long member_no;
 
     @Column(length = 100, nullable = false, unique = true, name = "member_id")
@@ -36,12 +37,18 @@ public class Member extends BaseEntity {
     @Column()
     private LocalDateTime del_dt;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member",
+            fetch = FetchType.LAZY
+    )
     @Builder.Default
     private Set<Member_Role> member_role_set = new HashSet<>();
 
     @OneToMany(mappedBy = "member")
     private List<Member_Seminar> member_seminar_list;
+
+    public Member(long member_no) {
+        this.member_no = member_no;
+    }
 
     public void setMember_id(String member_id) {
         this.member_id = member_id;

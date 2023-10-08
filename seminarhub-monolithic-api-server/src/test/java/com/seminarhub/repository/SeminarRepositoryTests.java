@@ -1,7 +1,9 @@
 package com.seminarhub.repository;
 
 
+import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.Seminar;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class SeminarRepositoryTests {
     private SeminarRepository seminarRepository;
 
     @Autowired
-    private SeminarQueryRepository seminarQueryRepository;
+    private SeminarQuerydslRepository seminarQuerydslRepository;
     private final String seminar_name= "SeminarTest";
 
     private final String seminar_remove_name= "SeminarRemoveTest";
@@ -97,7 +99,7 @@ public class SeminarRepositoryTests {
     @Test
     public void testGetWithSeminar_name123(){
         // given, when
-        List<Seminar> seminar = seminarQueryRepository.findByName("SeminarDummyIndex5");
+        List<Seminar> seminar = seminarQuerydslRepository.findByName("SeminarDummyIndex5");
 
         // then
         assertNotNull(seminar.size());
@@ -109,7 +111,7 @@ public class SeminarRepositoryTests {
     @Test
     public void testFindSeminarByBooleanBuilder(){
         // given // when
-        List<Seminar> seminarList = seminarQueryRepository.findSeminarByBooleanBuilder("SeminarDummyIndex23", "");
+        List<Seminar> seminarList = seminarQuerydslRepository.findSeminarByBooleanBuilder("SeminarDummyIndex23", "");
 
         // then
         assertNotNull( seminarList.size());
@@ -121,7 +123,7 @@ public class SeminarRepositoryTests {
     @Test
     public void testFindSeminarByBooleanExpression(){
         // given // when
-        List<Seminar> seminarList = seminarQueryRepository.findSeminarByBooleanExpression("SeminarDummyIndex23", "");
+        List<Seminar> seminarList = seminarQuerydslRepository.findSeminarByBooleanExpression("SeminarDummyIndex23", "");
 
         // then
         assertNotNull( seminarList.size());
@@ -129,6 +131,23 @@ public class SeminarRepositoryTests {
         seminarList.stream().forEach(seminar -> System.out.println(seminar.toString()));
     }
 
+    @DisplayName("FindSeminarWithExists")
+    @Test
+    public void testwithExists(){
+        boolean flag = seminarQuerydslRepository.exist("SeminarDummyIndex25");
+
+        System.out.println(flag);
+    }
+
+    @DisplayName("testCrossJoin")
+    @Test
+    @Transactional // To Maintain the Proxy Object Until the End of the Test
+    public void testCrossJoin(){
+        List<Member_Seminar> memberSeminarList = seminarQuerydslRepository.crossJoin();
+
+        memberSeminarList.stream().forEach(memberSeminar -> System.out.println(memberSeminar.getMember()+" "+memberSeminar.getSeminar()));
+
+    }
 
 
 }

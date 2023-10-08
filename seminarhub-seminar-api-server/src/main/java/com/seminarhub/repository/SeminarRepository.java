@@ -1,5 +1,6 @@
 package com.seminarhub.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.entity.Seminar;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

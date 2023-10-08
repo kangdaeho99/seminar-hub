@@ -1,5 +1,6 @@
 package com.seminarhub.repository;
 
+
 import com.seminarhub.entity.Seminar;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +24,8 @@ public class SeminarRepositoryTests {
     @Autowired
     private SeminarRepository seminarRepository;
 
+    @Autowired
+    private SeminarQueryRepository seminarQueryRepository;
     private final String seminar_name= "SeminarTest";
 
     private final String seminar_remove_name= "SeminarRemoveTest";
@@ -77,6 +81,54 @@ public class SeminarRepositoryTests {
         // then
         assertNotNull(seminar.get());
         System.out.println(seminar.get());
+    }
+
+//    @DisplayName("DUmmyDataInsert")
+//    @Test
+//    public void dummyInsert(){
+//
+//        for(int i=2; i<1000000; i++){
+//            Seminar seminar  = Seminar.builder()
+//                    .seminar_name("SeminarDummyIndex"+i)
+//                    .seminar_explanation("SeminarDummyExplanationIndex"+i)
+//                    .build();
+//            seminarRepository.save(seminar);
+//        }
+//    }
+    @DisplayName("jpaQueryFactoryfindBySeminar_name Test")
+    @Test
+    public void testGetWithSeminar_name123(){
+        // given, when
+        List<Seminar> seminar = seminarQueryRepository.findByName("SeminarDummyIndex5");
+
+        // then
+        assertNotNull(seminar.size());
+        System.out.println(seminar.get(0));
+    }
+    
+    
+    @DisplayName("FindSeminarByBooleanBuilder Test")
+    @Test
+    public void testFindSeminarByBooleanBuilder(){
+        // given // when
+        List<Seminar> seminarList = seminarQueryRepository.findSeminarByBooleanBuilder("SeminarDummyIndex23", "");
+
+        // then
+        assertNotNull( seminarList.size());
+//        System.out.println(seminar.);
+        seminarList.stream().forEach(seminar -> System.out.println(seminar.toString()));
+    }
+
+    @DisplayName("FindSeminarByBooleanExpression Test")
+    @Test
+    public void testFindSeminarByBooleanExpression(){
+        // given // when
+        List<Seminar> seminarList = seminarQueryRepository.findSeminarByBooleanExpression("SeminarDummyIndex23", "");
+
+        // then
+        assertNotNull( seminarList.size());
+//        System.out.println(seminar.);
+        seminarList.stream().forEach(seminar -> System.out.println(seminar.toString()));
     }
 
 

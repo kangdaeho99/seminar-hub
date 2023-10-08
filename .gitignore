@@ -25,6 +25,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+**/src/main/generated/
 application-real-db.properties
 *.yml
 
@@ -37,3 +38,4 @@ application-real-db.properties
 
 ### VS Code ###
 .vscode/
+

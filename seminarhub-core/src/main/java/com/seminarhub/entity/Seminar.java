@@ -27,7 +27,7 @@ public class Seminar extends BaseEntity {
     @Column(nullable=true)
     private LocalDateTime del_dt;
 
-    @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY)
     private List<Member_Seminar> member_seminar_list;
 
     public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
