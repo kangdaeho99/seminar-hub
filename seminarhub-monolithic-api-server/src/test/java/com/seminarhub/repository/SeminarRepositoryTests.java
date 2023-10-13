@@ -1,6 +1,9 @@
 package com.seminarhub.repository;
 
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.seminarhub.dto.SeminarDTO;
+import com.seminarhub.dto.SeminarPageResultDTO;
 import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.Seminar;
 import jakarta.transaction.Transactional;
@@ -9,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -147,6 +152,79 @@ public class SeminarRepositoryTests {
 
         memberSeminarList.stream().forEach(memberSeminar -> System.out.println(memberSeminar.getMember()+" "+memberSeminar.getSeminar()));
 
+    }
+
+    @DisplayName("dummyInsertWithJdbcTemplate")
+    @Test
+    public void dummyInsertWithJdbcTemplate(){
+        List<SeminarDTO> seminarDTOList = new LinkedList<>();
+        Random random = new Random();
+        for(int i=1000000; i<2000000; i++) {
+            SeminarDTO seminarDTO = SeminarDTO.builder()
+                    .seminar_name("SeminarDummyIndex" + i)
+                    .seminar_explanation("SeminarDummyExplanation" + i)
+                    .seminar_price(random.nextLong(999999) + 1)
+                    .build();
+            seminarDTOList.add(seminarDTO);
+        }
+        Long startTime = System.currentTimeMillis();
+        seminarQuerydslRepository.jdbcBulkInsert(seminarDTOList);
+        Long endTime = System.currentTimeMillis();
+        System.out.println("Execution Time:"+ (endTime - startTime) + "ms");
+
+    }
+
+    @Autowired
+    private JPAQueryFactory queryFactory;
+
+    @DisplayName("Querydsl PagingExample")
+    @Test
+    public void PagingExample(){
+        int pageNo = 190000 - 1;
+        String keyword="Seminar";
+        int pageSize = 10;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = seminarQuerydslRepository.pagingSeminarWithKeyword(keyword,pageNo, pageSize);
+        for(int i=0;i<seminarPageResultDTOList.size();i++){
+            System.out.println("cnt:"+i+" "+seminarPageResultDTOList.get(i).toString());
+        }
+    }
+    @Test
+    public void bulkUpdate(){
+            seminarQuerydslRepository.bulkUpdate();
+    }
+    @DisplayName("Querydsl PagingExampleWithCoveringIndex")
+    @Test
+    public void PagingExampleWithCoveringIndex(){
+        int pageNo =190000 - 1;
+        String keyword="Seminar";
+        int pageSize = 10;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = seminarQuerydslRepository.pagingSeminarWithKeywordWithCoveringIndex(keyword,pageNo, pageSize);
+        for(int i=0;i<seminarPageResultDTOList.size();i++){
+            System.out.println("cnt:"+i+" "+seminarPageResultDTOList.get(i).toString());
+        }
+    }
+    @DisplayName("testPagingSeminarWithSeminar_Price test")
+    @Test
+    public void testPagingSeminarWithSeminar_Price(){
+        int pageNo = 30000;
+        long seminar_price = 10000;
+        int pageSize = 10;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = seminarQuerydslRepository.pagingSeminarWithSeminar_Price(seminar_price ,pageNo, pageSize);
+        for(int i=0;i<seminarPageResultDTOList.size();i++){
+            System.out.println("cnt:"+i+" "+seminarPageResultDTOList.get(i).toString());
+        }
+    }
+
+    @DisplayName("testPagingSeminarWithCoveringIndexWithSeminar_Price")
+    @Test
+    public void testPagingSeminarWithCoveringIndexWithSeminar_Price(){
+        int pageNo =30000;
+        long seminar_price = 10000;
+        int pageSize = 10;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = seminarQuerydslRepository.pagingSeminarWithCoveringIndexWithSeminar_Price(seminar_price,pageNo, pageSize);
+        for(int i=0;i<seminarPageResultDTOList.size();i++){
+            System.out.println("cnt:"+i+" "+seminarPageResultDTOList.get(i).toString());
+        }
     }
 
 

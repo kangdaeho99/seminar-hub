@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+
 /**
  * [ 2023-08-21 daeho.kang ]
  * Description : SeminarDTO
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SeminarDTO {
+public class SeminarPageResultDTO implements Serializable {
 
     @Schema(description = "seminar_no")
     private Long seminar_no;
@@ -27,7 +29,7 @@ public class SeminarDTO {
     @Schema(description = "seminar_explanation")
     private String seminar_explanation;
 
-    @Schema(description = "seminar_price")
+    @Schema(description = "seminar_explanation")
     private Long seminar_price;
 
     @Schema(description = "inst_dt")

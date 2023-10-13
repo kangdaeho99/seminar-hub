@@ -24,6 +24,12 @@ public class Seminar extends BaseEntity {
     @Column(length = 500)
     private String seminar_explanation;
 
+    @Column
+    private Long seminar_price;
+
+    @Column
+    private Long seminar_maxParticipants;
+
     @Column(nullable=true)
     private LocalDateTime del_dt;
 

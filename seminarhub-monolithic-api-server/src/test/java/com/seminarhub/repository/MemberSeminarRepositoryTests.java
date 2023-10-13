@@ -1,5 +1,10 @@
 package com.seminarhub.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.Member_SeminarDTO;
 import com.seminarhub.entity.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +12,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -36,6 +45,9 @@ public class MemberSeminarRepositoryTests {
 
     @Autowired
     private SeminarRepository seminarRepository;
+
+    @Autowired
+    private JPAQueryFactory queryFactory;
 
     private final Long member_seminar_no = 1L;
     private final String member_id = "daeho.kang@naver.com"+ UUID.randomUUID();
@@ -208,5 +220,17 @@ public class MemberSeminarRepositoryTests {
         System.out.println(member_seminarList.get(0).getMember().getMember_no());
     }
 
+//    @DisplayName("Querydsl PagingExample")
+//    @Test
+//    public void querydslPaging(){
+//        Pageable pageable = PageRequest.of(0, 10, Sort.by("member_seminar_no").descending());
+//        QMember_Seminar qMember_seminar = QMember_Seminar.member_Seminar
+//        String keyword = "1";
+//        BooleanBuilder builder = new BooleanBuilder();
+//        BooleanExpression expression = qMember_seminar.seminar.seminar_explanation.contains(keyword);
+//        builder.and(expression);
+////        Page<Member_Seminar> result = memberSeminar
+//
+//    }
 
 }

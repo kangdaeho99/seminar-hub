@@ -17,11 +17,6 @@ public class Member_Seminar extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long member_seminar_no;
 
-    /**
-     * [ 2023-08-26 daeho.kang ]
-     * Description :
-     * 부모엔티티가 저장되면 자식 엔티티도 같이 저장되게 설정합니다.
-     */
     @ManyToOne(
             targetEntity = Member.class,
             fetch = FetchType.LAZY
@@ -35,6 +30,9 @@ public class Member_Seminar extends BaseEntity {
             )
     @JoinColumn(name = "seminar_no")
     private Seminar seminar;
+
+    @OneToOne
+    private Payment payment;
 
     @Column(nullable=true)
     private LocalDateTime del_dt;

@@ -4,17 +4,29 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.seminarhub.entity.*;
+import com.seminarhub.dto.SeminarDTO;
+import com.seminarhub.dto.SeminarPageResultDTO;
+import com.seminarhub.entity.Member_Seminar;
+import com.seminarhub.entity.QMember_Seminar;
+import com.seminarhub.entity.QSeminar;
+import com.seminarhub.entity.Seminar;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Repository
 public class SeminarQuerydslRepository {
+    private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
 
     public List<Seminar> findByName(String seminar_name){
@@ -107,6 +119,174 @@ public class SeminarQuerydslRepository {
                 .limit(10)
                 .fetch();
     }
+
+    @Transactional
+    public void bulkUpdate() {
+        QSeminar seminar = QSeminar.seminar;
+        Random random = new Random();
+        long[] arr = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 5000000};
+        for(int i=2000000; i<2000025;i++){
+//            System.out.println(random.nextInt(arr.length + 1) % arr.length);
+            queryFactory.update(seminar)
+            .set(seminar.seminar_price, arr[random.nextInt(12)%arr.length])
+            .where(seminar.seminar_no.eq((long) i))
+            .execute();
+        }
+
+    }
+
+    public void jdbcBulkInsert(List<SeminarDTO> seminar_list){
+        String sql = "insert into seminar (seminar_name, seminar_explanation, seminar_price) VALUES (?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql,
+                seminar_list,
+                seminar_list.size(),
+                (PreparedStatement ps, SeminarDTO dto) ->{
+                    ps.setString(1, dto.getSeminar_name());
+                    ps.setString(2, dto.getSeminar_explanation());
+                    ps.setLong(3, dto.getSeminar_price());
+                });
+    }
+
+
+    public List<SeminarPageResultDTO> pagingSeminarWithKeyword(String keyword, int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .where(seminar.seminar_name.like(keyword + "%"))
+                .orderBy(seminar.seminar_no.desc())
+                .limit(pageSize)
+                .offset(pageNo * pageSize)
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+    public List<SeminarPageResultDTO> pagingSeminarWithKeywordWithCoveringIndex(String keyword, int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<Long> ids = queryFactory
+                .select(seminar.seminar_no)
+                .from(seminar)
+                .where(seminar.seminar_name.like(keyword + '%'))
+                .orderBy(seminar.seminar_name.desc())
+                .limit(pageSize)
+                .offset(pageNo * pageSize)
+                .fetch();
+
+        if(CollectionUtils.isEmpty(ids)){
+            return new ArrayList<>();
+        }
+
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .where(seminar.seminar_no.in(ids))
+                .orderBy(seminar.seminar_no.desc())
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+
+    public List<SeminarPageResultDTO> pagingSeminarWithSeminar_Price(long seminar_price, int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .where(seminar.seminar_price.eq(seminar_price))
+                .orderBy(seminar.seminar_no.desc())
+                .limit(pageSize)
+                .offset(pageNo * pageSize)
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+
+    public List<SeminarPageResultDTO> pagingSeminarWithCoveringIndexWithSeminar_Price(long seminar_price, int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<Long> ids = queryFactory
+                .select(seminar.seminar_no)
+                .from(seminar)
+                .where(seminar.seminar_price.eq(seminar_price))
+                .orderBy(seminar.seminar_no.asc())
+                .limit(pageSize)
+                .offset(pageNo*pageSize)
+                .fetch();
+        
+        if(CollectionUtils.isEmpty(ids)){
+            return new ArrayList<>();
+        }
+
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .where(seminar.seminar_no.in(ids))
+                .orderBy(seminar.seminar_no.desc())
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+
+    @Cacheable(value = "mainPageSeminarList",  key = "'page-' + #pageNo + '-limit-' + #limit")
+    public List<SeminarPageResultDTO> mainPagePagingSeminarWithEhCache(int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .orderBy(seminar.seminar_no.desc())
+                .limit(pageSize)
+                .offset(pageNo * pageSize)
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+
+    @Cacheable(value = "mainPageSeminarList",  key = "'page-' + #pageNo + '-limit-' + #limit")
+    public List<SeminarPageResultDTO> mainPagePagingSeminarWithCoveringIndexAndEhCache(int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<Long> ids = queryFactory
+                .select(seminar.seminar_no)
+                .from(seminar)
+                .orderBy(seminar.seminar_no.desc())
+                .limit(pageSize)
+                .offset(pageNo*pageSize)
+                .fetch();
+
+        if(CollectionUtils.isEmpty(ids)){
+            return new ArrayList<>();
+        }
+
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .where(seminar.seminar_no.in(ids))
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+
 
 
 }
