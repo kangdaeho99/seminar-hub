@@ -30,6 +30,9 @@ public class Seminar extends BaseEntity {
     @Column
     private Long seminar_maxParticipants;
 
+//    @Version
+//    private Integer version;
+
     @Column(nullable=true)
     private LocalDateTime del_dt;
 

@@ -6,10 +6,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.dto.SeminarPageResultDTO;
-import com.seminarhub.entity.Member_Seminar;
-import com.seminarhub.entity.QMember_Seminar;
-import com.seminarhub.entity.QSeminar;
-import com.seminarhub.entity.Seminar;
+import com.seminarhub.entity.*;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -28,6 +27,12 @@ import java.util.Random;
 public class SeminarQuerydslRepository {
     private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
+
+    private final SeminarRepository seminarRepository;
+
+    private final MemberRepository memberRepository;
+
+    private final Member_SeminarRepository member_SeminarRepository;
 
     public List<Seminar> findByName(String seminar_name){
         QSeminar qSeminar = QSeminar.seminar;
@@ -136,7 +141,7 @@ public class SeminarQuerydslRepository {
     }
 
     public void jdbcBulkInsert(List<SeminarDTO> seminar_list){
-        String sql = "insert into seminar (seminar_name, seminar_explanation, seminar_price) VALUES (?, ?, ?)";
+        String sql = "insert into seminar (seminar_name, seminar_explanation, seminar_price, seminar_maxParticipants) VALUES (?, ?, ?, ?)";
         jdbcTemplate.batchUpdate(sql,
                 seminar_list,
                 seminar_list.size(),
@@ -144,6 +149,7 @@ public class SeminarQuerydslRepository {
                     ps.setString(1, dto.getSeminar_name());
                     ps.setString(2, dto.getSeminar_explanation());
                     ps.setLong(3, dto.getSeminar_price());
+                    ps.setLong(4, dto.getSeminar_maxParticipants());
                 });
     }
 
@@ -286,6 +292,91 @@ public class SeminarQuerydslRepository {
                 .fetch();
         return seminarPageResultDTOList;
     }
+
+
+    //syncrhonzied사용시 에러남. 한번 원인찾아서 써보기. 지금 seminar_participant_cnt에 안되는 이유는 해당 쿼리는 entity가 아니기 때문임.
+    //신청쿼리 작성해보기
+    @Transactional
+    public void participateOnSeminar(Long member_no, Long seminar_no){
+        QSeminar seminar = QSeminar.seminar;
+        //신청시 인원이 몇명인지 확인하고 각 세미나의 maxParticipant가 넘는지 안넘는지 확인한다.
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+
+        Long seminar_participnat_cnt = queryFactory.select(member_seminar.count())
+                .from(member_seminar)
+                .where(member_seminar.seminar.seminar_no.eq(seminar_no)
+                        .and(member_seminar.del_dt.isNull()))
+                .fetchOne();
+
+        System.out.println("seminar_participant_cnt:"+seminar_participnat_cnt);
+
+        Long maxParticipant_cnt = (long) 0;
+        maxParticipant_cnt = queryFactory.select(seminar.seminar_maxParticipants)
+                .from(seminar)
+                .where(seminar.seminar_no.eq(seminar_no)
+                        .and(seminar.del_dt.isNull()))
+                .fetchOne();
+        System.out.println("maxParticipant_cnt:"+maxParticipant_cnt);
+        if(seminar_participnat_cnt < maxParticipant_cnt){ //인원이 더적다면 member_seminar에 넣는다.
+            Optional<Member> memberEntity = memberRepository.findByMember_no(member_no);
+            Optional<Seminar> seminarEntity = seminarRepository.findBySeminar_no(seminar_no);
+
+            Member_Seminar member_seminarEntity = Member_Seminar.builder()
+                            .member(memberEntity.get())
+                            .seminar(seminarEntity.get())
+                            .build();
+
+            member_SeminarRepository.save(member_seminarEntity);
+        }else{
+            System.out.println("Max_Participant Over");
+        }
+
+
+    }
+
+    @Transactional
+    public void participateOnSeminarWithPESSIMISTICLock(Long member_no, Long seminar_no){
+        QSeminar seminar = QSeminar.seminar;
+        //신청시 인원이 몇명인지 확인하고 각 세미나의 maxParticipant가 넘는지 안넘는지 확인한다.
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+
+        // 세미나 레코드를 PESSIMISTIC_WRITE 락으로 가져옵니다.
+        Seminar seminarEntityLock = queryFactory.selectFrom(seminar)
+                .where(seminar.seminar_no.eq(seminar_no)
+                        .and(seminar.del_dt.isNull()))
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락 설정
+                .fetchOne();
+
+        if (seminarEntityLock != null) {
+            Long seminar_participant_cnt = queryFactory.select(member_seminar.count())
+                    .from(member_seminar)
+                    .where(member_seminar.seminar.seminar_no.eq(seminar_no)
+                            .and(member_seminar.del_dt.isNull()))
+                    .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                    .fetchOne();
+
+            Long maxParticipant_cnt = seminarEntityLock.getSeminar_maxParticipants();
+            System.out.println("seminar_participant_cnt: " + seminar_participant_cnt);
+            System.out.println("maxParticipant_cnt: " + maxParticipant_cnt);
+            if (seminar_participant_cnt < maxParticipant_cnt) {
+                Optional<Member> memberEntity = memberRepository.findByMember_no(member_no);
+                Optional<Seminar> seminarEntity = seminarRepository.findBySeminar_no(seminar_no);
+
+                if (memberEntity.isPresent() && seminarEntity.isPresent()) {
+                    Member_Seminar member_seminarEntity = Member_Seminar.builder()
+                            .member(memberEntity.get())
+                            .seminar(seminarEntity.get())
+                            .build();
+
+                    member_SeminarRepository.save(member_seminarEntity);
+                }
+            } else{
+                System.out.println("bigger than MAX_Participant ");
+            }
+        }
+    }
+
+
 
 
 

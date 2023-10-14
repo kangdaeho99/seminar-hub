@@ -4,21 +4,18 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.Member_SeminarDTO;
-import com.seminarhub.entity.Member;
 import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.QMember_Seminar;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
-public class MemberSeminarQuerydslRepository {
+public class Member_SeminarQuerydslRepository {
     private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
 

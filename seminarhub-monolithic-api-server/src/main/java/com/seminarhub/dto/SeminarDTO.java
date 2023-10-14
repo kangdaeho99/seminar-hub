@@ -30,6 +30,9 @@ public class SeminarDTO {
     @Schema(description = "seminar_price")
     private Long seminar_price;
 
+    @Schema(description = "seminar_maxParticipants")
+    private Long seminar_maxParticipants;
+
     @Schema(description = "inst_dt")
     private LocalDateTime inst_dt;
 

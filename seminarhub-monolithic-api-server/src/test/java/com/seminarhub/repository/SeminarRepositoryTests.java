@@ -15,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -159,11 +162,12 @@ public class SeminarRepositoryTests {
     public void dummyInsertWithJdbcTemplate(){
         List<SeminarDTO> seminarDTOList = new LinkedList<>();
         Random random = new Random();
-        for(int i=1000000; i<2000000; i++) {
+        for(int i=2000028; i<=2000028; i++) {
             SeminarDTO seminarDTO = SeminarDTO.builder()
                     .seminar_name("SeminarDummyIndex" + i)
                     .seminar_explanation("SeminarDummyExplanation" + i)
                     .seminar_price(random.nextLong(999999) + 1)
+                    .seminar_maxParticipants((long) 40)
                     .build();
             seminarDTOList.add(seminarDTO);
         }
@@ -225,6 +229,65 @@ public class SeminarRepositoryTests {
         for(int i=0;i<seminarPageResultDTOList.size();i++){
             System.out.println("cnt:"+i+" "+seminarPageResultDTOList.get(i).toString());
         }
+    }
+
+    @DisplayName("testParticipateOnSeminar")
+    @Test
+    public void testParticipateOnSeminar(){
+//        Seminar s
+//        seminarRepository.save()
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        seminarQuerydslRepository.participateOnSeminar(member_no, seminar_no);
+
+    }
+
+    @DisplayName("testParticipateOnSeminarWithoutLock")
+    @Test
+    public void testParticipateOnSeminarWithoutLock() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+
+        final int executeNumber = 100;
+        final ExecutorService executorService = Executors.newFixedThreadPool(40);
+        final CountDownLatch countDownLatch = new CountDownLatch(executeNumber);
+
+        for(int i=0;i<executeNumber;i++){
+            executorService.execute( () -> {
+                try{
+                    seminarQuerydslRepository.participateOnSeminar(member_no, seminar_no);
+                } catch(Exception e){
+                    System.out.println(e.getMessage());
+                }finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+        countDownLatch.await();
+    }
+
+    @DisplayName("testParticipateOnSeminarWithPessimisticLock")
+    @Test
+    public void testParticipateOnSeminarWithMultiThread() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+
+        final int executeNumber = 200;
+        final ExecutorService executorService = Executors.newFixedThreadPool(40);
+        final CountDownLatch countDownLatch = new CountDownLatch(executeNumber);
+
+        for(int i=0;i<executeNumber;i++){
+            executorService.execute( () -> {
+                try{
+                    seminarQuerydslRepository.participateOnSeminarWithPESSIMISTICLock(member_no, seminar_no);
+                } catch(Exception e){
+                    System.out.println(e.getMessage());
+                }finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+        countDownLatch.await();
     }
 
 

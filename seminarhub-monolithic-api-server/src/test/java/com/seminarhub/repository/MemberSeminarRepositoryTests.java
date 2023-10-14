@@ -1,26 +1,13 @@
 package com.seminarhub.repository;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.Member_SeminarDTO;
 import com.seminarhub.entity.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,10 +23,10 @@ import static org.junit.Assert.assertNotNull;
 @SpringBootTest
 public class MemberSeminarRepositoryTests {
     @Autowired
-    private MemberSeminarRepository memberSeminarRepository;
+    private Member_SeminarRepository memberSeminarRepository;
 
     @Autowired
-    private MemberSeminarQuerydslRepository memberSeminarQuerydslRepository;
+    private Member_SeminarQuerydslRepository memberSeminarQuerydslRepository;
     @Autowired
     private MemberRepository memberRepository;
 

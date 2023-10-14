@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberSeminarRepository extends JpaRepository<Member_Seminar, Long> {
+public interface Member_SeminarRepository extends JpaRepository<Member_Seminar, Long> {
 
     @Query("SELECT m_s FROM Member_Seminar m_s WHERE m_s.member_seminar_no = :member_seminar_no AND del_dt is null")
     Optional<Member_Seminar> findByMember_Seminar_no(@Param("member_seminar_no") Long member_seminar_no);
