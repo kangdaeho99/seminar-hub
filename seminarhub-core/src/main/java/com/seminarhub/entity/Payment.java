@@ -18,9 +18,7 @@ public class Payment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long payment_no;
 
-    @OneToOne(
-            mappedBy = "payment"
-    )
+    @OneToOne(mappedBy = "payment", fetch = FetchType.LAZY)
     @JoinColumn(name = "member_seminar_no")
     private Member_Seminar member_seminar;
 
@@ -32,5 +30,8 @@ public class Payment extends BaseEntity {
 
 
     public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
+    public void setMember_seminar(Member_Seminar member_seminar){
+        this.member_seminar = member_seminar;
+    }
 
 }
