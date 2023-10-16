@@ -4,6 +4,7 @@ package com.seminarhub.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.dto.SeminarPageResultDTO;
+import com.seminarhub.dto.Seminar_Member_Seminar_PaymentResponseDTO;
 import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.Seminar;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -288,6 +290,156 @@ public class SeminarRepositoryTests {
             });
         }
         countDownLatch.await();
+    }
+
+    @DisplayName("testParticipateOnSeminarWithPessimisticLock")
+    @Test
+    public void testparticipateOnSeminarWithPESSIMISTICLockAddPayment() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+
+        final int executeNumber = 40;
+        final ExecutorService executorService = Executors.newFixedThreadPool(40);
+        final CountDownLatch countDownLatch = new CountDownLatch(executeNumber);
+
+        for(int i=0;i<executeNumber;i++){
+            executorService.execute( () -> {
+                try{
+                    seminarQuerydslRepository.participateOnSeminarWithPESSIMISTICLockAddPayment(member_no, seminar_no);
+                } catch(Exception e){
+                    System.out.println(e.getMessage());
+                }finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+        countDownLatch.await();
+    }
+
+    @Transactional //Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPayment")
+    @Test
+    public void testgetListForMember_SeminarAndPayment() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+
+        List<Seminar> seminar = seminarQuerydslRepository.getSeminar(seminar_no);
+        System.out.println(seminar.get(0).toString());
+        for(int i=0;i<seminar.get(0).getMember_seminar_list().size();i++){
+            System.out.println("----------------------------------------");
+            System.out.println(seminar.get(0).getMember_seminar_list().get(i).toString());
+            System.out.println(seminar.get(0).getMember_seminar_list().get(i).getPayment().toString());
+        }
+
+    }
+
+    @Transactional //Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPaymentFetchJoin")
+    @Test
+    public void testgetListForMember_SeminarAndPaymentWithFetchJoin() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+
+        List<Seminar> seminar = seminarQuerydslRepository.getSeminarFetchJoin(seminar_no);
+        System.out.println(seminar.get(0).toString());
+        for(int i=0;i<seminar.get(0).getMember_seminar_list().size();i++){
+            System.out.println("----------------------------------------");
+            System.out.println(seminar.get(0).getMember_seminar_list().get(i).toString());
+            System.out.println(seminar.get(0).getMember_seminar_list().get(i).getPayment().toString());
+        }
+    }
+
+    @Transactional //Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPayment")
+    @Test
+    public void testgetListSeminar() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        int pageNo = 0;
+        int pageSize = 10;
+        List<Seminar> seminar = seminarQuerydslRepository.getListSeminar(pageNo, pageSize);
+        System.out.println("CNT:"+seminar.size());
+        for(int i=0;i<seminar.size();i++){
+            System.out.println("---------------------------------------");
+            System.out.println("Seminar:"+seminar.get(i).toString());
+            for(int j=0;j<seminar.get(i).getMember_seminar_list().size();j++){
+                System.out.println(seminar.get(i).getMember_seminar_list().get(j).toString());
+                System.out.println(seminar.get(i).getMember_seminar_list().get(j).getPayment().toString());
+            }
+        }
+    }
+
+    @Transactional //Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPayment")
+    @Test
+    public void testgetListSeminarWithFetchJoin() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        int pageNo = 0;
+        int pageSize = 50;
+        List<Seminar> seminar = seminarQuerydslRepository.getListSeminarWithFetchJoin(pageNo, pageSize);
+        System.out.println("CNT:"+seminar.size());
+        for(int i=0;i<seminar.size();i++){
+
+            System.out.println("---------------------------------------");
+            System.out.println("Seminar:"+seminar.get(i).toString());
+            System.out.println(seminar.get(i).getMember_seminar_list().size());
+
+            for(int j=0;j<seminar.get(i).getMember_seminar_list().size();j++){
+                Member_Seminar member_seminar = seminar.get(i).getMember_seminar_list().get(j);
+                System.out.println(member_seminar.toString());
+//                System.out.println(member_seminar.getPayment().toString());
+            }
+        }
+    }
+
+    @Transactional //Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPayment")
+    @Test
+    public void testgetListSeminarWithBatch() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        int pageNo = 0;
+        int pageSize = 50;
+        List<Seminar> seminar = seminarQuerydslRepository.getListSeminarWithBatch(pageNo, pageSize);
+        System.out.println("CNT:"+seminar.size());
+        for(int i=0;i<seminar.size();i++){
+
+            System.out.println("---------------------------------------");
+//            System.out.println("Seminar:"+seminar.get(i).toString());
+            for(int j=0;j<seminar.get(i).getMember_seminar_list().size();j++){
+                Member_Seminar member_seminar = seminar.get(i).getMember_seminar_list().get(j);
+                System.out.println(member_seminar.toString());
+//                System.out.println(member_seminar.getPayment().toString());
+            }
+        }
+    }
+
+
+
+    @Transactional //Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPayment With DTO")
+    @Test
+    public void testgetListSeminarWithFetchJoinWIthDTO() throws InterruptedException {
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        int pageNo = 0;
+        int pageSize = 10;
+        List<Seminar_Member_Seminar_PaymentResponseDTO> seminar = seminarQuerydslRepository.getListForMember_SeminarAndPayment(seminar_no);
+        System.out.println("CNT:"+seminar.size());
+        for(int i=0;i<seminar.size();i++){
+            System.out.println("---------------------------------------");
+            System.out.println("Seminar:"+seminar.get(i).toString());
+            seminar.get(i).getMember_seminar_no();
+            seminar.get(i).getMember_no();
+            seminar.get(i).getSeminar_explanation();
+            seminar.get(i).getSeminar_price();
+            seminar.get(i).getSeminar_explanation();
+            seminar.get(i).getMember_seminar_no();
+            seminar.get(i).getMember_no();
+            seminar.get(i).getPayment_no();
+            seminar.get(i).getAmount();
+        }
     }
 
 

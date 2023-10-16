@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.dto.SeminarPageResultDTO;
+import com.seminarhub.dto.Seminar_Member_Seminar_PaymentResponseDTO;
 import com.seminarhub.entity.*;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,8 @@ public class SeminarQuerydslRepository {
     private final MemberRepository memberRepository;
 
     private final Member_SeminarRepository member_SeminarRepository;
+
+    private final PaymentRepository paymentRepository;
 
     public List<Seminar> findByName(String seminar_name){
         QSeminar qSeminar = QSeminar.seminar;
@@ -376,6 +379,198 @@ public class SeminarQuerydslRepository {
         }
     }
 
+    @Transactional
+    public void participateOnSeminarWithPESSIMISTICLockAddPayment(Long member_no, Long seminar_no){
+        QSeminar seminar = QSeminar.seminar;
+        //신청시 인원이 몇명인지 확인하고 각 세미나의 maxParticipant가 넘는지 안넘는지 확인한다.
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+
+        // 세미나 레코드를 PESSIMISTIC_WRITE 락으로 가져옵니다.
+        Seminar seminarEntityLock = queryFactory.selectFrom(seminar)
+                .where(seminar.seminar_no.eq(seminar_no)
+                        .and(seminar.del_dt.isNull()))
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락 설정
+                .fetchOne();
+
+        if (seminarEntityLock != null) {
+            Long seminar_participant_cnt = queryFactory.select(member_seminar.count())
+                    .from(member_seminar)
+                    .where(member_seminar.seminar.seminar_no.eq(seminar_no)
+                            .and(member_seminar.del_dt.isNull()))
+                    .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                    .fetchOne();
+
+            Long maxParticipant_cnt = seminarEntityLock.getSeminar_maxParticipants();
+            System.out.println("seminar_participant_cnt: " + seminar_participant_cnt);
+            System.out.println("maxParticipant_cnt: " + maxParticipant_cnt);
+            if (seminar_participant_cnt < maxParticipant_cnt) {
+                Optional<Member> memberEntity = memberRepository.findByMember_no(member_no);
+                Optional<Seminar> seminarEntity = seminarRepository.findBySeminar_no(seminar_no);
+
+                if (memberEntity.isPresent() && seminarEntity.isPresent()) {
+                    Member_Seminar member_seminarEntity = Member_Seminar.builder()
+                            .member(memberEntity.get())
+                            .seminar(seminarEntity.get())
+                            .build();
+
+                    Payment payment = Payment.builder()
+                            .member_seminar(member_seminarEntity)
+                            .amount(seminarEntity.get().getSeminar_price())
+                            .build();
+
+                    payment.setMember_seminar(member_seminarEntity);
+                    paymentRepository.save(payment);
+                    member_seminarEntity.setPayment(payment);
+                    member_SeminarRepository.save(member_seminarEntity);
+
+
+                }
+            } else{
+                System.out.println("bigger than MAX_Participant ");
+            }
+        }
+    }
+
+
+    /**
+     * Service단 고려해서 진행할때.
+     */
+    public List<Seminar> getSeminar(long seminar_no){
+        QSeminar seminar = QSeminar.seminar;
+//        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+//        QPayment payment = QPayment.payment;
+
+        //먼저 Seminar_no가 주어지면 해당 값에 대한 모든 Member_Seminar를 가져올것이다.
+        List<Seminar> seminarEntity = queryFactory
+                .select(seminar)
+                .from(seminar)
+//                .leftJoin(seminar.member_seminar_list, member_seminar)
+//                .fetchJoin()
+//                .leftJoin(member_seminar.payment, payment)
+//                .fetchJoin()
+                .where(seminar.seminar_no.eq(seminar_no))
+                .fetch();
+
+        return seminarEntity;
+    }
+
+    /**
+     * Service단 고려해서 진행할때.
+     */
+    public List<Seminar> getSeminarFetchJoin(long seminar_no){
+        QSeminar seminar = QSeminar.seminar;
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+        QPayment payment = QPayment.payment;
+
+        //먼저 Seminar_no가 주어지면 해당 값에 대한 모든 Member_Seminar를 가져올것이다.
+        List<Seminar> seminarEntity = queryFactory
+                .select(seminar)
+                .from(seminar)
+//                .leftJoin(seminar.member_seminar_list, member_seminar)
+                .fetchJoin()
+                .leftJoin(member_seminar.payment, payment)
+                .fetchJoin()
+                .where(seminar.seminar_no.eq(seminar_no))
+                .fetch();
+
+        return seminarEntity;
+    }
+
+    /**
+     * 이렇게하면 JPA N+1 문제는 발생하지만 문제는 없다!!!! 하지만 성능에 안좋겠지.
+     * 이걸 우리는 해결해가야하는것이다~~
+     * [  daeho.kang ]
+     * Description :
+     *
+     */
+    public List<Seminar> getListSeminar(int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+//        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+//        QPayment payment = QPayment.payment;
+
+        //먼저 Seminar_no가 주어지면 해당 값에 대한 모든 Member_Seminar를 가져올것이다.
+        List<Seminar> seminarEntity = queryFactory
+                .select(seminar)
+                .from(seminar)
+//                .leftJoin(seminar.member_seminar_list, member_seminar)
+//                .fetchJoin()
+//                .leftJoin(member_seminar.payment, payment)
+//                .fetchJoin()
+//                .where(seminar.seminar_no.eq(seminar_no))
+                .orderBy(seminar.seminar_no.desc())
+                .limit(pageSize)
+                .offset(pageNo)
+                .fetch();
+        return seminarEntity;
+    }
+    public List<Seminar> getListSeminarWithFetchJoin(int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+        QPayment payment = QPayment.payment;
+
+        List<Seminar> seminarEntity = queryFactory
+                .select(seminar)
+                .from(seminar)
+//                .leftJoin(seminar.member_seminar_list, member_seminar)
+//                .fetchJoin()
+//                .leftJoin(member_seminar.payment, payment)
+//                .fetchJoin()
+//                .orderBy(seminar.seminar_no.desc())
+                .offset(pageNo * pageSize)
+                .limit(pageSize)
+                .fetch();
+
+        return seminarEntity;
+    }
+    public List<Seminar> getListSeminarWithBatch(int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+        QPayment payment = QPayment.payment;
+
+        List<Seminar> seminarEntity = queryFactory
+                .select(seminar)
+                .from(seminar)
+//                .leftJoin(seminar.member_seminar_list, member_seminar)
+//                .fetchJoin()
+//                .leftJoin(member_seminar.payment, payment)
+//                .fetchJoin()
+                .orderBy(seminar.seminar_no.desc())
+                .offset(pageNo * pageSize)
+                .limit(pageSize)
+                .fetch();
+        return seminarEntity;
+    }
+
+
+
+    /**
+     *
+     * 단순히 DTO로 값을 받는경우
+     */
+    public List<Seminar_Member_Seminar_PaymentResponseDTO> getListForMember_SeminarAndPayment(long seminar_no){
+        QSeminar seminar = QSeminar.seminar;
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+        QPayment payment = QPayment.payment;
+
+        //먼저 Seminar_no가 주어지면 해당 값에 대한 모든 Member_Seminar를 가져올것이다.
+        List<Seminar_Member_Seminar_PaymentResponseDTO> list = queryFactory
+                .select(Projections.fields(Seminar_Member_Seminar_PaymentResponseDTO.class,
+                        seminar.seminar_no.as("seminar_no"),
+                        seminar.seminar_name.as("seminar_name"),
+                        seminar.seminar_explanation.as("seminar_explanation"),
+                        seminar.seminar_price.as("seminar_price"),
+                        member_seminar.member_seminar_no.as("member_seminar_no"),
+                        member_seminar.member.member_no.as("member_no"),
+                        payment.payment_no,
+                        payment.amount))
+                .from(seminar)
+                .leftJoin(seminar.member_seminar_list, member_seminar)
+                .leftJoin(member_seminar.payment, payment)
+                .where(seminar.seminar_no.eq(seminar_no))
+                .fetch();
+
+        return list;
+    }
 
 
 
