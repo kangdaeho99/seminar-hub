@@ -36,20 +36,14 @@
 
 
 ## 📕 Project Architecture
-> Multi Module 
+> Multi Module
+
+![MultiModule](https://user-images.githubusercontent.com/48047377/272231005-39e30faa-6dca-47cd-bbf0-1897cb1aee14.png)
 
 > Kubernetes
 
- 
-## 📒 현재 DB 구조 ( 회원관련쪽 진행중 )
-> 
+![k8sDeployment](https://user-images.githubusercontent.com/48047377/272234456-e3991da8-291a-46db-86a3-4db35bdcb5c3.png)
 
-
-![DB 배포구조](https://github.com/kangdaeho99/seminar-hub/assets/48047377/60ebef9e-a0e5-4d58-866f-1dc20dda7dc6)
-
-
-<br/><br/>
-<br/>
 
 <!----------------------------------------------------------------------->
 <!----------------------------------------------------------------------->
@@ -134,7 +128,7 @@
 
  <br/>
 
- 
+
 ## 📒 현재 DB 구조 ( 회원관련쪽 진행중 )
 
 > Member, Member_Role, Role 회원 관련 DB 구성이 완료된 상태입니다.
