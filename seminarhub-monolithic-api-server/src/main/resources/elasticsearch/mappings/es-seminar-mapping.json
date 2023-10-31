@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "seminar_no" : {
+      "type" : "long"
+    },
+    "seminar_name": {
+      "type": "text",
+      "analyzer": "seminar_name_analyzer",
+      "fields" : {
+        "keyword": {
+          "type": "keyword",
+          "ignore_above" : 256
+        }
+      }
+    },
+    "seminar_explanation" : {
+      "type" : "text",
+      "analyzer": "seminar_explanation_analyzer"
+    },
+    "seminar_max_participants" : {
+      "type" : "long"
+    },
+    "inst_dt" : {
+      "type" : "date"
+    },
+    "updt_dt" : {
+      "type" : "date"
+    }
+  }
+}

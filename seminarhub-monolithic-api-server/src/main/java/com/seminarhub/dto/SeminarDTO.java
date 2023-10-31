@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 /**
  * [ 2023-08-21 daeho.kang ]
@@ -31,13 +32,13 @@ public class SeminarDTO {
     private Long seminar_price;
 
     @Schema(description = "seminar_maxParticipants")
-    private Long seminar_maxParticipants;
+    private Long seminar_max_participants;
 
     @Schema(description = "inst_dt")
-    private LocalDateTime inst_dt;
+    private Timestamp inst_dt;
 
     @Schema(description = "updt_dt")
-    private LocalDateTime updt_dt;
+    private Timestamp updt_dt;
 
     @Schema(description = "del_dt")
     private LocalDateTime del_dt;

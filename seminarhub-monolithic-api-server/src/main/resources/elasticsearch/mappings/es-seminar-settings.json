@@ -1,0 +1,41 @@
+{
+  "number_of_shards" : "1",
+  "number_of_replicas" : "1",
+  "analysis": {
+    "analyzer": {
+      "seminar_name_analyzer": {
+        "type": "custom",
+        "char_filter": ["html_strip"],
+        "tokenizer": "nori_tokenizer_discard",
+        "filter": ["lowercase", "english_stop_filter", "snowball", "nori_part_of_speech"]
+      },
+      "seminar_explanation_analyzer": {
+        "type": "custom",
+        "char_filter": ["html_strip"],
+        "tokenizer": "nori_tokenizer_discard",
+        "filter": ["lowercase", "english_stop_filter", "snowball", "nori_part_of_speech"]
+      }
+    },
+    "tokenizer": {
+      "nori_tokenizer_discard": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "discard"
+      }
+    },
+    "filter": {
+      "english_stop_filter": {
+        "type": "stop",
+        "stopwords": ["a", "an", "the", "is", "at", "on", "in", "of", "and", "or"]
+      },
+      "nori_part_of_speech": {
+        "type": "nori_part_of_speech",
+        "stoptags": [
+          "E", "IC", "J", "MAG", "MAJ",
+          "MM", "SP", "SSC", "SSO", "SC",
+          "SE", "XPN", "XSA", "XSN", "XSV",
+          "UNA", "NA", "VSV"
+        ]
+      }
+    }
+  }
+}

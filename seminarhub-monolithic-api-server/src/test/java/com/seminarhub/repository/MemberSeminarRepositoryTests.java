@@ -3,6 +3,7 @@ package com.seminarhub.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.Member_SeminarDTO;
 import com.seminarhub.entity.*;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -207,17 +208,17 @@ public class MemberSeminarRepositoryTests {
         System.out.println(member_seminarList.get(0).getMember().getMember_no());
     }
 
-//    @DisplayName("Querydsl PagingExample")
-//    @Test
-//    public void querydslPaging(){
-//        Pageable pageable = PageRequest.of(0, 10, Sort.by("member_seminar_no").descending());
-//        QMember_Seminar qMember_seminar = QMember_Seminar.member_Seminar
-//        String keyword = "1";
-//        BooleanBuilder builder = new BooleanBuilder();
-//        BooleanExpression expression = qMember_seminar.seminar.seminar_explanation.contains(keyword);
-//        builder.and(expression);
-////        Page<Member_Seminar> result = memberSeminar
-//
-//    }
+    @Transactional
+    @DisplayName("getMember_SeminarBySeminar_noPagination test")
+    @Test
+    public void getMember_SeminarBySeminar_noPagination(){
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        int pageNo = 0;
+        int pageSize = 10;
+        List<Member_Seminar> list = memberSeminarQuerydslRepository.getMember_SeminarBySeminar_noPagination(seminar_no, pageNo, pageSize);
+        list.stream().forEach(list2 -> System.out.println(list2));
+
+    }
 
 }

@@ -18,10 +18,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RequiredArgsConstructor
 @Repository
@@ -129,10 +132,11 @@ public class SeminarQuerydslRepository {
     }
 
     @Transactional
-    public void bulkUpdate() {
+    public void bulkUpdatePrice() {
         QSeminar seminar = QSeminar.seminar;
         Random random = new Random();
         long[] arr = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 5000000};
+
         for(int i=2000000; i<2000025;i++){
 //            System.out.println(random.nextInt(arr.length + 1) % arr.length);
             queryFactory.update(seminar)
@@ -143,8 +147,25 @@ public class SeminarQuerydslRepository {
 
     }
 
+    @Transactional
+    public void bulkUpdateSeminar_nameSeminar_explanation(String[] seminar_name, String[] seminar_explanation) {
+        QSeminar seminar = QSeminar.seminar;
+        Random random = new Random();
+
+        System.out.println(seminar_explanation.length);
+        for(int i=0; i<=2000000;i++){
+//            System.out.println(random.nextInt(arr.length + 1) % arr.length);
+            queryFactory.update(seminar)
+            .set(seminar.seminar_name, seminar_name[random.nextInt(seminar_name.length + 1)%seminar_name.length])
+            .set(seminar.seminar_explanation, seminar_explanation[random.nextInt(seminar_explanation.length + 1)%seminar_name.length])
+            .where(seminar.seminar_no.eq((long) i))
+            .execute();
+        }
+
+    }
+
     public void jdbcBulkInsert(List<SeminarDTO> seminar_list){
-        String sql = "insert into seminar (seminar_name, seminar_explanation, seminar_price, seminar_maxParticipants) VALUES (?, ?, ?, ?)";
+        String sql = "insert into seminar (seminar_name, seminar_explanation, seminar_price, seminar_max_participants, inst_dt, updt_dt ) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.batchUpdate(sql,
                 seminar_list,
                 seminar_list.size(),
@@ -152,7 +173,9 @@ public class SeminarQuerydslRepository {
                     ps.setString(1, dto.getSeminar_name());
                     ps.setString(2, dto.getSeminar_explanation());
                     ps.setLong(3, dto.getSeminar_price());
-                    ps.setLong(4, dto.getSeminar_maxParticipants());
+                    ps.setLong(4, dto.getSeminar_max_participants());
+                    ps.setTimestamp(5, dto.getUpdt_dt());
+                    ps.setTimestamp(6,  dto.getInst_dt());
                 });
     }
 
@@ -174,6 +197,7 @@ public class SeminarQuerydslRepository {
                 .fetch();
         return seminarPageResultDTOList;
     }
+
     public List<SeminarPageResultDTO> pagingSeminarWithKeywordWithCoveringIndex(String keyword, int pageNo, int pageSize){
         QSeminar seminar = QSeminar.seminar;
         List<Long> ids = queryFactory
@@ -503,7 +527,7 @@ public class SeminarQuerydslRepository {
                 .fetch();
         return seminarEntity;
     }
-    public List<Seminar> getListSeminarWithFetchJoin(int pageNo, int pageSize){
+    public List<Seminar> getListSeminarWithFetchJoin(Long seminar_no, int pageNo, int pageSize){
         QSeminar seminar = QSeminar.seminar;
         QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
         QPayment payment = QPayment.payment;
@@ -511,18 +535,19 @@ public class SeminarQuerydslRepository {
         List<Seminar> seminarEntity = queryFactory
                 .select(seminar)
                 .from(seminar)
-//                .leftJoin(seminar.member_seminar_list, member_seminar)
+                .leftJoin(seminar.member_seminar_list, member_seminar)
 //                .fetchJoin()
 //                .leftJoin(member_seminar.payment, payment)
 //                .fetchJoin()
-//                .orderBy(seminar.seminar_no.desc())
+//                .where(seminar.seminar_no.eq(seminar_no))
+                .orderBy(seminar.seminar_no.desc())
                 .offset(pageNo * pageSize)
                 .limit(pageSize)
                 .fetch();
 
         return seminarEntity;
     }
-    public List<Seminar> getListSeminarWithBatch(int pageNo, int pageSize){
+    public List<Seminar> getListSeminarWithBatch(Long seminar_no, int pageNo, int pageSize){
         QSeminar seminar = QSeminar.seminar;
         QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
         QPayment payment = QPayment.payment;
@@ -534,6 +559,7 @@ public class SeminarQuerydslRepository {
 //                .fetchJoin()
 //                .leftJoin(member_seminar.payment, payment)
 //                .fetchJoin()
+                .where(seminar.seminar_no.eq(seminar_no))
                 .orderBy(seminar.seminar_no.desc())
                 .offset(pageNo * pageSize)
                 .limit(pageSize)
@@ -571,6 +597,26 @@ public class SeminarQuerydslRepository {
 
         return list;
     }
+
+
+    public List<SeminarPageResultDTO> pagingSeminarWithWholeword(String keyword, int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        List<SeminarPageResultDTO> seminarPageResultDTOList = queryFactory
+                .select(Projections.fields(SeminarPageResultDTO.class,
+                        seminar.seminar_no,
+                        seminar.seminar_name,
+                        seminar.seminar_explanation,
+                        seminar.seminar_price
+                ))
+                .from(seminar)
+                .where(seminar.seminar_name.like("%"+keyword + "%"))
+                .orderBy(seminar.seminar_no.desc())
+                .limit(pageSize)
+                .offset(pageNo * pageSize)
+                .fetch();
+        return seminarPageResultDTOList;
+    }
+
 
 
 

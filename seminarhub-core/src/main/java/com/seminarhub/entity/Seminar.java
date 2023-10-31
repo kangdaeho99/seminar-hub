@@ -18,7 +18,7 @@ public class Seminar extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seminar_no;
 
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 100, nullable = false)
     private String seminar_name;
 
     @Column(length = 500)

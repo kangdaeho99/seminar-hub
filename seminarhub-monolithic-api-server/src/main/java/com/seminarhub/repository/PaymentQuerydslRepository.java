@@ -11,5 +11,4 @@ public class PaymentQuerydslRepository {
     private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
 
-
 }
