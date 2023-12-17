@@ -28,6 +28,7 @@ out/
 **/src/main/generated/
 application-real-db.properties
 *.yml
+*.log
 
 ### NetBeans ###
 /nbproject/private/

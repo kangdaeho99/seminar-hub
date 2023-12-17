@@ -518,6 +518,28 @@ public class SeminarRepositoryTests {
     @Transactional // Proxy 유지
     @DisplayName("test getListForMember_SeminarAndPayment")
     @Test
+    public void testgetParticularListSeminarWithFetchJoin() throws InterruptedException {
+        // Given
+        Long member_no = 1L;
+        Long seminar_no = 2000028L;
+        int pageNo = 0;
+        int pageSize = 50;
+
+        // When
+        List<Seminar> seminar = seminarQuerydslRepository.getParticularListSeminarWithFetchJoin(seminar_no, pageNo, pageSize);
+        System.out.println("CNT:" + seminar.size() + " ");
+
+        // Then
+        for (int i = 0; i < seminar.size(); i++) {
+            System.out.println(seminar.get(i).toString());
+            System.out.println(seminar.get(i).getMember_seminar_list().toString());
+        }
+
+    }
+
+    @Transactional // Proxy 유지
+    @DisplayName("test getListForMember_SeminarAndPayment")
+    @Test
     public void testgetListSeminarWithBatch() throws InterruptedException {
         // Given
         Long member_no = 1L;

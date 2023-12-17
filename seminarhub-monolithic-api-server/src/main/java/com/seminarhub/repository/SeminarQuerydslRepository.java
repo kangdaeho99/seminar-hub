@@ -547,6 +547,27 @@ public class SeminarQuerydslRepository {
 
         return seminarEntity;
     }
+    public List<Seminar> getParticularListSeminarWithFetchJoin(Long seminar_no, int pageNo, int pageSize){
+        QSeminar seminar = QSeminar.seminar;
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
+        QPayment payment = QPayment.payment;
+
+        List<Seminar> seminarEntity = queryFactory
+                .select(seminar)
+                .from(seminar)
+                .leftJoin(seminar.member_seminar_list, member_seminar)
+                .fetchJoin()
+//                .leftJoin(member_seminar.payment, payment)
+//                .fetchJoin()
+                .where(seminar.seminar_no.eq(seminar_no))
+                .orderBy(seminar.seminar_no.desc())
+                .offset(pageNo * pageSize)
+                .limit(pageSize)
+                .fetch();
+
+        return seminarEntity;
+    }
+
     public List<Seminar> getListSeminarWithBatch(Long seminar_no, int pageNo, int pageSize){
         QSeminar seminar = QSeminar.seminar;
         QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;

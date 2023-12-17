@@ -80,7 +80,7 @@ public class Member_SeminarQuerydslRepository {
                 .select(member_seminar)
                 .from(member_seminar)
                 .where(member_seminar.seminar.seminar_no.eq(seminar_no))
-                .leftJoin(member_seminar.seminar, seminar)
+                .leftJoin(member_seminar.seminar, seminar).fetchJoin()
                 .orderBy(member_seminar.member_seminar_no.desc())
                 .offset(pageSize * pageNo)
                 .limit(pageSize)
