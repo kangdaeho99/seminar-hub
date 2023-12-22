@@ -108,5 +108,13 @@ public class SeminarServiceImpl implements  SeminarService{
         return result;
     }
 
+    @Override
+    public String printOutString(String str){
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException("Input string should not be null or empty");
+        }
+        return str;
+    }
+
 
 }

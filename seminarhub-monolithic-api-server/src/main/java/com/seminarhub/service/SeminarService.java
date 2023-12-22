@@ -44,6 +44,13 @@ public interface SeminarService {
     List<SeminarPageResultDTO> mainPagelistWithCoveringIndexAndEhCache(int pageNo, int pageSize);
 
     /**
+     * [ 2023-12-18 daeho.kang ]
+     * Description : AOP Test
+     *
+     */
+    String printOutString(String str);
+
+    /**
      * [ 2023-08-21 daeho.kang ]
      * Description: Convert a SeminarDTO object to a Seminar entity.
      */
