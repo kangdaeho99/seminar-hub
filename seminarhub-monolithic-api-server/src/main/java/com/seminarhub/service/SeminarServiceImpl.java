@@ -2,17 +2,13 @@ package com.seminarhub.service;
 
 import com.seminarhub.common.exception.DuplicateSeminarException;
 import com.seminarhub.dto.SeminarDTO;
-import com.seminarhub.dto.SeminarPageResultDTO;
 import com.seminarhub.entity.Seminar;
-import com.seminarhub.repository.SeminarQuerydslRepository;
 import com.seminarhub.repository.SeminarRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,8 +21,6 @@ import java.util.Optional;
 public class SeminarServiceImpl implements  SeminarService{
 
     private final SeminarRepository seminarRepository;
-
-    private final SeminarQuerydslRepository seminarQuerydslRepository;
 
     /**
      * [ 2023-08-10 daeho.kang ]
@@ -94,18 +88,6 @@ public class SeminarServiceImpl implements  SeminarService{
             result.get().setDel_dt(LocalDateTime.now());
 //            seminarRepository.deleteBySeminar_name(seminar_name);
         }
-    }
-
-    @Override
-    public List<SeminarPageResultDTO> list(int pageNo, int pageSize) {
-        List<SeminarPageResultDTO> result = seminarQuerydslRepository.mainPagePagingSeminarWithEhCache(pageNo, pageSize);
-        return result;
-    }
-
-    @Override
-    public List<SeminarPageResultDTO> mainPagelistWithCoveringIndexAndEhCache(int pageNo, int pageSize) {
-        List<SeminarPageResultDTO> result = seminarQuerydslRepository.mainPagePagingSeminarWithCoveringIndexAndEhCache(pageNo, pageSize);
-        return result;
     }
 
     @Override

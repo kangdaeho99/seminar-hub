@@ -4,6 +4,7 @@ package com.seminarhub.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -20,22 +21,25 @@ public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_no")
-    private Long member_no;
+    private Long member_no; //고유번호
 
     @Column(length = 100, nullable = false, unique = true, name = "member_id")
-    private String member_id;
+    private String member_id; //회원아이디
 
     @Column(length = 100, nullable = false)
-    private String member_password;
+    private String member_password; //회원 비밀번호
 
-    @Column(length = 100, nullable = true)
-    private String member_nickname;
+    @Column(length = 100, nullable = false)
+    private String member_nickname; //회원닉네임
 
     @Column(nullable = false)
-    private boolean member_from_social;
+    private boolean member_from_social; //회원 소셜로그인 여부
+
+    @Column(nullable = false)
+    private BigDecimal member_charged_money; //회원 충전금액
 
     @Column()
-    private LocalDateTime del_dt;
+    private LocalDateTime del_dt; //삭제일
 
     @OneToMany(mappedBy = "member",
             fetch = FetchType.LAZY
@@ -65,6 +69,5 @@ public class Member extends BaseEntity {
     public void addMemberRole(Member_Role member_role) {
         member_role_set.add(member_role);
     }
-
 
 }

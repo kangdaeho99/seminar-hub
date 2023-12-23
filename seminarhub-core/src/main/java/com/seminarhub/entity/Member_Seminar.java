@@ -2,7 +2,6 @@ package com.seminarhub.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = {"member", "seminar", "payment"})
+@ToString(exclude = {"member", "seminar", "member_seminar_payment_history"})
 public class Member_Seminar extends BaseEntity {
 
     @Id
@@ -27,16 +26,12 @@ public class Member_Seminar extends BaseEntity {
     private Seminar seminar;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_no", referencedColumnName = "payment_no")
-    private Payment payment;
+    @JoinColumn(name = "member_seminar_payment_history_no", referencedColumnName = "member_seminar_payment_history_no")
+    private Member_Seminar_Payment_History member_seminar_payment_history;
 
-    @Column(nullable=true)
+    @Column()
     private LocalDateTime del_dt;
 
     public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
-
-    public void setPayment(Payment payment){
-        this.payment = payment;
-    }
 
 }

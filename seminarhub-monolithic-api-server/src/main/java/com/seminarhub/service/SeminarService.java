@@ -2,11 +2,7 @@ package com.seminarhub.service;
 
 import com.seminarhub.common.exception.DuplicateSeminarException;
 import com.seminarhub.dto.SeminarDTO;
-import com.seminarhub.dto.SeminarPageResultDTO;
 import com.seminarhub.entity.Seminar;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 /**
  * [ 2023-08-21 daeho.kang ]
@@ -38,10 +34,6 @@ public interface SeminarService {
      * Description: Soft remove a seminar by its seminar_name.
      */
     void remove(String seminar_name);
-
-    List<SeminarPageResultDTO> list(int pageNo, int pageSize);
-
-    List<SeminarPageResultDTO> mainPagelistWithCoveringIndexAndEhCache(int pageNo, int pageSize);
 
     /**
      * [ 2023-12-18 daeho.kang ]
