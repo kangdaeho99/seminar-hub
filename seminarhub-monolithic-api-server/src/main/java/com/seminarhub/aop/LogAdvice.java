@@ -17,8 +17,8 @@ public class LogAdvice {
 //    public void logBefore(ProceedingJoinPoint proceedingJoinPoint){
 //        log.info("========================");
 //    }
-    @Around( "execution(* com.seminarhub..*(..))")
-    public Object logTime(ProceedingJoinPoint proceedingJoinPoint){
+    @Around( "execution(* com.seminarhub.service..*(..))")
+    public Object logTime(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         log.info("========================");
         long start = System.currentTimeMillis();
 
@@ -32,6 +32,7 @@ public class LogAdvice {
             result = proceedingJoinPoint.proceed();
         } catch (Throwable e){
             e.printStackTrace();
+            throw e; // 다시 예외를 던지면서 상위 호출자에게 전달
         }
 
         long end = System.currentTimeMillis();

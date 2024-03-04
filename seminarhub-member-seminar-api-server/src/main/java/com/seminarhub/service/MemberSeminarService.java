@@ -1,9 +1,8 @@
 package com.seminarhub.service;
 
-import com.seminarhub.common.exception.DuplicateSeminarException;
+import com.seminarhub.dto.MemberSeminarDTO;
 import com.seminarhub.entity.Member;
 import com.seminarhub.entity.Member_Seminar;
-import com.seminarhub.dto.MemberSeminarDTO;
 import com.seminarhub.entity.Seminar;
 
 import java.util.List;

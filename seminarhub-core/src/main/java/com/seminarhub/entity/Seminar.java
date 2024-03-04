@@ -30,6 +30,9 @@ public class Seminar extends BaseEntity {
     @Column
     private Long seminar_maxParticipants;
 
+    @Column
+    private Long seminar_participants_cnt;
+
 //    @Version
 //    private Integer version;
 
@@ -44,4 +47,6 @@ public class Seminar extends BaseEntity {
     public void setSeminar_name(String seminar_name){
         this.seminar_name = seminar_name;
     }
+
+    public void setSeminar_participants_cnt(long seminar_participants_cnt) { this.seminar_participants_cnt = seminar_participants_cnt;}
 }

@@ -21,7 +21,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * The result is customized using an EntityGraph to eagerly load the role information.
      *
      */
-    @EntityGraph(attributePaths = {"member_role_set.role"}, type = EntityGraph.EntityGraphType.LOAD)
+//    @EntityGraph(attributePaths = {"member_role_set.role"}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT m From Member m WHERE m.member_id = :member_id AND del_dt is null")
     Optional<Member> findByMember_id(@Param("member_id") String member_id);
 

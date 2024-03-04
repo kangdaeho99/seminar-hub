@@ -1,0 +1,26 @@
+<configuration>
+    <springProperty scope="context" name="logging.logstash.host" source="logging.logstash.host"/>
+    <springProperty scope="context" name="logging.logstash.port" source="logging.logstash.port"/>
+<!--    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">-->
+<!--        <destination>${logging.logstash.host}:${logging.logstash.port}</destination>-->
+<!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />-->
+<!--    </appender>-->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${logging.logstash.host}:${logging.logstash.port}</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <fieldNames>
+                <message>message</message>
+                <timestamp>@timestamp</timestamp>
+                <version>@version</version>
+                <logger>logger_name</logger>
+                <thread>thread_name</thread>
+                <levelValue>level_value</levelValue>
+            </fieldNames>
+            <customFields>{"source.address":"%ip", "http.request.method":"%method", "url.original":"%requestURL", "http.version":"%httpVersion", "http.response.status_code":"%statusCode", "http.response.body.bytes":"%bytesSent", "http.request.referrer":"%requestHeader{Referer}", "user_agent.original":"%requestHeader{User-Agent}"}</customFields>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="LOGSTASH" />
+    </root>
+</configuration>

@@ -87,12 +87,14 @@ public class SeminarController {
      * Accessible only to users with USER role using @CheckRole annotation
      * Currently, the URL API is the same as another API, causing an error. Requires modification.
      */
-    @GetMapping(value ="/{seminar_name}")
-    @Operation(summary = "5. Get ALL seminar information by seminar_name")
-    public ResponseEntity<SeminarDTO> findAllSeminar(@PathVariable("seminar_name") String seminar_name){
-        log.info("-------------------read----------------------");
-        log.info(seminar_name);
+//    @GetMapping(value ="/{seminar_name}")
+//    @Operation(summary = "5. Get ALL seminar information by seminar_name")
+//    public ResponseEntity<SeminarDTO> findAllSeminar(@PathVariable("seminar_name") String seminar_name){
+//        log.info("-------------------read----------------------");
+//        log.info(seminar_name);
+//
+//        return new ResponseEntity<>(seminarService.get(seminar_name), HttpStatus.OK);
+//    }
 
-        return new ResponseEntity<>(seminarService.get(seminar_name), HttpStatus.OK);
-    }
+
 }

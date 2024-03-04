@@ -36,7 +36,6 @@ public class SeminarServiceImpl implements  SeminarService{
         if(seminarRepository.findBySeminar_name(seminarDTO.getSeminar_name()).isPresent()){
             throw new DuplicateSeminarException(seminarDTO.getSeminar_name() + "is Already Exists");
         }
-
         seminarRepository.save(seminar);
 
         return seminar.getSeminar_no();
@@ -98,5 +97,19 @@ public class SeminarServiceImpl implements  SeminarService{
         return str;
     }
 
+    @Override
+    public SeminarDTO getBySeminar_name(String seminar_name) {
+        return null;
+    }
+
+    @Override
+    public void increaseParticipantsCnt(long seminar_no) {
+        seminarRepository.incrementParticipantsCnt(seminar_no);
+    }
+
+    @Override
+    public void decreaseParticipantsCnt(long seminar_no) {
+        seminarRepository.decreaseParticipantsCnt(seminar_no);
+    }
 
 }

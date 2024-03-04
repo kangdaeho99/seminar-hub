@@ -3,6 +3,7 @@ package com.seminarhub.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.QMember_Seminar;
 import com.seminarhub.entity.QSeminar;
@@ -88,9 +89,16 @@ public class SeminarQuerydslRepository {
                 .fetch();
     }
 
+    public Long findCurrentParticipateCount(SeminarDTO seminarDTO){
+        QMember_Seminar member_seminar = QMember_Seminar.member_Seminar;
 
+        Long seminar_participant_cnt = queryFactory.select(member_seminar.count())
+                .from(member_seminar)
+                .where(member_seminar.seminar.seminar_no.eq(seminarDTO.getSeminar_no())
+                        .and(member_seminar.del_dt.isNull()))
+                .fetchOne();
 
-
-
+        return seminar_participant_cnt;
+    }
 
 }

@@ -1,7 +1,9 @@
 package com.seminarhub.repository;
 
 import com.seminarhub.entity.Seminar;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,15 +29,14 @@ public interface SeminarRepository extends JpaRepository<Seminar, Long> {
     @Query("SELECT s FROM Seminar s WHERE s.seminar_no = :seminar_no AND del_dt is null")
     Optional<Seminar> findBySeminar_no(@Param("seminar_no") Long seminar_no);
 
-    /**
-     * [ 2023-08-21 daeho.kang ]
-     * Description: Custom method for deleting a seminar by its seminar_name (SOFT delete)
-     */
-//    @Transactional
-//    @Modifying
-//    @Query("UPDATE Seminar s SET s.del_dt = CURRENT_TIMESTAMP WHERE s.seminar_name = :seminar_name")
-//    void deleteBySeminar_name(String seminar_name);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Seminar s SET s.seminar_participants_cnt = s.seminar_participants_cnt + 1 WHERE s.seminar_no = :seminar_no AND del_dt is null")
+    void incrementParticipantsCnt(@Param("seminar_no") Long seminar_no);
 
-
+    @Transactional
+    @Modifying
+    @Query("UPDATE Seminar s SET s.seminar_participants_cnt = s.seminar_participants_cnt - 1 WHERE s.seminar_no = :seminar_no AND del_dt is null")
+    void decreaseParticipantsCnt(@Param("seminar_no") Long seminar_no);
 
 }

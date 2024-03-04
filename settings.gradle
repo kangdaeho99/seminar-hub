@@ -8,4 +8,5 @@ include 'seminarhub-cloud-gateway-server'
 include 'seminarhub-member-seminar-api-server'
 include 'seminarhub-monolithic-api-server'
 include 'seminarhub-batch'
+include 'payment-server'
 

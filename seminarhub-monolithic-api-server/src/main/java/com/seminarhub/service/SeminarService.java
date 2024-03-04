@@ -21,7 +21,7 @@ public interface SeminarService {
      * [ 2023-08-21 daeho.kang ]
      * Description: Retrieve a seminar by its seminar_no.
      */
-    SeminarDTO get(String seminar_no);
+    SeminarDTO get(String seminar_name);
 
     /**
      * [ 2023-08-21 daeho.kang ]
@@ -42,6 +42,11 @@ public interface SeminarService {
      */
     String printOutString(String str);
 
+    SeminarDTO getBySeminar_name(String seminar_name);
+
+    void increaseParticipantsCnt(long seminar_no);
+
+    void decreaseParticipantsCnt(long seminar_no);
     /**
      * [ 2023-08-21 daeho.kang ]
      * Description: Convert a SeminarDTO object to a Seminar entity.
@@ -51,6 +56,9 @@ public interface SeminarService {
                 .seminar_no(seminarDTO.getSeminar_no())
                 .seminar_name(seminarDTO.getSeminar_name())
                 .seminar_explanation(seminarDTO.getSeminar_explanation())
+                .seminar_price(seminarDTO.getSeminar_price())
+                .seminar_maxParticipants(seminarDTO.getSeminar_max_participants())
+                .seminar_participants_cnt(seminarDTO.getSeminar_participants_cnt())
                 .build();
         return seminar;
     }
@@ -64,6 +72,9 @@ public interface SeminarService {
                 .seminar_no(seminar.getSeminar_no())
                 .seminar_name(seminar.getSeminar_name())
                 .seminar_explanation(seminar.getSeminar_explanation())
+                .seminar_max_participants(seminar.getSeminar_maxParticipants())
+                .seminar_participants_cnt(seminar.getSeminar_participants_cnt())
+                .seminar_price(seminar.getSeminar_price())
                 .build();
         return seminarDTO;
     }

@@ -1,6 +1,5 @@
 package com.seminarhub.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,13 +16,10 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentDTO {
-
-    private Long payment_no;
-    private Long member_seminar_no;
-    private Long amount;
+public class Member_Seminar_Payment_HistoryDTO {
+    private Long member_seminar_payment_history_no;
+    private Long member_seminar_payment_history_amount;
     private LocalDateTime inst_dt;
     private LocalDateTime updt_dt;
     private LocalDateTime del_dt;
-
 }
