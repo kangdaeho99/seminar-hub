@@ -57,7 +57,7 @@ public interface SeminarService {
                 .seminar_name(seminarDTO.getSeminar_name())
                 .seminar_explanation(seminarDTO.getSeminar_explanation())
                 .seminar_price(seminarDTO.getSeminar_price())
-                .seminar_maxParticipants(seminarDTO.getSeminar_max_participants())
+                .seminar_max_participants(seminarDTO.getSeminar_max_participants())
                 .seminar_participants_cnt(seminarDTO.getSeminar_participants_cnt())
                 .build();
         return seminar;
@@ -72,7 +72,7 @@ public interface SeminarService {
                 .seminar_no(seminar.getSeminar_no())
                 .seminar_name(seminar.getSeminar_name())
                 .seminar_explanation(seminar.getSeminar_explanation())
-                .seminar_max_participants(seminar.getSeminar_maxParticipants())
+                .seminar_max_participants(seminar.getSeminar_max_participants())
                 .seminar_participants_cnt(seminar.getSeminar_participants_cnt())
                 .seminar_price(seminar.getSeminar_price())
                 .build();

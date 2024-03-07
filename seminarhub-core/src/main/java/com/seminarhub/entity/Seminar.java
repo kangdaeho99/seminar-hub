@@ -28,7 +28,7 @@ public class Seminar extends BaseEntity {
     private Long seminar_price;
 
     @Column
-    private Long seminar_maxParticipants;
+    private Long seminar_max_participants;
 
     @Column
     private Long seminar_participants_cnt;

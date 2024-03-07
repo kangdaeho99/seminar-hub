@@ -23,7 +23,7 @@ public class Member extends BaseEntity {
     @Column(name = "member_no")
     private Long member_no; //고유번호
 
-    @Column(length = 100, nullable = false, unique = true, name = "member_id")
+    @Column(length = 100, unique = true, name = "member_id")
     private String member_id; //회원아이디
 
     @Column(length = 100, nullable = false)
@@ -32,10 +32,9 @@ public class Member extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String member_nickname; //회원닉네임
 
-    @Column(nullable = false)
     private boolean member_from_social; //회원 소셜로그인 여부
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "DECIMAL(19, 2) DEFAULT 0.0")
     private BigDecimal member_charged_money; //회원 충전금액
 
     @Column()

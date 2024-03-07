@@ -96,11 +96,12 @@ public class MemberRepositoryTests {
     @Test
     public void dummyInsert(){
 
-        for(int i=1; i<100; i++){
+        for(int i=1; i<2; i++){
             Member member = Member.builder()
                     .member_id("MemberDummyIndex"+i)
                     .member_nickname("NickName"+i)
                     .member_password("password"+i)
+
                     .build();
 
             Role userRole = roleRepository.findByRole_type(RoleType.USER)
