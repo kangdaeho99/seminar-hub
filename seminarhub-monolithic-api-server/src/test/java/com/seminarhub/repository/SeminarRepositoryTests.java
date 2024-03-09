@@ -2,6 +2,7 @@ package com.seminarhub.repository;
 
 
 import com.seminarhub.entity.Seminar;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -152,6 +153,36 @@ public class SeminarRepositoryTests {
                     .build();
             seminarRepository.save(seminar);
         }
+    }
+    /**
+     * [ 2024-03-xx passionfruit200 ]
+     * Description :
+     * Hibernate:
+     *     select
+     *         s1_0.seminar_no,
+     *         s1_0.del_dt,
+     *         s1_0.inst_dt,
+     *         s1_0.seminar_explanation,
+     *         s1_0.seminar_max_participants,
+     *         s1_0.seminar_name,
+     *         s1_0.seminar_participants_cnt,
+     *         s1_0.seminar_price,
+     *         s1_0.updt_dt
+     *     from
+     *         seminar s1_0
+     *     where
+     *         s1_0.seminar_name=?
+     *         and s1_0.del_dt is null for update
+     */
+    @DisplayName("getBySeminar_NameWithPessimisticLock Test ")
+    @Transactional
+    @Test
+    public void testGetBySeminar_NameWithPessimisticLock(){
+        // given // when
+        Optional<Seminar> seminar = seminarQuerydslRepository.findBySeminar_NameWithPessimisticLock("스타크래프트 세미나");
+
+        // then
+        assertNotNull(seminar.get());
     }
 
 }

@@ -23,6 +23,8 @@ public interface SeminarService {
      */
     SeminarDTO get(String seminar_name);
 
+    SeminarDTO getWithPessimisticLock(String seminar_name);
+
     /**
      * [ 2023-08-21 daeho.kang ]
      * Description: Modify an existing seminar's information.

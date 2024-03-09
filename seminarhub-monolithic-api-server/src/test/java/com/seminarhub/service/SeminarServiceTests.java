@@ -4,6 +4,7 @@ import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.entity.Seminar;
 import com.seminarhub.repository.SeminarQuerydslRepository;
 import com.seminarhub.repository.SeminarRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,29 @@ public class SeminarServiceTests {
         Assertions.assertEquals(seminarDTO.getSeminar_explanation(), "SeminarExplanation");
 
         verify(seminarRepository).findBySeminar_name("SeminarTest");
+    }
+
+    @DisplayName("Seminar Service getWithPessimisticLock Test")
+    @Transactional
+    @Test
+    public void testGetWithPessimisticLockSeminar(){
+        // Given
+        Seminar existingSeminar = Seminar.builder()
+                .seminar_no((long)123L)
+                .seminar_name("SeminarTest")
+                .seminar_explanation("SeminarExplanation")
+                .build();
+        Mockito.when(seminarQuerydslRepository.findBySeminar_NameWithPessimisticLock("SeminarTest")).thenReturn(Optional.of(existingSeminar));
+
+        // when
+        SeminarDTO seminarDTO = seminarService.getWithPessimisticLock("SeminarTest");
+
+        // then
+        Assertions.assertEquals(seminarDTO.getSeminar_no(), 123L);
+        Assertions.assertEquals(seminarDTO.getSeminar_name(), "SeminarTest");
+        Assertions.assertEquals(seminarDTO.getSeminar_explanation(), "SeminarExplanation");
+
+        verify(seminarQuerydslRepository).findBySeminar_NameWithPessimisticLock("SeminarTest");
     }
 
     @DisplayName("Seminar Service Increase Participants Count Test")

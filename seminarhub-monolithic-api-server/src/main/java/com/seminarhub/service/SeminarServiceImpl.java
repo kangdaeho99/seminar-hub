@@ -3,6 +3,7 @@ package com.seminarhub.service;
 import com.seminarhub.common.exception.DuplicateSeminarException;
 import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.entity.Seminar;
+import com.seminarhub.repository.SeminarQuerydslRepository;
 import com.seminarhub.repository.SeminarRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,8 @@ import java.util.Optional;
 public class SeminarServiceImpl implements  SeminarService{
 
     private final SeminarRepository seminarRepository;
+
+    private final SeminarQuerydslRepository seminarQuerydslRepository;
 
     /**
      * [ 2023-08-10 daeho.kang ]
@@ -55,6 +58,14 @@ public class SeminarServiceImpl implements  SeminarService{
         return null;
     }
 
+    @Override
+    public SeminarDTO getWithPessimisticLock(String seminar_name) {
+        Optional<Seminar> result = seminarQuerydslRepository.findBySeminar_NameWithPessimisticLock(seminar_name);
+        if(result.isPresent()){
+            return entityToDTO(result.get());
+        }
+        return null;
+    }
 
 
     /**

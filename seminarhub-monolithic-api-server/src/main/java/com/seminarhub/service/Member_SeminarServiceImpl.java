@@ -13,6 +13,7 @@ import com.seminarhub.repository.SeminarQuerydslRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -60,33 +61,30 @@ public class Member_SeminarServiceImpl implements Member_SeminarService{
         }
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public Long registerForSeminar(MemberSeminarRegisterRequestDTO memberSeminarRegisterRequestDTO) throws SeminarRegistrationFullException {
         log.info(memberSeminarRegisterRequestDTO.toString());
-        SeminarDTO seminarDTO = seminarService.get(memberSeminarRegisterRequestDTO.getSeminar_name());
         MemberDTO memberDTO = memberService.get(memberSeminarRegisterRequestDTO.getMember_id());
+        SeminarDTO seminarDTO = seminarService.getWithPessimisticLock(memberSeminarRegisterRequestDTO.getSeminar_name());
+
         if (seminarDTO == null || memberDTO == null) {
             // 예외 처리: 세미나나 멤버가 존재하지 않는 경우
             throw new SeminarRegistrationFullException("There are no Info Of Member || Seminar");
         }
 
-        //먼저 진행해야만, 다른 Repeatable_Read 격리 레벨에서 작동이 가능하다. (Repeatable_read에서는 현재 다른 트랜잭션이 조회하는 데이터는 수정하거나 삭제할 수 없기 때문이다.)
-        seminarService.increaseParticipantsCnt(seminarDTO.getSeminar_no());
-
         //신청하려는 Seminar가 아직 남아있는지 확인해야하고, Transactional로 격리상태를 유지해야합니다.
 //        Long currentParticipateCnt = seminarQuerydslRepository.findCurrentParticipateCount(seminarDTO);
         Long currentParticipateCnt = seminarDTO.getSeminar_participants_cnt();
-        if (seminarDTO.getSeminar_max_participants() < currentParticipateCnt) {
+        if (seminarDTO.getSeminar_max_participants() <= (currentParticipateCnt)) {
             throw new SeminarRegistrationFullException("SeminarInfo:" + seminarDTO.getSeminar_name() + "is already " + currentParticipateCnt + "/" + seminarDTO.getSeminar_max_participants() + " full. Registration failed.");
         }
+        seminarService.increaseParticipantsCnt(seminarDTO.getSeminar_no());
 
         Member_Seminar_Payment_History member_seminar_payment_history = Member_Seminar_Payment_History.builder()
                 .member_seminar_payment_history_amount(seminarDTO.getSeminar_price())
                 .build();
         member_seminar_payment_historyRepository.save(member_seminar_payment_history);
-
-
 
         Member_SeminarDTO member_seminarDTO = Member_SeminarDTO.builder()
                 .member_no(memberDTO.getMember_no())

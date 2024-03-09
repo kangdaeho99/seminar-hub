@@ -8,12 +8,14 @@ import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.QMember_Seminar;
 import com.seminarhub.entity.QSeminar;
 import com.seminarhub.entity.Seminar;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -28,6 +30,18 @@ public class SeminarQuerydslRepository {
                 .where(qSeminar.seminar_name.eq(seminar_name)
                 .and(qSeminar.del_dt.isNull()))
                 .fetch();
+    }
+
+    public Optional<Seminar> findBySeminar_NameWithPessimisticLock(String seminar_name){
+        QSeminar qSeminar = QSeminar.seminar;
+
+        // 세미나 레코드를 PESSIMISTIC_WRITE 락으로 가져옵니다.
+        Seminar seminarEntityLock = queryFactory.selectFrom(qSeminar)
+                .where(qSeminar.seminar_name.eq(seminar_name)
+                        .and(qSeminar.seminar.del_dt.isNull()))
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락 설정
+                .fetchOne();
+        return Optional.ofNullable(seminarEntityLock);
     }
 
 
