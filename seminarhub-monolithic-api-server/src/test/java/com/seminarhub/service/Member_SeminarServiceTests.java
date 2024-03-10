@@ -17,9 +17,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -242,6 +247,97 @@ public class Member_SeminarServiceTests {
             // ExecutorService 종료
             executorService.shutdown();
         }
+
+    }
+
+
+
+    String member_id = "passionfruit200@naver.com";
+    String[] seminar_name_arr = new String[] { "2024년 상반기 스타크래프트 테란 세미나", "2024년 상반기 스타크래프트 프로토스 세미나", "스타크래프트 세미나", "2024년 상반기 스타크래프트 저그 세미나"};
+    boolean[] visited = new boolean[seminar_name_arr.length];
+    public List<String> memberSeminarRegisterRequestDTOList = new ArrayList<>();
+
+    int[] answer;
+    public void seminar_name_Permutation(int level, int size, int maxSize){
+        if(level == maxSize){
+            StringBuilder sb = new StringBuilder();
+            for(int i=0;i<answer.length;i++){
+                sb.append(answer[i]+" ");
+            }
+            memberSeminarRegisterRequestDTOList.add(sb.toString());
+            return ;
+        }
+        for(int i=0;i<seminar_name_arr.length;i++){
+            if(visited[i] == false){
+                visited[i] = true;
+                answer[level] = i;
+                seminar_name_Permutation(level + 1, size + 1, maxSize);
+                visited[i] = false;
+            }
+        }
+
+    }
+    @DisplayName("Member_Seminar Service RegisterForSeminar Test")
+    @Test
+    public void testWithThreadsRegisterForSeminarList() throws SeminarRegistrationFullException {
+        String member_id = "passionfruit200@naver.com";
+        String seminar_name = "스타크래프트 세미나";
+
+        String[] seminar_name_arr = new String[] { "2024년 상반기 스타크래프트 테란 세미나", "2024년 상반기 스타크래프트 프로토스 세미나", "스타크래프트 세미나", "2024년 상반기 스타크래프트 저그 세미나"};
+
+        for(int i=1;i<=seminar_name_arr.length;i++){
+            answer = new int[i];
+            seminar_name_Permutation(0, 0, i);
+        }
+        
+//        for(int i=0;i<memberSeminarRegisterRequestDTOList.size();i++){
+//            System.out.println("KIND --- ");
+//            System.out.println(memberSeminarRegisterRequestDTOList.get(i));
+//        }
+
+        Random random = new Random();
+//        for(int i=0;i<100;i++){
+//            int randomIndex = random.nextInt(memberSeminarRegisterRequestDTOList.size()); // memberSeminarRegisterRequestDTOList에서 랜덤한 인덱스를 선택합니다.
+//            System.out.println("-----------------------------------------randomIndex:"+randomIndex);
+//            System.out.println(memberSeminarRegisterRequestDTOList.get(randomIndex));
+//        }
+
+        AtomicInteger allNumber = new AtomicInteger();
+        final int executeNumber = 400;
+        final ExecutorService executorService = Executors.newFixedThreadPool(100);
+        final CountDownLatch countDownLatch = new CountDownLatch(executeNumber);
+        for(int i=0;i<executeNumber; i++){
+            executorService.execute( () -> {
+                try{
+                    int randomIndex = random.nextInt(memberSeminarRegisterRequestDTOList.size()); // memberSeminarRegisterRequestDTOList에서 랜덤한 인덱스를 선택합니다.
+                    String[] info = memberSeminarRegisterRequestDTOList.get( (randomIndex) ).split(" ");
+                    Arrays.sort(info);
+                    allNumber.addAndGet(info.length);
+                    List<MemberSeminarRegisterRequestDTO> MemberSeminarRegisterRequestDTOLIST = new ArrayList<>();
+                    for(int j=0;j<info.length;j++){
+                        MemberSeminarRegisterRequestDTOLIST.add(new MemberSeminarRegisterRequestDTO(member_id, seminar_name_arr[ Integer.parseInt(info[j])]));
+                    }
+                    memberSeminarService.registerForSeminarWithList(MemberSeminarRegisterRequestDTOLIST);
+                }catch(Exception e){
+                    System.out.println(e.getMessage());
+                }finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        try {
+            // 모든 스레드가 종료될 때까지 대기
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Thread interrupted while waiting for completion.");
+        } finally {
+            // ExecutorService 종료
+            executorService.shutdown();
+        }
+        
+        System.out.println("allNumber:"+allNumber);
 
     }
 

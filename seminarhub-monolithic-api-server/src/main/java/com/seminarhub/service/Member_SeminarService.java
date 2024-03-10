@@ -9,6 +9,8 @@ import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.Member_Seminar_Payment_History;
 import com.seminarhub.entity.Seminar;
 
+import java.util.List;
+
 public interface Member_SeminarService {
     /**
      * [ 2023-08-21 daeho.kang ]
@@ -30,6 +32,8 @@ public interface Member_SeminarService {
     void modify(Member_SeminarDTO Member_SeminarDTO);
 
     Long registerForSeminar(MemberSeminarRegisterRequestDTO memberSeminarRegisterRequestDTO) throws SeminarRegistrationFullException;
+
+    void registerForSeminarWithList(List<MemberSeminarRegisterRequestDTO> memberSeminarRegisterRequestDTO) throws SeminarRegistrationFullException;
 
     /**
      * [ 2023-08-21 daeho.kang ]

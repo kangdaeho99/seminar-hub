@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -95,6 +97,53 @@ public class Member_SeminarServiceImpl implements Member_SeminarService{
         member_seminarRepository.save(member_seminar);
         return member_seminar.getMember_seminar_no();
     }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_UNCOMMITTED)
+    @Override
+    public void registerForSeminarWithList(List<MemberSeminarRegisterRequestDTO> memberSeminarRegisterRequestDTO) throws SeminarRegistrationFullException {
+//        log.info(memberSeminarRegisterRequestDTO.toString());
+        for(int i=0;i<memberSeminarRegisterRequestDTO.size();i++) {
+            try{
+                registerSeminarIndependently(memberSeminarRegisterRequestDTO.get(i));
+            }catch (Throwable e){
+                e.printStackTrace();
+                throw e; // 다시 예외를 던지면서 상위 호출자에게 전달
+            }
+        }
+
+//        return member_seminar.getMember_seminar_no();
+    }
+
+    @Transactional( isolation = Isolation.READ_UNCOMMITTED)
+    public void registerSeminarIndependently(MemberSeminarRegisterRequestDTO memberSeminarRegisterRequestDTO){
+        MemberDTO memberDTO = memberService.get(memberSeminarRegisterRequestDTO.getMember_id());
+        SeminarDTO seminarDTO = seminarService.getWithPessimisticLock(memberSeminarRegisterRequestDTO.getSeminar_name());
+
+        if (seminarDTO == null || memberDTO == null) {
+            // 예외 처리: 세미나나 멤버가 존재하지 않는 경우
+            throw new SeminarRegistrationFullException("There are no Info Of Member || Seminar");
+        }
+
+        Long currentParticipateCnt = seminarDTO.getSeminar_participants_cnt();
+        if (seminarDTO.getSeminar_max_participants() <= (currentParticipateCnt)) {
+            throw new SeminarRegistrationFullException("SeminarInfo:" + seminarDTO.getSeminar_name() + "is already " + currentParticipateCnt + "/" + seminarDTO.getSeminar_max_participants() + " full. Registration failed.");
+        }
+        seminarService.increaseParticipantsCnt(seminarDTO.getSeminar_no());
+
+        Member_Seminar_Payment_History member_seminar_payment_history = Member_Seminar_Payment_History.builder()
+                .member_seminar_payment_history_amount(seminarDTO.getSeminar_price())
+                .build();
+        member_seminar_payment_historyRepository.save(member_seminar_payment_history);
+
+        Member_SeminarDTO member_seminarDTO = Member_SeminarDTO.builder()
+                .member_no(memberDTO.getMember_no())
+                .seminar_no(seminarDTO.getSeminar_no())
+                .member_seminar_payment_history_no(member_seminar_payment_history.getMember_seminar_payment_history_no())
+                .build();
+        Member_Seminar member_seminar = dtoToEntity(member_seminarDTO);
+        member_seminarRepository.save(member_seminar);
+    }
+
 
 //    @Transactional
 //    @Override
