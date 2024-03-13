@@ -14,6 +14,8 @@ public interface MemberService {
 
     MemberDTO get(String member_id);
 
+    MemberDTO getMember_no(String member_id);
+
     void modify(MemberDTO memberDTO);
 
     @Transactional

@@ -116,7 +116,7 @@ public class Member_SeminarServiceImpl implements Member_SeminarService{
 
     @Transactional( isolation = Isolation.READ_UNCOMMITTED)
     public void registerSeminarIndependently(MemberSeminarRegisterRequestDTO memberSeminarRegisterRequestDTO){
-        MemberDTO memberDTO = memberService.get(memberSeminarRegisterRequestDTO.getMember_id());
+        MemberDTO memberDTO = memberService.getMember_no(memberSeminarRegisterRequestDTO.getMember_id());
         SeminarDTO seminarDTO = seminarService.getWithPessimisticLock(memberSeminarRegisterRequestDTO.getSeminar_name());
 
         if (seminarDTO == null || memberDTO == null) {

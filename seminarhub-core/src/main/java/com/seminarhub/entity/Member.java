@@ -23,16 +23,17 @@ public class Member extends BaseEntity {
     @Column(name = "member_no")
     private Long member_no; //고유번호
 
-    @Column(length = 100, unique = true, name = "member_id")
+    @Column(length = 500, unique = true, name = "member_id")
     private String member_id; //회원아이디
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 500, nullable = false)
     private String member_password; //회원 비밀번호
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 500, nullable = false)
     private String member_nickname; //회원닉네임
 
-    private boolean member_from_social; //회원 소셜로그인 여부
+    @Column(columnDefinition = "BIT default false")
+    private boolean member_from_social;
 
     @Column(columnDefinition = "DECIMAL(19, 2) DEFAULT 0.0")
     private BigDecimal member_charged_money; //회원 충전금액

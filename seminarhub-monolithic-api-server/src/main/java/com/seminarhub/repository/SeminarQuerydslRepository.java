@@ -37,10 +37,18 @@ public class SeminarQuerydslRepository {
 
         // 세미나 레코드를 PESSIMISTIC_WRITE 락으로 가져옵니다.
         Seminar seminarEntityLock = queryFactory.selectFrom(qSeminar)
+                .select(Projections.fields(Seminar.class,
+                        qSeminar.seminar_max_participants,
+                        qSeminar.seminar_participants_cnt))
                 .where(qSeminar.seminar_name.eq(seminar_name)
                         .and(qSeminar.seminar.del_dt.isNull()))
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락 설정
                 .fetchOne();
+//        Seminar seminarEntityLock = queryFactory.selectFrom(qSeminar)
+//                .where(qSeminar.seminar_name.eq(seminar_name)
+//                        .and(qSeminar.seminar.del_dt.isNull()))
+//                .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락 설정
+//                .fetchOne();
         return Optional.ofNullable(seminarEntityLock);
     }
 

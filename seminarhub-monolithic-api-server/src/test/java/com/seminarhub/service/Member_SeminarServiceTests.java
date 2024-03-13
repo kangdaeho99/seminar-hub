@@ -256,7 +256,6 @@ public class Member_SeminarServiceTests {
     String[] seminar_name_arr = new String[] { "2024년 상반기 스타크래프트 테란 세미나", "2024년 상반기 스타크래프트 프로토스 세미나", "스타크래프트 세미나", "2024년 상반기 스타크래프트 저그 세미나"};
     boolean[] visited = new boolean[seminar_name_arr.length];
     public List<String> memberSeminarRegisterRequestDTOList = new ArrayList<>();
-
     int[] answer;
     public void seminar_name_Permutation(int level, int size, int maxSize){
         if(level == maxSize){

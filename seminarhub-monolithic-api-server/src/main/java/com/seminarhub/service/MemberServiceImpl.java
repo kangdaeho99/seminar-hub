@@ -56,6 +56,15 @@ public class MemberServiceImpl implements  MemberService{
         return null;
     }
 
+    @Override
+    public MemberDTO getMember_no(String member_id) {
+        Optional<Member> result = memberRepository.findByMember_id(member_id);
+        if(result.isPresent()){
+            return entityToDTO(result.get());
+        }
+        return null;
+    }
+
     /**
      * [ 2023-08-10 daeho.kang ]
      * Description: Modifies member information based on the provided memberDTO.

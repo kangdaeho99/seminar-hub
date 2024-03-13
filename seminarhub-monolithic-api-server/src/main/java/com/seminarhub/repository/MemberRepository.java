@@ -25,6 +25,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m From Member m WHERE m.member_id = :member_id AND del_dt is null")
     Optional<Member> findByMember_id(@Param("member_id") String member_id);
 
+    @Query("SELECT m.member_no From Member m WHERE m.member_id = :member_id AND del_dt is null")
+    Optional<Member> findMember_noByMember_id(@Param("member_id") String member_id);
+
     @EntityGraph(attributePaths = {"member_role_set.role"}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT m From Member m WHERE m.member_no = :member_no AND del_dt is null")
     Optional<Member> findByMember_no(@Param("member_no") Long member_no);
