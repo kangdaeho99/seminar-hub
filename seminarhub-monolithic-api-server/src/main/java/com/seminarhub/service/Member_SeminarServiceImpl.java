@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,6 +103,13 @@ public class Member_SeminarServiceImpl implements Member_SeminarService{
     @Override
     public void registerForSeminarWithList(List<MemberSeminarRegisterRequestDTO> memberSeminarRegisterRequestDTO) throws SeminarRegistrationFullException {
 //        log.info(memberSeminarRegisterRequestDTO.toString());
+        //오름차순 정렬
+        Collections.sort(memberSeminarRegisterRequestDTO, (dto1, dto2) -> {
+            if(dto1.getSeminar_no() > dto2.getSeminar_no()) return 1;
+            else if(dto1.getSeminar_no() < dto2.getSeminar_no()) return -1;
+            else return 0;
+        });
+
         for(int i=0;i<memberSeminarRegisterRequestDTO.size();i++) {
             try{
                 registerSeminarIndependently(memberSeminarRegisterRequestDTO.get(i));
@@ -114,10 +122,10 @@ public class Member_SeminarServiceImpl implements Member_SeminarService{
 //        return member_seminar.getMember_seminar_no();
     }
 
-    @Transactional( isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_UNCOMMITTED)
     public void registerSeminarIndependently(MemberSeminarRegisterRequestDTO memberSeminarRegisterRequestDTO){
         MemberDTO memberDTO = memberService.getMember_no(memberSeminarRegisterRequestDTO.getMember_id());
-        SeminarDTO seminarDTO = seminarService.getWithPessimisticLock(memberSeminarRegisterRequestDTO.getSeminar_name());
+        SeminarDTO seminarDTO = seminarService.getBySeminar_NoWithPessimisticLock(memberSeminarRegisterRequestDTO.getSeminar_no());
 
         if (seminarDTO == null || memberDTO == null) {
             // 예외 처리: 세미나나 멤버가 존재하지 않는 경우

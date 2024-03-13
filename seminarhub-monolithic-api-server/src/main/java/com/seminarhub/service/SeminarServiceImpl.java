@@ -67,6 +67,16 @@ public class SeminarServiceImpl implements  SeminarService{
         return null;
     }
 
+    @Override
+    public SeminarDTO getBySeminar_NoWithPessimisticLock(Long seminar_no) {
+        Optional<Seminar> result = seminarQuerydslRepository.findBySeminar_NoWithPessimisticLock(seminar_no);
+        if(result.isPresent()){
+            return entityToDTO(result.get());
+        }
+        return null;
+    }
+
+
 
     /**
      * [ 2023-08-10 daeho.kang ]

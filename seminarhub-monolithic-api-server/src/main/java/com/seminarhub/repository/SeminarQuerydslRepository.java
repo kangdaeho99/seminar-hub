@@ -52,6 +52,23 @@ public class SeminarQuerydslRepository {
         return Optional.ofNullable(seminarEntityLock);
     }
 
+    public Optional<Seminar> findBySeminar_NoWithPessimisticLock(Long seminar_no){
+        QSeminar qSeminar = QSeminar.seminar;
+
+        // 세미나 레코드를 PESSIMISTIC_WRITE 락으로 가져옵니다.
+        Seminar seminarEntityLock = queryFactory.selectFrom(qSeminar)
+                .select(Projections.fields(Seminar.class,
+                        qSeminar.seminar_max_participants,
+                        qSeminar.seminar_participants_cnt,
+                        qSeminar.seminar_name,
+                        qSeminar.seminar_no))
+                .where(qSeminar.seminar_no.eq(seminar_no)
+                        .and(qSeminar.seminar.del_dt.isNull()))
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락 설정
+                .fetchOne();
+        return Optional.ofNullable(seminarEntityLock);
+    }
+
 
     //Boolean Builder
     public List<Seminar> findSeminarByBooleanBuilder(String seminar_name, String seminar_explanation){
