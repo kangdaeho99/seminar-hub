@@ -47,7 +47,7 @@ public class Member extends BaseEntity {
     @Builder.Default
     private Set<Member_Role> member_role_set = new HashSet<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Member_Seminar> member_seminar_list;
 
     public Member(long member_no) {
