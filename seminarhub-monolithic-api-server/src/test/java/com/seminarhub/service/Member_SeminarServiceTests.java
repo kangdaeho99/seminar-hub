@@ -295,8 +295,10 @@ public class Member_SeminarServiceTests {
         Random random = new Random();
         //총 몇번의 트랜잭션이 시작되었는지 counting 합니다. 이를 통해 올바르게 롤백되었는지도 확인할 수 있습니다.
         AtomicInteger allNumber = new AtomicInteger();
+        AtomicInteger successNumber = new AtomicInteger();
+        AtomicInteger failedNumber = new AtomicInteger();
         final int executeNumber = 1000;
-        final ExecutorService executorService = Executors.newFixedThreadPool(100);
+        final ExecutorService executorService = Executors.newFixedThreadPool(500);
         final CountDownLatch countDownLatch = new CountDownLatch(executeNumber);
         for(int i=0;i<executeNumber; i++){
             executorService.execute( () -> {
@@ -319,7 +321,9 @@ public class Member_SeminarServiceTests {
                     try {
                         memberSeminarService.registerForSeminarWithList(MemberSeminarRegisterRequestDTOLIST);
                         allNumber.addAndGet(info.length);
+                        successNumber.addAndGet(1);
                     }catch (Exception e){
+                        failedNumber.addAndGet(1);
                         throw e;
                     }
                 }catch(Exception e){
@@ -342,6 +346,8 @@ public class Member_SeminarServiceTests {
         }
         
         System.out.println("allNumber:"+allNumber);
+        System.out.println("successNumber:"+successNumber);
+        System.out.println("failedNumber:"+failedNumber);
 
     }
 
