@@ -193,10 +193,22 @@ public class SeminarRepositoryTests {
     @DisplayName("getBySeminar_NameWithPessimisticLock Test ")
     @Transactional
     @Test
-    public void testGetBySeminar_NameWithPessimisticLockQuerydsl(){
+    public void testFindBySeminar_NameWithPessimisticLockQuerydsl(){
         // given // when
         Optional<Seminar> seminar = seminarQuerydslRepository.findBySeminar_NameWithPessimisticLock("스타크래프트 세미나");
         System.out.println(" "+seminar.toString());
+        // then
+        assertNotNull(seminar.get());
+    }
+
+    @DisplayName("getBySeminar_NameWithPessimisticLock Test ")
+    @Transactional
+    @Test
+    public void testFindBySeminar_NoWithPessimisticLockQuerydsl(){
+        // given // when
+        Optional<Seminar> seminar = seminarQuerydslRepository.findBySeminar_NoWithPessimisticLock(7L);
+        System.out.println(" "+seminar.toString());
+
         // then
         assertNotNull(seminar.get());
     }

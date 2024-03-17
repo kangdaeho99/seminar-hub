@@ -17,8 +17,12 @@ public class Member_Seminar_Payment_History extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long member_seminar_payment_history_no;
 
-    @Column()
+    @Column(nullable = false)
     private Long member_seminar_payment_history_amount;
+
+//    JPA에서 제공하지 않음.
+//    @OneToOne(mappedBy = "member_seminar_payment_history")
+//    private Member_Seminar member_seminar;
 
     @Column()
     private LocalDateTime del_dt;
