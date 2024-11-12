@@ -824,4 +824,56 @@ public class functionUtil {
         }
     }
 
+    public static int f_randintminmax(int min, int max) {
+        // 최소값이 최대값보다 큰 경우 예외 처리
+        if (min > max) {
+            return 0; // Java에서는 NULL 대신 기본값 0을 반환하거나
+            // throw new IllegalArgumentException("min cannot be greater than max"); // 예외를 던질 수 있습니다
+        }
+        // Math.random()은 0.0 이상 1.0 미만의 난수를 생성
+        // MySQL의 RAND()와 동일한 기능
+        return (int) (Math.random() * (max - min + 1)) + min;
+    }
+
+    public static String f_randpointtype() {
+        // Math.random()을 사용하여 0-14 사이의 난수 생성
+        int randomNum = (int) (Math.random() * 15);
+
+        // MySQL의 CASE문을 switch문으로 변환
+        String result;
+        switch (randomNum) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 5:
+            case 7:
+                result = "SEMINAR_PURCHASE";
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+            case 14:  // ELSE에 해당
+                result = "WITHDRAW";
+                break;
+            case 8:
+                result = "EVENT";
+                break;
+            case 10:
+                result = "PROMOTION";
+                break;
+            case 12:
+                result = "ADMIN_MANUAL";
+                break;
+            case 13:
+                result = "REFERRAL";
+                break;
+            default:
+                result = "WITHDRAW";
+                break;
+        }
+
+        return result;
+    }
 }

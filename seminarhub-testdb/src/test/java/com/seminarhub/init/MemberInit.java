@@ -63,7 +63,11 @@ public class MemberInit {
 //        procedureUtil.sp_insert_board(1, 100); //하나의 회원당 평균 3개씩, 10000000명의 회원이, 30 *
         procedureUtil.sp_insert_board(1, 10000000); //하나의 회원당 평균 3개씩, 10000000명의 회원이, 30 *
     }
-
+    // 10 -> 50개. 10 000000 -> 50000000
+    @Test
+    public void procedureInsertMemberPointCSVTest(){
+        procedureUtil.sp_insert_member_points_history(1, 10000000);
+    }
 
 
 

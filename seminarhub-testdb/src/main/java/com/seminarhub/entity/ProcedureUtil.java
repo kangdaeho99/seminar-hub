@@ -254,7 +254,75 @@ public class ProcedureUtil {
         System.out.println("게시판 데이터 파일 생성 완료");
     }
 
+    public void sp_insert_member_points_history(int pointCnt, int maxMemberNo) {
+        String filePath = "member_points_history.csv";
+        long historyNo = 1; // history_no 초기화
 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // 1부터 최대 회원번호까지 순회
+            for (int memberNo = 1; memberNo <= maxMemberNo; memberNo++) {
+                // 각 회원의 이력 건수를 0~pointCnt 사이의 랜덤값으로 설정
+                int recordsToCreate = (int) Math.max(0, ThreadLocalRandom.current().nextGaussian() * pointCnt * 10 + pointCnt);
+
+                // 회원의 초기값 설정
+                int currentPoint = 0;
+                int version = 1;
+                // 각 회원의 시작 시간을 랜덤으로 설정
+                LocalDateTime currentDateTime = f_randdatetime(
+                        LocalDateTime.of(2000, 1, 1, 0, 0),
+                        LocalDateTime.of(2024, 11, 2, 0, 0)
+                );
+
+                // 각 회원별 이력 생성
+                for (int v = 1; v <= recordsToCreate; v++) {
+                    // 포인트 타입 먼저 결정
+                    String pointType = f_randpointtype();
+
+                    // 포인트 타입에 따른 amount 값 생성
+                    int amount;
+                    if (pointType.equals("WITHDRAW")) {
+                        // withdraw인 경우 음수값만 생성 (-40000 ~ -1)
+                        amount = -f_randintminmax(1, 40000);
+                    } else {
+                        // 다른 타입인 경우 기존 로직대로 처리
+                        amount = f_randintminmax(-40000, 50000);
+                    }
+
+                    // point가 0 미만이 되는 경우 amount 조정
+                    if ((currentPoint + amount) < 0) {
+                        amount = -currentPoint;
+                    }
+
+                    // 포인트 누적
+                    currentPoint += amount;
+
+                    // CSV 형식으로 작성
+                    writer.write(String.format("%d,%d,%d,\"\",%d,%d,%s,\"%s\",\"%s\",NULL\n",
+                            historyNo++,        // history_no (PK)
+                            memberNo,           // member_no
+                            version,            // version
+                            amount,             // amount
+                            currentPoint,       // point
+                            pointType,          // type
+                            currentDateTime,    // inst_dt
+                            currentDateTime     // updt_dt
+                    ));
+
+                    // 다음 기록을 위해 시간 증가 (1분~24시간 사이 랜덤)
+                    currentDateTime = currentDateTime.plusSeconds(60 + (int)(Math.random() * 86340));
+                    version++;
+                }
+
+                // 진행상황 출력 (1000000건마다)
+                if (memberNo % 1000000 == 0) {
+                    System.out.printf("Processed member %d / %d\n", memberNo, maxMemberNo);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("포인트 이력 데이터 파일 생성 완료");
+    }
 
 
 
