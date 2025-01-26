@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'com.seminarhub'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24' // Lombok 어노테이션 프로세서 버전 추가
+
+    implementation 'org.springframework:spring-jdbc:5.3.24' // Spring JDBC 의존성 추가
+    implementation 'org.springframework:spring-context:5.3.24' // Spring Context 의존성 추가
+    implementation 'mysql:mysql-connector-java:8.0.21' // MySQL 드라이버 의존성
+
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.0.13'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: '3.0.13'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.0.13'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+}
+test {
+    useJUnitPlatform()
+}
