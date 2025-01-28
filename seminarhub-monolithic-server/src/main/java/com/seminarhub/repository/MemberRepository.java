@@ -3,14 +3,8 @@ package com.seminarhub.repository;
 import com.seminarhub.dto.GenericDTORowMapper;
 import com.seminarhub.dto.MemberDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,8 +36,6 @@ public class MemberRepository {
                 LocalDateTime.now()   // updt_dt
         );
     }
-
-
 
     //SELECT
     public MemberDTO findMemberById(int member_no) {
@@ -86,4 +78,9 @@ public class MemberRepository {
         return jdbcTemplate.update(sql, LocalDateTime.now(), memberNo);
     }
 
+
+    public MemberDTO findPwById(String id){
+        String sql = "SELECT pw FROM member WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql,new Object[]{id}, new GenericDTORowMapper<>(MemberDTO.class));
+    }
 }
