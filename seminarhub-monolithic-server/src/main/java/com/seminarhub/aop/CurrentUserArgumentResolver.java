@@ -1,6 +1,6 @@
 package com.seminarhub.aop;
 
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.MemberDTO;
 import com.seminarhub.annotation.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;

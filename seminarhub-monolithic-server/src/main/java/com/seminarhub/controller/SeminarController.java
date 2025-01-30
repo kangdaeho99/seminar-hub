@@ -1,6 +1,6 @@
 package com.seminarhub.controller;
 
-import com.seminarhub.dto.SeminarDTO;
+import com.seminarhub.entity.SeminarDTO;
 import com.seminarhub.service.SeminarService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

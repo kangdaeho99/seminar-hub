@@ -2,8 +2,11 @@ package com.seminarhub.controller;
 
 import com.seminarhub.annotation.CurrentUser;
 import com.seminarhub.annotation.UseGuard;
-import com.seminarhub.dto.OrderDTO;
+import com.seminarhub.entity.MemberDTO;
+import com.seminarhub.entity.OrderDTO;
+import com.seminarhub.service.MemberService;
 import com.seminarhub.service.OrderService;
+import com.seminarhub.service.SeminarService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,14 +17,26 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final MemberService memberService;
+    private final SeminarService seminarService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, MemberService memberService, SeminarService seminarService) {
         this.orderService = orderService;
+        this.memberService = memberService;
+        this.seminarService = seminarService;
+    }
+
+    //Create Order Service
+    @UseGuard()
+    @PostMapping("")
+    public ResponseEntity<String> buySeminarWithShoopingCart(@CurrentUser MemberDTO memberDTO, @RequestBody List<OrderDTO> orderDTOList){
+        orderService.placeOrderForSeminars(orderDTOList);
+        return ResponseEntity.ok("Order created successfuly");
     }
 
     // Create order
     @UseGuard()
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<String> createOrder(@RequestBody OrderDTO order) {
         int result = orderService.createOrder(order);
         if (result > 0) {

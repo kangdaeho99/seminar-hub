@@ -1,7 +1,7 @@
 package com.seminarhub.repository;
 
-import com.seminarhub.dto.GenericDTORowMapper;
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.GenericDTORowMapper;
+import com.seminarhub.entity.MemberDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -38,9 +38,14 @@ public class MemberRepository {
     }
 
     //SELECT
-    public MemberDTO findMemberById(int member_no) {
+    public MemberDTO findMemberByMemberNo(Long member_no) {
         String sql = "SELECT * FROM member WHERE member_no = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{member_no}, new GenericDTORowMapper<>(MemberDTO.class));
+    }
+
+    public MemberDTO findMemberById(String id){
+        String sql = "SELECT * FROM member WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, new GenericDTORowMapper<>(MemberDTO.class));
     }
 
     //SELECT LIST

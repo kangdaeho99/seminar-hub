@@ -1,6 +1,6 @@
 package com.seminarhub.repository;
 
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.MemberDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +32,14 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    public void testFindMember(){
-        MemberDTO memberDTO = memberRepository.findMemberById(100);
+    public void testFindMemberByMemberNo(){
+        MemberDTO memberDTO = memberRepository.findMemberByMemberNo(100L);
+        System.out.println(memberDTO.toString());
+    }
+
+    @Test
+    public void testFindMemberById(){
+        MemberDTO memberDTO = memberRepository.findMemberById("test_user");
         System.out.println(memberDTO.toString());
     }
 

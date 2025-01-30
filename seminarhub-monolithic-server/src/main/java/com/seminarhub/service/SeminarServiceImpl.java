@@ -1,6 +1,6 @@
 package com.seminarhub.service;
 
-import com.seminarhub.dto.SeminarDTO;
+import com.seminarhub.entity.SeminarDTO;
 import com.seminarhub.repository.SeminarRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +14,20 @@ public class SeminarServiceImpl implements SeminarService {
         this.seminarRepository = seminarRepository;
     }
 
+
+    @Override
+    public int decrementSeminarAvailableSeats(SeminarDTO seminar) {
+        return seminarRepository.decrementAvailableSeats(seminar);
+    }
+
     @Override
     public int createSeminar(SeminarDTO seminar) {
         return seminarRepository.insert(seminar);
+    }
+
+    @Override
+    public SeminarDTO getSeminarBySeminarNoWithPessimisticLock(Long seminar_no) {
+        return seminarRepository.findSeminarBySeminarNoWithPessimisticLock(seminar_no);
     }
 
     @Override

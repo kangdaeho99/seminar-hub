@@ -1,8 +1,8 @@
 package com.seminarhub.repository;
 
 
-import com.seminarhub.dto.GenericDTORowMapper;
-import com.seminarhub.dto.OrderDTO;
+import com.seminarhub.entity.GenericDTORowMapper;
+import com.seminarhub.entity.OrderDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.seminarhub.dto;
+package com.seminarhub.entity;
 
 import lombok.Builder;
 import lombok.Getter;

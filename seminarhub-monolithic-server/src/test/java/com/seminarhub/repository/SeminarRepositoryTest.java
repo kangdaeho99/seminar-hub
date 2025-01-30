@@ -1,6 +1,6 @@
 package com.seminarhub.repository;
 
-import com.seminarhub.dto.SeminarDTO;
+import com.seminarhub.entity.SeminarDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

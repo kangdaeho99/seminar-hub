@@ -1,12 +1,13 @@
 package com.seminarhub.service;
 
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.MemberDTO;
 
 import java.util.List;
 
 public interface MemberService {
     int createMember(MemberDTO member);
-    MemberDTO getMemberById(int member_no);
+    MemberDTO getMemberByMemberNo(Long member_no);
+    MemberDTO getMemberById(String id);
     List<MemberDTO> getMembersByName(String name);
     int updateMember(MemberDTO member);
     int softDeleteMember(Long memberNo);

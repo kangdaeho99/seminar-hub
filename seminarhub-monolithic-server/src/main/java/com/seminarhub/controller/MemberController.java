@@ -1,6 +1,6 @@
 package com.seminarhub.controller;
 
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.MemberDTO;
 import com.seminarhub.annotation.CurrentUser;
 import com.seminarhub.annotation.UseGuard;
 import com.seminarhub.service.MemberService;
@@ -34,9 +34,9 @@ public class MemberController {
     // Get member by ID
     @UseGuard()
     @GetMapping("/{member_no}")
-    public ResponseEntity<MemberDTO> getMemberById(@CurrentUser() MemberDTO user, @PathVariable int member_no) {
+    public ResponseEntity<MemberDTO> getMemberById(@CurrentUser() MemberDTO user, @PathVariable Long member_no) {
         System.out.println("CurrentUser MemberDTO Information:"+user.getId());
-        MemberDTO member = memberService.getMemberById(member_no);
+        MemberDTO member = memberService.getMemberByMemberNo(member_no);
         if (member != null) {
             return ResponseEntity.ok(member);
         } else {

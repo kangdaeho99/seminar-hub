@@ -1,6 +1,6 @@
 package com.seminarhub.aop;
 
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.MemberDTO;
 import com.seminarhub.annotation.UseGuard;
 import com.seminarhub.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;

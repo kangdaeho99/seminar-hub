@@ -1,4 +1,4 @@
-package com.seminarhub.dto;
+package com.seminarhub.entity;
 
 import lombok.Data;
 
@@ -13,4 +13,14 @@ public class OrderDTO {
     private LocalDateTime inst_dt; // 삽입일시 (datetime)
     private LocalDateTime updt_dt; // 수정일시 (datetime)
     private LocalDateTime del_dt;  // 삭제일시 (datetime, nullable)
+
+    public OrderDTO(){
+
+    }
+    public OrderDTO(Long member_no, Long seminar_no, Long quantity){
+        this.member_no = member_no;
+        this.seminar_no = seminar_no;
+        this.quantity = quantity;
+    }
+
 }

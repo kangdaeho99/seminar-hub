@@ -1,7 +1,7 @@
 package com.seminarhub.repository;
 
 
-import com.seminarhub.dto.OrderDTO;
+import com.seminarhub.entity.OrderDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

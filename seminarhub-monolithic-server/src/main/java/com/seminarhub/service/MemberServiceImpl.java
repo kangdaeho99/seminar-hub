@@ -1,6 +1,6 @@
 package com.seminarhub.service;
 
-import com.seminarhub.dto.MemberDTO;
+import com.seminarhub.entity.MemberDTO;
 import com.seminarhub.repository.MemberRepository;
 import com.seminarhub.util.JWTUtil;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,13 @@ public class MemberServiceImpl implements  MemberService{
     }
 
     @Override
-    public MemberDTO getMemberById(int member_no) {
-        return memberRepository.findMemberById(member_no);
+    public MemberDTO getMemberByMemberNo(Long member_no) {
+        return memberRepository.findMemberByMemberNo(member_no);
+    }
+
+    @Override
+    public MemberDTO getMemberById(String id) {
+        return memberRepository.findMemberById(id);
     }
 
     @Override

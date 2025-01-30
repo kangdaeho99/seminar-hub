@@ -1,7 +1,7 @@
 package com.seminarhub.repository;
 
-import com.seminarhub.dto.GenericDTORowMapper;
-import com.seminarhub.dto.SeminarDTO;
+import com.seminarhub.entity.GenericDTORowMapper;
+import com.seminarhub.entity.SeminarDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -39,10 +39,14 @@ public class SeminarRepository {
                 LocalDateTime.now()   // updt_dt
         );
     }
-
     // SELECT by seminar_no
-    public SeminarDTO findSeminarById(int seminar_no) {
+    public SeminarDTO findSeminarById(long seminar_no) {
         String sql = "SELECT * FROM seminar WHERE seminar_no = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{seminar_no}, new GenericDTORowMapper<>(SeminarDTO.class));
+    }
+
+    public SeminarDTO findSeminarBySeminarNoWithPessimisticLock(long seminar_no){
+        String sql = "SELECT * FROM seminar WHERE seminar_no = ? FOR UPDATE";
         return jdbcTemplate.queryForObject(sql, new Object[]{seminar_no}, new GenericDTORowMapper<>(SeminarDTO.class));
     }
 
@@ -51,7 +55,6 @@ public class SeminarRepository {
         String sql = "SELECT * FROM seminar WHERE company_no = ?";
         return jdbcTemplate.query(sql, new Object[]{company_no}, new GenericDTORowMapper<>(SeminarDTO.class));
     }
-
     // Update
     public int update(SeminarDTO seminar) {
         String sql = """
@@ -76,6 +79,15 @@ public class SeminarRepository {
                 seminar.getSeminar_no()
         );
     }
+    public int decrementAvailableSeats(SeminarDTO seminar){
+        String sql = """
+                UPDATE seminar
+                SET available_seats = available_seats - 1
+                WHERE seminar_no = ?
+                """;
+        return jdbcTemplate.update(sql, seminar.getSeminar_no());
+    }
+
 
     // Soft Delete
     public int softDelete(Long seminar_no) {
