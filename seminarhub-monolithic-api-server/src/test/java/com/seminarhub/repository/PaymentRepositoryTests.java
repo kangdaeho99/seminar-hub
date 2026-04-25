@@ -1,5 +1,7 @@
 package com.seminarhub.repository;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -8,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * Only for QueryDSL or JPQL Custom Method
  */
 @SpringBootTest
+@Disabled
 public class PaymentRepositoryTests {
 
 

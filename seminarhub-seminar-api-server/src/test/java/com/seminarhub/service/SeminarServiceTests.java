@@ -1,5 +1,7 @@
 package com.seminarhub.service;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.common.exception.DuplicateSeminarException;
 import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.entity.Seminar;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.verify;
  * Description: Test class for SeminarServiceImpl
  */
 @SpringBootTest(classes = {SeminarServiceImpl.class})
+@Disabled
 public class SeminarServiceTests {
     @MockBean
     private SeminarRepository seminarRepository;

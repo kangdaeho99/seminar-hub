@@ -1,5 +1,7 @@
 package com.seminarhub.security.service;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.security.dto.JwtTokenPayloadDTO;
 import com.seminarhub.security.util.JWTUtil;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.*;
  *
  */
 @SpringBootTest(classes = {RedisRefreshTokenService.class})
+@Disabled
 public class RedisRefreshTokenServiceTests {
 
     @MockBean

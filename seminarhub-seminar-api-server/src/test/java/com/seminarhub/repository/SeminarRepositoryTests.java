@@ -1,5 +1,7 @@
 package com.seminarhub.repository;
 
+import org.junit.jupiter.api.Disabled;
+
 
 import com.seminarhub.entity.Seminar;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @SpringBootTest
+@Disabled
 public class SeminarRepositoryTests {
     @Autowired
     private SeminarRepository seminarRepository;

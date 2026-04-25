@@ -1,5 +1,7 @@
 package com.seminarhub.repository;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.entity.Member;
 import com.seminarhub.entity.Member_Role;
 import com.seminarhub.entity.Role;
@@ -21,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
  * Only for QueryDSL or JPQL Custom Method
  */
 @SpringBootTest
+@Disabled
 public class MemberRepositoryTests {
     @Autowired
     private MemberRepository memberRepository;

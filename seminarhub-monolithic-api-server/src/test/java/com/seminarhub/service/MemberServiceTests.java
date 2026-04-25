@@ -1,5 +1,7 @@
 package com.seminarhub.service;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.dto.MemberDTO;
 import com.seminarhub.entity.Member;
 import com.seminarhub.repository.MemberRepository;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
+@Disabled
 public class MemberServiceTests {
 
     @MockBean

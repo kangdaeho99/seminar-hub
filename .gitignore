@@ -27,7 +27,6 @@ out/
 !**/src/test/**/out/
 **/src/main/generated/
 application-real-db.properties
-*.yml
 *.log
 
 ### NetBeans ###

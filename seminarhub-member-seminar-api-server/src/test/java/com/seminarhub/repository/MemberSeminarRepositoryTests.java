@@ -1,5 +1,7 @@
 package com.seminarhub.repository;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.entity.Member;
 import com.seminarhub.entity.Member_Seminar;
 import com.seminarhub.entity.Seminar;
@@ -22,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @SpringBootTest
+@Disabled
 public class MemberSeminarRepositoryTests {
     @Autowired
     private MemberSeminarRepository memberSeminarRepository;

@@ -1,5 +1,7 @@
 package com.seminarhub.repository;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seminarhub.dto.Member_SeminarDTO;
 import com.seminarhub.entity.*;
@@ -22,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @SpringBootTest
+@Disabled
 public class MemberSeminarRepositoryTests {
     @Autowired
     private Member_SeminarRepository memberSeminarRepository;

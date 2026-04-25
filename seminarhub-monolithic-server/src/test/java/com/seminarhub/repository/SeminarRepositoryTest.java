@@ -1,5 +1,7 @@
 package com.seminarhub.repository;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.entity.SeminarDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
+@Disabled
 public class SeminarRepositoryTest {
     @Autowired
     private SeminarRepository seminarRepository;

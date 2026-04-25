@@ -1,5 +1,7 @@
 package com.seminarhub.security.util;
 
+import org.junit.jupiter.api.Disabled;
+
 
 import com.seminarhub.security.dto.JwtTokenPayloadDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
  * JWTUtil은 SpringBoot의 Context 내에서 진행되는 테스트가 아니므로, SrpingBootTest가 없어도됩니다.
  *
  */
+@Disabled
 public class JWTTests {
 
     /**

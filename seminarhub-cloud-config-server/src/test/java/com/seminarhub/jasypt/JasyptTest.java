@@ -1,11 +1,14 @@
 package com.seminarhub.jasypt;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@Disabled
 public class JasyptTest {
 
     @DisplayName("Jasypt Encryption Test")

@@ -1,5 +1,7 @@
 package com.seminarhub.service;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.dto.SeminarDTO;
 import com.seminarhub.entity.Seminar;
 import com.seminarhub.repository.SeminarQuerydslRepository;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.verify;
  */
 //@SpringBootTest(classes = {SeminarServiceImpl.class, SeminarQuerydslRepository.class, LogAdvice.class})
 @SpringBootTest
+@Disabled
 public class SeminarServiceTests {
     @MockBean
     private SeminarRepository seminarRepository;

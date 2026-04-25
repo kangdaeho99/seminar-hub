@@ -1,0 +1,40 @@
+# MariaDB Settings
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/seminar-hub
+    username: root
+    password: root
+
+  # Redis DB Setting
+  redis:
+    host: localhost
+    port: 6379
+    # password: my_password
+    database: 0
+
+  # JPA Setting
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDB106Dialect
+
+# Swagger Customize Settings
+# Guided By [ https://www.baeldung.com/spring-rest-openapi-documentation ]
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    operationsSorter: alpha
+    tagsSorter: alpha
+
+# Spring Security Log Level Config
+logging:
+  level:
+    org.springframework.security.web: trace
+    com.seminarhub: debug

@@ -1,0 +1,16 @@
+# DataSource Settings
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seminarhub?serverTimezone=Asia/Seoul
+    username: root
+    password: root
+
+  # JPA/Hibernate Settings
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

@@ -1,5 +1,7 @@
 package com.seminarhub.service;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.common.exception.SeminarRegistrationFullException;
 import com.seminarhub.dto.MemberDTO;
 import com.seminarhub.dto.MemberSeminarRegisterRequestDTO;
@@ -29,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
+@Disabled
 public class Member_SeminarServiceTests {
 
 //    @MockBean

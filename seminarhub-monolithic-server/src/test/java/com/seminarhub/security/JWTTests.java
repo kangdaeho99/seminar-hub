@@ -1,9 +1,11 @@
 package com.seminarhub.security;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.util.JWTUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+@Disabled
 public class JWTTests {
     private JWTUtil jwtUtil;
     

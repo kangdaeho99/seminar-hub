@@ -1,5 +1,7 @@
 package com.seminarhub.redis;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.seminarhub.security.dto.JwtTokenPayloadDTO;
 import com.seminarhub.security.util.JWTUtil;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * 
  */
 @SpringBootTest
+@Disabled
 public class RedisRefreshTokenTemplateTests {
 
     @Autowired

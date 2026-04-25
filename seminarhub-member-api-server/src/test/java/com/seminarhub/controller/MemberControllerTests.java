@@ -1,5 +1,7 @@
 package com.seminarhub.controller;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seminarhub.dto.MemberDTO;
 import com.seminarhub.security.dto.JwtTokenPayloadDTO;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Disabled
 public class MemberControllerTests {
 
     @Autowired

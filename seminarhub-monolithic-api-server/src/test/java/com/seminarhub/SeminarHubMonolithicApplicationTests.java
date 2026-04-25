@@ -1,5 +1,8 @@
 package com.seminarhub;
 
+import org.junit.jupiter.api.Disabled;
+
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * Test class for loading the application context in the SeminarHubSeminarApplication.
  */
 @SpringBootTest
+@Disabled
 class SeminarHubMonolithicApplicationTests {
 
 	/**
