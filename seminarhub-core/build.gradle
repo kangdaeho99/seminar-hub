@@ -1,3 +1,19 @@
-dependencies {
-    implementation project(path: ':')
+plugins {
+    id 'java'
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Core module dependencies can be added here.
+    // Example: implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Note: Removed self-referential dependency on root project.
+}

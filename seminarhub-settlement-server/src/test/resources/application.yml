@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: seminarhub-settlement-server
+  datasource:
+    url: ${DB_URL_TEST:jdbc:postgresql://localhost:5432/seminar-hub}
+    username: ${DB_USERNAME_TEST:postgres}
+    password: ${DB_PASSWORD_TEST:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true

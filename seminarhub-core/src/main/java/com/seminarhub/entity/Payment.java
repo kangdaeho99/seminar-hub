@@ -19,8 +19,8 @@ public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_no")
     private Long payment_no; //고유번호
+    
     @Column(length = 100)
     private String member_id; //회원아이디
 

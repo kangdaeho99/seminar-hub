@@ -36,6 +36,12 @@ subprojects { //각 모듈에 적용할 공통설정
 	apply plugin: 'java'
 	apply plugin: 'org.springframework.boot'
 	apply plugin: 'io.spring.dependency-management'
+
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(21)
+		}
+	}
 	dependencies {
 
 	}
