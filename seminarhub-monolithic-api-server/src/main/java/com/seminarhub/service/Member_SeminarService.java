@@ -57,7 +57,6 @@ public interface Member_SeminarService {
         Member_Seminar member_seminar = Member_Seminar.builder()
                 .member(member)
                 .seminar(seminar)
-                .member_seminar_payment_history(member_seminar_payment_history)
                 .build();
         return member_seminar;
     }

@@ -39,3 +39,4 @@ application-real-db.properties
 ### VS Code ###
 .vscode/
 .env
+.gemini/

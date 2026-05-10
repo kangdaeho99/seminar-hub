@@ -25,10 +25,6 @@ public class Member_Seminar extends BaseEntity {
     @JoinColumn(name = "seminar_no")
     private Seminar seminar;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_seminar_payment_history_no")
-    private Member_Seminar_Payment_History member_seminar_payment_history;
-
     @Column()
     private LocalDateTime del_dt;
 
