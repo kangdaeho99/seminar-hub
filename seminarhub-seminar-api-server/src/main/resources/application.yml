@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    config:
+      enabled: false # Config 클라이언트 비활성화
+
+eureka:
+  client:
+    enabled: false # Eureka 클라이언트 비활성화
+    register-with-eureka: false
+    fetch-registry: false

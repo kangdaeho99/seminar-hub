@@ -7,7 +7,6 @@ import com.seminarhub.entity.QSeminar;
 import com.seminarhub.entity.Seminar;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,11 +31,10 @@ public class SeminarQueryRepository {
     public List<Seminar> findSeminarByBooleanBuilder(String seminar_name, String seminar_explanation){
         BooleanBuilder builder = new BooleanBuilder();
 
-        //어떤 쿼리인지 예상하기 어렵다.
-        if(!StringUtils.isEmpty(seminar_name)){
+        if(seminar_name != null && !seminar_name.isEmpty()){
             builder.and(QSeminar.seminar.seminar_name.eq(seminar_name));
         }
-        if(!StringUtils.isEmpty(seminar_explanation)){
+        if(seminar_explanation != null && !seminar_explanation.isEmpty()){
             builder.and(QSeminar.seminar.seminar_explanation.eq(seminar_explanation));
         }
         return queryFactory
@@ -50,19 +48,19 @@ public class SeminarQueryRepository {
         return queryFactory
                 .selectFrom(QSeminar.seminar)
                 .where(eqName(seminar_name),
-                        eqSeminarExplanation(seminar_explanation))
+                        eqSeminar_explanation(seminar_explanation))
                 .fetch();
     }
 
     private BooleanExpression eqName(String seminar_name){
-        if(StringUtils.isEmpty(seminar_name)){
+        if(seminar_name == null || seminar_name.isEmpty()){
             return null;
         }
         return QSeminar.seminar.seminar_name.eq(seminar_name);
     }
 
-    private BooleanExpression eqSeminarExplanation(String seminar_explanation){
-        if(StringUtils.isEmpty(seminar_explanation)){
+    private BooleanExpression eqSeminar_explanation(String seminar_explanation){
+        if(seminar_explanation == null || seminar_explanation.isEmpty()){
             return null;
         }
         return QSeminar.seminar.seminar_explanation.eq(seminar_explanation);

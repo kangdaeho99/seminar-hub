@@ -3,6 +3,7 @@ package com.seminarhub.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -32,10 +33,11 @@ public class Member extends BaseEntity {
     @Column(length = 500, nullable = false)
     private String member_nickname; //회원닉네임
 
-    @Column(columnDefinition = "BIT default false")
+    @Column
+    @ColumnDefault("false")
     private boolean member_from_social;
 
-    @Column(columnDefinition = "DECIMAL(19, 2) DEFAULT 0.0")
+    @Column(columnDefinition = "NUMERIC(19, 2) DEFAULT 0.0")
     private BigDecimal member_charged_money; //회원 충전금액
 
     @Column()

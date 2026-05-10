@@ -1,0 +1,382 @@
+# Entity Classes in com.seminarhub.entity
+
+## BaseEntity.java
+package com.seminarhub.entity;
+
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+/**
+ * [ 2023-07-11 daeho.kang ]
+ * Description :
+ * @Desc Entity 데이터 등록 시간, 수정시간 자동으로 추가, 변경되게해주는 class
+ *
+ * @MappedSuperclass : 해당 어노테이션이 적용된 클래스는 테이블로 생성되지 않음,
+ * 실제 테이블은 BaseEntity를 상속한 엔티티의 클래스로 데이터베이스 테이블이 생성됨
+ *
+ * @EntityListeners(value = {AuditingEntityListener.class}) : JPA 엔티티 객체들은 Persistence COntext에서 관리.
+ * 해당 엔티티 객체들의 변화를 감지, AuditingEntityListener.class가 JPA 내부에서 엔티티 객체 생성/변경 되는것을 감지
+ *
+ * @CreatedDate : JPA에서 엔티티의 생성시간을 처리
+ * @LastModifiedDate : 최종 수정시간을 자동으로 처리하는 용도,
+ *
+ * 속성으로 insertable updateable 등이 있는데 updatable = false 일경우 해당 엔티티 객체를 데이터베이스에 반영할때 regdate칼럼값은
+ * 변경되지 않습니다.
+ * JPA를 이용하면서 AuditingEntityListener를 활성화시키기 위해서는 프로젝트에 @EnableJpaAuditing 설정을 추가해아힙니다.
+ * 프로젝트 생성시에 존재하는 Application @SpringBootApplication에 @EnableJpaAuditing 을 추가합니다.
+ */
+@MappedSuperclass
+@EntityListeners(value = {AuditingEntityListener.class})
+@Getter
+public class BaseEntity {
+    @CreatedDate
+    @Column(name = "inst_dt")
+    private LocalDateTime inst_dt;
+
+    @LastModifiedDate
+    @Column(name = "updt_dt")
+    private LocalDateTime updt_dt;
+
+}
+
+--------------------------------------------------------------------------------
+
+## Member.java
+package com.seminarhub.entity;
+
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = {"member_role_set", "member_seminar_list"})
+public class Member extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_no")
+    private Long member_no; //고유번호
+
+    @Column(length = 500, unique = true, name = "member_id")
+    private String member_id; //회원아이디
+
+    @Column(length = 500, nullable = false)
+    private String member_password; //회원 비밀번호
+
+    @Column(length = 500, nullable = false)
+    private String member_nickname; //회원닉네임
+
+    @Column(columnDefinition = "BIT default false")
+    private boolean member_from_social;
+
+    @Column(columnDefinition = "DECIMAL(19, 2) DEFAULT 0.0")
+    private BigDecimal member_charged_money; //회원 충전금액
+
+    @Column()
+    private LocalDateTime del_dt; //삭제일
+
+    @OneToMany(mappedBy = "member",
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private Set<Member_Role> member_role_set = new HashSet<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Member_Seminar> member_seminar_list;
+
+    public Member(long member_no) {
+        this.member_no = member_no;
+    }
+
+    public void setMember_id(String member_id) {
+        this.member_id = member_id;
+    }
+
+    public void setMember_nickname(String member_nickname) {
+        this.member_nickname = member_nickname;
+    }
+
+    public void setDel_dt(LocalDateTime del_dt) {
+        this.del_dt = del_dt;
+    }
+
+    public void addMemberRole(Member_Role member_role) {
+        member_role_set.add(member_role);
+    }
+
+}
+
+--------------------------------------------------------------------------------
+
+## Member_Role.java
+package com.seminarhub.entity;
+
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = "member")
+public class Member_Role extends BaseEntity{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long member_role_no;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_no")
+    private Member member; //연관관계 지정
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_no")
+    private Role role;
+
+    @Column(nullable=true)
+    private LocalDateTime del_dt;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+
+}
+
+--------------------------------------------------------------------------------
+
+## Member_Seminar.java
+package com.seminarhub.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = {"member", "seminar", "member_seminar_payment_history"})
+public class Member_Seminar extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long member_seminar_no;
+
+    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_no")
+    private Member member;
+
+    @ManyToOne(targetEntity = Seminar.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "seminar_no")
+    private Seminar seminar;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_seminar_payment_history_no")
+    private Member_Seminar_Payment_History member_seminar_payment_history;
+
+    @Column()
+    private LocalDateTime del_dt;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
+
+}
+
+--------------------------------------------------------------------------------
+
+## Member_Seminar_Payment_History.java
+package com.seminarhub.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString
+public class Member_Seminar_Payment_History extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long member_seminar_payment_history_no;
+
+    @Column(nullable = false)
+    private Long member_seminar_payment_history_amount;
+
+//    JPA에서 제공하지 않음.
+//    @OneToOne(mappedBy = "member_seminar_payment_history")
+//    private Member_Seminar member_seminar;
+
+    @Column()
+    private LocalDateTime del_dt;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
+
+}
+
+--------------------------------------------------------------------------------
+
+## Payment.java
+package com.seminarhub.entity;
+
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+public class Payment extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_no")
+    private Long payment_no; //고유번호
+    @Column(length = 100)
+    private String member_id; //회원아이디
+
+    @Column(nullable = false)
+    private BigDecimal payment_amount; //회원 충전금액
+
+    @Column()
+    private LocalDateTime del_dt; //삭제일
+
+}
+
+--------------------------------------------------------------------------------
+
+## Role.java
+package com.seminarhub.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = {"member_list"})
+public class Role extends BaseEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long role_no;
+
+    @Column(nullable=true)
+    private LocalDateTime del_dt;
+
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private List<Member_Role> member_list;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true)
+    private RoleType role_type;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
+}
+
+--------------------------------------------------------------------------------
+
+## RoleType.java
+package com.seminarhub.entity;
+
+public enum RoleType {
+    USER, MANAGER, ADMIN
+}
+
+--------------------------------------------------------------------------------
+
+## Seminar.java
+package com.seminarhub.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = {"member_seminar_list"})
+public class Seminar extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seminar_no;
+
+    @Column(length = 100, nullable = false, unique = true)
+    private String seminar_name;
+
+    @Column(length = 500)
+    private String seminar_explanation;
+
+    @Column
+    private Long seminar_price;
+
+    @Column
+    private Long seminar_max_participants;
+
+    @Column
+    private Long seminar_participants_cnt;
+
+//    @Version
+//    private Integer version;
+
+    @Column(nullable=true)
+    private LocalDateTime del_dt;
+
+    @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY)
+    private List<Member_Seminar> member_seminar_list;
+
+    public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
+
+    public void setSeminar_name(String seminar_name){
+        this.seminar_name = seminar_name;
+    }
+
+    public void setSeminar_participants_cnt(long seminar_participants_cnt) { this.seminar_participants_cnt = seminar_participants_cnt;}
+}

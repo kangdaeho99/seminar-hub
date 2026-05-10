@@ -12,6 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class SeminarHubMonolithic {
     public static void main(String[] args) {
         System.out.println("Hello world!");
-        SpringApplication.run(SeminarHubMonolithic.class, args);;
+        SpringApplication.run(SeminarHubMonolithic.class, args);
     }
 }

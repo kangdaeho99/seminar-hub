@@ -12,25 +12,27 @@ repositories {
 dependencies {
 
     // Spring Boot BOM을 사용하여 버전 관리를 일원화
-    implementation platform('org.springframework.boot:spring-boot-dependencies:3.0.13')
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.2.5')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
+    // Modules
+    implementation project(':seminarhub-core')
+
     // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'javax.xml.bind:jaxb-api:2.3.0'
 
     // Database
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'com.mysql:mysql-connector-j'
+    implementation 'org.postgresql:postgresql'
 
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
 }
 test {
     useJUnitPlatform()

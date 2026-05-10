@@ -1,7 +1,7 @@
 package com.seminarhub.controller;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 아래의 API호출을 통하여 해당 JVM의 세팅값을 알 수 있습니다.
  */
 @RestController
-@RefreshScope
+
 public class TestMemberSeminarController {
 
     @Value("${seminarhub.value}")
