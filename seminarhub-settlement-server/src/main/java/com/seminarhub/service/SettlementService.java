@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SettlementService {
 
-    private static final long SLEEP_MILLIS = 5000L;
+    private static final long SLEEP_MILLIS = 10000L;
 
     private final MemberSeminarSettlementDateRepository settlementDateRepository;
     private final SettlementAggregationRepository settlementAggregationRepository;

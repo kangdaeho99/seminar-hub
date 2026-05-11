@@ -37,7 +37,8 @@ public class Member extends BaseEntity {
     @ColumnDefault("false")
     private boolean member_from_social;
 
-    @Column(columnDefinition = "NUMERIC(19, 2) DEFAULT 0.0")
+    @Column(precision = 19, scale = 2)
+    @ColumnDefault("0.0")
     private BigDecimal member_charged_money; //회원 충전금액
 
     @Column()
