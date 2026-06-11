@@ -20,69 +20,56 @@ public class SettlementController {
 
     private final SettlementService settlementService;
 
-    // curl -X POST "http://localhost:8080/api/v1/settlement/pessimistic/update" -H "Content-Type: application/json" -d '{"settlementDateId": 1, "targetDate": "2025-12-31"}'
-    @PostMapping("/pessimistic/update")
-    public SettlementApiResponse updateWithPessimisticLock(@RequestBody SettlementDateUpdateRequest request) {
-        return settlementService.updateWithPessimisticLock(request);
-    }
-
-    // curl -X GET "http://localhost:8080/api/v1/settlement/pessimistic/aggregate?startAt=2025-01-01&endAt=2025-01-31"
-    @GetMapping("/pessimistic/aggregate")
-    public SettlementApiResponse aggregateWithPessimisticLock(
-            @RequestParam("startAt") LocalDate startAt,
-            @RequestParam("endAt") LocalDate endAt
-    ) {
-        return settlementService.aggregateWithPessimisticLock(startAt, endAt);
-    }
-
-    // curl.exe -X POST "http://localhost:8080/api/v1/settlement/read-committed/update" ^
-    //   -H "Content-Type: application/json" ^
-    //  -d "{\"settlementDateId\": 1, \"targetDate\": \"2025-12-31\"}"
     @PostMapping("/read-committed/update")
     public SettlementApiResponse updateWithReadCommitted(@RequestBody SettlementDateUpdateRequest request) {
-        return settlementService.updateWithReadCommitted(request);
+        settlementService.updateWithReadCommitted(request);
+        return SettlementApiResponse.ok();
     }
 
-    // curl.exe -X GET "http://localhost:8080/api/v1/settlement/read-committed/aggregate?startAt=2025-01-01&endAt=2025-01-31"
     @GetMapping("/read-committed/aggregate")
     public SettlementApiResponse aggregateWithReadCommitted(
             @RequestParam("startAt") LocalDate startAt,
-            @RequestParam("endAt") LocalDate endAt
-    ) {
-        return settlementService.aggregateWithReadCommitted(startAt, endAt);
+            @RequestParam("endAt") LocalDate endAt) {
+        settlementService.aggregateWithReadCommitted(startAt, endAt);
+        return SettlementApiResponse.ok();
     }
 
-    // curl.exe -X POST "http://localhost:8080/api/v1/settlement/repeatable-read/update" ^
-    //   -H "Content-Type: application/json" ^
-    //  -d "{\"settlementDateId\": 1, \"targetDate\": \"2025-12-31\"}"
-    @PostMapping("/repeatable-read/update")
-    public SettlementApiResponse updateWithRepeatableRead(@RequestBody SettlementDateUpdateRequest request) {
-        return settlementService.updateWithRepeatableRead(request);
+    @GetMapping("/read-committed-pessimistic-write/aggregate")
+    public SettlementApiResponse aggregateWithReadCommittedPessimisticWrite(@RequestParam("startAt") LocalDate startAt,
+            @RequestParam("endAt") LocalDate endAt) {
+        settlementService.aggregateWithReadCommittedPessimisticWrite(startAt, endAt);
+        return SettlementApiResponse.ok();
     }
 
-    // curl.exe -X GET "http://localhost:8080/api/v1/settlement/repeatable-read/aggregate?startAt=2025-01-01&endAt=2025-01-31"
     @GetMapping("/repeatable-read/aggregate")
     public SettlementApiResponse aggregateWithRepeatableRead(
             @RequestParam("startAt") LocalDate startAt,
-            @RequestParam("endAt") LocalDate endAt
-    ) {
-        return settlementService.aggregateWithRepeatableRead(startAt, endAt);
+            @RequestParam("endAt") LocalDate endAt) {
+        settlementService.aggregateWithRepeatableRead(startAt, endAt);
+        return SettlementApiResponse.ok();
     }
 
-    // curl.exe -X POST "http://localhost:8080/api/v1/settlement/serializable/update" ^
-    //   -H "Content-Type: application/json" ^
-    //  -d "{\"settlementDateId\": 1, \"targetDate\": \"2025-12-31\"}"
-    @PostMapping("/serializable/update")
-    public SettlementApiResponse updateWithSerializable(@RequestBody SettlementDateUpdateRequest request) {
-        return settlementService.updateWithSerializable(request);
+    @GetMapping("/repeatable-read-pessimistic-write/aggregate")
+    public SettlementApiResponse aggregateWithRepeatableReadPessimisticWrite(@RequestParam("startAt") LocalDate startAt,
+            @RequestParam("endAt") LocalDate endAt) {
+        settlementService.aggregateWithRepeatableReadPessimisticWrite(startAt, endAt);
+        return SettlementApiResponse.ok();
     }
 
-    // curl.exe -X GET "http://localhost:8080/api/v1/settlement/serializable/aggregate?startAt=2025-01-01&endAt=2025-01-31"
     @GetMapping("/serializable/aggregate")
     public SettlementApiResponse aggregateWithSerializable(
             @RequestParam("startAt") LocalDate startAt,
-            @RequestParam("endAt") LocalDate endAt
-    ) {
-        return settlementService.aggregateWithSerializable(startAt, endAt);
+            @RequestParam("endAt") LocalDate endAt) {
+        settlementService.aggregateWithSerializable(startAt, endAt);
+        return SettlementApiResponse.ok();
     }
+
+    @GetMapping("/serializable-pessimistic-write/aggregate")
+    public SettlementApiResponse aggregateWithSerializablePessimisticWrite(@RequestParam("startAt") LocalDate startAt,
+            @RequestParam("endAt") LocalDate endAt) {
+        settlementService.aggregateWithSerializablePessimisticWrite(startAt, endAt);
+        return SettlementApiResponse.ok();
+    }
+
+
 }

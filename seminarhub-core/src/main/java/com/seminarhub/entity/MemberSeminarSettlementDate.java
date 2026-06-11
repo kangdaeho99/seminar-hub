@@ -8,10 +8,15 @@ import org.hibernate.annotations.Comment;
 
 import java.time.LocalDate;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Comment("회원 세미나 참여(결제) 항목 정산 기준일")
+@Table(indexes = {
+        @Index(name = "idx_settlement_date_del", columnList = "date, del_dt")
+})
 public class MemberSeminarSettlementDate extends BaseEntity { // (선택) 등록/수정일이 필요하다면 BaseEntity 상속
 
     @Id
@@ -28,6 +33,14 @@ public class MemberSeminarSettlementDate extends BaseEntity { // (선택) 등록
     @Column
     @Comment("정산 기준일, 만약 null이면 정산일 세팅전입니다.")
     private LocalDate date;
+
+    @Column
+    @Comment("삭제일")
+    private LocalDateTime del_dt;
+
+    public void setDel_dt(LocalDateTime del_dt) {
+        this.del_dt = del_dt;
+    }
 
     // 생성자
     public MemberSeminarSettlementDate(Member_Seminar memberSeminar) {

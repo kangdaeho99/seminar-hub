@@ -9,16 +9,20 @@ import java.time.LocalDate;
 
 public interface SettlementAggregationRepository extends JpaRepository<MemberSeminarSettlementDate, Long> {
 
+
     @Query("""
-            select coalesce(sum(seminar.seminar_price), 0)
+            select new com.seminarhub.dto.SettlementRecord(
+                memberSeminar.member_seminar_no,
+                seminar.seminar_price,
+                settlementDate.id
+            )
             from MemberSeminarSettlementDate settlementDate
             join settlementDate.memberSeminar memberSeminar
             join memberSeminar.seminar seminar
             where settlementDate.date between :startAt and :endAt
             and memberSeminar.del_dt is null
-            and seminar.del_dt is null
             """)
-    Long sumSeminarPriceBySettlementDateBetween(
+    java.util.List<com.seminarhub.dto.SettlementRecord> findAllBySettlementDateBetween(
             @Param("startAt") LocalDate startAt,
             @Param("endAt") LocalDate endAt
     );

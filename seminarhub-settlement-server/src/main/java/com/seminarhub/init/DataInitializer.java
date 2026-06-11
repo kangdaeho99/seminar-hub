@@ -19,28 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * 서버 기동 시 동시성 테스트용 초기 데이터를 자동으로 삽입하는 컴포넌트.
- *
- * <p>멱등성을 보장합니다: MemberSeminarSettlementDate 데이터가 이미 존재하면 삽입을 건너뜁니다.
- *
- * <p>삽입되는 데이터:
- * <ul>
- *   <li>Member 2개 (test-member-1, test-member-2)</li>
- *   <li>Seminar 3개 (Spring 기초/JPA 심화/동시성 제어, 가격 50000/80000/100000)</li>
- *   <li>Member_Seminar 6개 (Seminar × Member 교차 할당)</li>
- *   <li>MemberSeminarSettlementDate 6개 (date: 2025-01-15 × 2, 2025-01-20 × 2, 2025-02-01 × 2)</li>
- * </ul>
- *
- * <p>집계 테스트 기준:
- * <pre>
- *   GET /api/v1/settlement/.../aggregate?startAt=2025-01-01&endAt=2025-01-31
- *   → 범위 내 4건 (50000 + 50000 + 80000 + 80000 = 260,000원) 집계 예상
- *
- *   POST /api/v1/settlement/.../update
- *   Body: { "settlementDateId": 1, "targetDate": "2025-03-01" }
- * </pre>
- */
 @Slf4j
 @Component
 @Profile("!test")
@@ -66,7 +44,6 @@ public class DataInitializer implements ApplicationRunner {
 
         log.info("[DataInitializer] Starting test data initialization...");
 
-        // [1] Member 2개 생성
         Member member1 = memberRepository.save(
                 Member.builder()
                         .member_id("test-member-1")
@@ -85,7 +62,6 @@ public class DataInitializer implements ApplicationRunner {
         );
         log.info("[DataInitializer] [1/4] Members saved: id={}, id={}", member1.getMember_no(), member2.getMember_no());
 
-        // [2] Seminar 3개 생성
         Seminar seminarSpring = seminarRepository.save(
                 Seminar.builder()
                         .seminar_name("Spring 기초")
@@ -116,7 +92,6 @@ public class DataInitializer implements ApplicationRunner {
         log.info("[DataInitializer] [2/4] Seminars saved: ids={}, {}, {}",
                 seminarSpring.getSeminar_no(), seminarJpa.getSeminar_no(), seminarConcurrency.getSeminar_no());
 
-        // [3] Member_Seminar 6개 생성 (Seminar × Member 교차 할당)
         Member_Seminar ms1 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarSpring).member(member1).build());
         Member_Seminar ms2 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarSpring).member(member2).build());
         Member_Seminar ms3 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarJpa).member(member1).build());
@@ -125,10 +100,6 @@ public class DataInitializer implements ApplicationRunner {
         Member_Seminar ms6 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarConcurrency).member(member2).build());
         log.info("[DataInitializer] [3/4] MemberSeminars saved: 6 records");
 
-        // [4] MemberSeminarSettlementDate 6개 생성
-        //   - 2025-01-15 × 2건 (Spring 기초, 50,000 × 2)
-        //   - 2025-01-20 × 2건 (JPA 심화,  80,000 × 2)
-        //   - 2025-02-01 × 2건 (동시성 제어, 범위 밖 → 집계 제외 확인용)
         List<MemberSeminarSettlementDate> settlementDates = List.of(
                 createSettlementDate(ms1, DATE_JAN_15),
                 createSettlementDate(ms2, DATE_JAN_15),

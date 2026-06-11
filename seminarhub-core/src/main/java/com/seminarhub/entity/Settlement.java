@@ -18,9 +18,11 @@ public class Settlement extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long settlement_no;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_seminar_no", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Member_Seminar memberSeminar;
+    @Column(nullable = false)
+    private java.time.LocalDate startDate;
+
+    @Column(nullable = false)
+    private java.time.LocalDate endDate;
 
     @Column(nullable = false)
     private BigDecimal amount;
@@ -29,4 +31,6 @@ public class Settlement extends BaseEntity {
     @Column(nullable = false)
     private SettlementStatus settlement_status;
 
+    @Column
+    private java.time.LocalDateTime deleted_at;
 }
