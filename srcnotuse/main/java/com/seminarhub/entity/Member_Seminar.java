@@ -18,11 +18,11 @@ public class Member_Seminar extends BaseEntity {
     private int member_seminar_no;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_no")
+    @JoinColumn(name = "member_no", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seminar_no")
+    @JoinColumn(name = "seminar_no", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Seminar seminar;
 
 }
