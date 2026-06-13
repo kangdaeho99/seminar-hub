@@ -82,6 +82,7 @@ project(':seminarhub-core') {
 	}
 }
 
+/*
 project(':seminarhub-monolithic-api-server') {
 
 	bootJar { enabled = true }
@@ -158,6 +159,7 @@ project(':payment-server') {
 project(':seminarhub-batch') {
 	bootJar { enabled = false }
 }
+*/
 
 /*
 project(':seminarhub-cloud-config-server') {
@@ -210,6 +212,7 @@ project(':seminarhub-cloud-netflix-eureka-server'){
 }
 */
 
+/*
 project(':seminarhub-member-api-server') {
 	bootJar { enabled = true }
 	jar { enabled = false }
@@ -316,4 +319,4 @@ project(':seminarhub-seminar-api-server') {
 	}
 
 
-}
+}*/
