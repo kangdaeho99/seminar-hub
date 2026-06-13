@@ -20,8 +20,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
-@Component
-@Profile("!test")
+//@Component
+//@Profile("!test")
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
@@ -46,18 +46,18 @@ public class DataInitializer implements ApplicationRunner {
 
         Member member1 = memberRepository.save(
                 Member.builder()
-                        .member_email("test-member-1")
-                        .member_nickname("테스터1")
-                        .member_password("password")
-                        .member_from_social(false)
+                        .email("test-member-1")
+                        .nickname("테스터1")
+                        .password("password")
+                        .from_social(false)
                         .build()
         );
         Member member2 = memberRepository.save(
                 Member.builder()
-                        .member_email("test-member-2")
-                        .member_nickname("테스터2")
-                        .member_password("password")
-                        .member_from_social(false)
+                        .email("test-member-2")
+                        .nickname("테스터2")
+                        .password("password")
+                        .from_social(false)
                         .build()
         );
         log.info("[DataInitializer] [1/4] Members saved: id={}, id={}", member1.getId(), member2.getId());

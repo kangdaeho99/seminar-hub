@@ -22,7 +22,7 @@ public class Payment extends BaseEntity {
     private Long id; //고유번호
     
     @Column(length = 100)
-    private String member_email; //회원아이디
+    private String email; //회원아이디
 
     @Column(nullable = false)
     private BigDecimal payment_amount; //회원 충전금액

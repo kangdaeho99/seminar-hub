@@ -23,22 +23,22 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //고유번호
 
-    @Column(length = 500, unique = true)
-    private String member_email; //회원아이디
+    @Column(length = 500)
+    private String email; //회원아이디
 
-    @Column(length = 500, nullable = false)
-    private String member_password; //회원 비밀번호
+    @Column(length = 500)
+    private String password; //회원 비밀번호
 
-    @Column(length = 500, nullable = false)
-    private String member_nickname; //회원닉네임
+    @Column(length = 500)
+    private String nickname; //회원닉네임
 
     @Column
     @ColumnDefault("false")
-    private boolean member_from_social;
+    private boolean from_social;
 
     @Column(precision = 19, scale = 2)
     @ColumnDefault("0.0")
-    private BigDecimal member_charged_money; //회원 충전금액
+    private BigDecimal charged_money; //회원 충전금액
 
     @Column()
     private LocalDateTime del_dt; //삭제일
@@ -56,12 +56,12 @@ public class Member extends BaseEntity {
         this.id = id;
     }
 
-    public void setMember_email(String member_email) {
-        this.member_email = member_email;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setMember_nickname(String member_nickname) {
-        this.member_nickname = member_nickname;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public void setDel_dt(LocalDateTime del_dt) {
