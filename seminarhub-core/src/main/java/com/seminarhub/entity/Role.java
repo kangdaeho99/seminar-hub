@@ -15,7 +15,7 @@ import java.util.List;
 public class Role extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long role_no;
+    private Long id;
 
     @Column(nullable=true)
     private LocalDateTime del_dt;

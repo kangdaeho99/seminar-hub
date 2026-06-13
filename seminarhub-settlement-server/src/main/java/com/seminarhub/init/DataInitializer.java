@@ -46,7 +46,7 @@ public class DataInitializer implements ApplicationRunner {
 
         Member member1 = memberRepository.save(
                 Member.builder()
-                        .member_id("test-member-1")
+                        .member_email("test-member-1")
                         .member_nickname("테스터1")
                         .member_password("password")
                         .member_from_social(false)
@@ -54,43 +54,43 @@ public class DataInitializer implements ApplicationRunner {
         );
         Member member2 = memberRepository.save(
                 Member.builder()
-                        .member_id("test-member-2")
+                        .member_email("test-member-2")
                         .member_nickname("테스터2")
                         .member_password("password")
                         .member_from_social(false)
                         .build()
         );
-        log.info("[DataInitializer] [1/4] Members saved: id={}, id={}", member1.getMember_no(), member2.getMember_no());
+        log.info("[DataInitializer] [1/4] Members saved: id={}, id={}", member1.getId(), member2.getId());
 
         Seminar seminarSpring = seminarRepository.save(
                 Seminar.builder()
-                        .seminar_name("Spring 기초")
-                        .seminar_explanation("Spring Framework 입문 과정")
-                        .seminar_price(50_000L)
-                        .seminar_max_participants(30L)
-                        .seminar_participants_cnt(0L)
+                        .name("Spring 기초")
+                        .explanation("Spring Framework 입문 과정")
+                        .price(50_000L)
+                        .max_participants(30L)
+                        .participants_cnt(0L)
                         .build()
         );
         Seminar seminarJpa = seminarRepository.save(
                 Seminar.builder()
-                        .seminar_name("JPA 심화")
-                        .seminar_explanation("JPA 및 Hibernate 심화 과정")
-                        .seminar_price(80_000L)
-                        .seminar_max_participants(20L)
-                        .seminar_participants_cnt(0L)
+                        .name("JPA 심화")
+                        .explanation("JPA 및 Hibernate 심화 과정")
+                        .price(80_000L)
+                        .max_participants(20L)
+                        .participants_cnt(0L)
                         .build()
         );
         Seminar seminarConcurrency = seminarRepository.save(
                 Seminar.builder()
-                        .seminar_name("동시성 제어")
-                        .seminar_explanation("트랜잭션 격리 수준 및 락 전략 비교")
-                        .seminar_price(100_000L)
-                        .seminar_max_participants(15L)
-                        .seminar_participants_cnt(0L)
+                        .name("동시성 제어")
+                        .explanation("트랜잭션 격리 수준 및 락 전략 비교")
+                        .price(100_000L)
+                        .max_participants(15L)
+                        .participants_cnt(0L)
                         .build()
         );
         log.info("[DataInitializer] [2/4] Seminars saved: ids={}, {}, {}",
-                seminarSpring.getSeminar_no(), seminarJpa.getSeminar_no(), seminarConcurrency.getSeminar_no());
+                seminarSpring.getId(), seminarJpa.getId(), seminarConcurrency.getId());
 
         Member_Seminar ms1 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarSpring).member(member1).build());
         Member_Seminar ms2 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarSpring).member(member2).build());

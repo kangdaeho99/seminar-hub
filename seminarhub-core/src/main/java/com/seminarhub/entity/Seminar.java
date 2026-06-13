@@ -16,22 +16,22 @@ public class Seminar extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long seminar_no;
+    private Long id;
 
     @Column(length = 100, nullable = false, unique = true)
-    private String seminar_name;
+    private String name;
 
     @Column(length = 500)
-    private String seminar_explanation;
+    private String explanation;
 
     @Column
-    private Long seminar_price;
+    private Long price;
 
     @Column
-    private Long seminar_max_participants;
+    private Long max_participants;
 
     @Column
-    private Long seminar_participants_cnt;
+    private Long participants_cnt;
 
 //    @Version
 //    private Integer version;
@@ -44,9 +44,9 @@ public class Seminar extends BaseEntity {
 
     public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
 
-    public void setSeminar_name(String seminar_name){
-        this.seminar_name = seminar_name;
+    public void setName(String name){
+        this.name = name;
     }
 
-    public void setSeminar_participants_cnt(long seminar_participants_cnt) { this.seminar_participants_cnt = seminar_participants_cnt;}
+    public void setParticipants_cnt(long participants_cnt) { this.participants_cnt = participants_cnt;}
 }

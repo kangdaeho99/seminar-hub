@@ -19,9 +19,9 @@ public interface MemberSeminarSettlementDateRepository extends JpaRepository<Mem
     @Query("""
             select memberSeminarSettlementDate
             from MemberSeminarSettlementDate memberSeminarSettlementDate
-            where memberSeminarSettlementDate.id = :settlementDateId
+            where memberSeminarSettlementDate.memberSeminar.id = :memberSeminarId
             """)
-    Optional<MemberSeminarSettlementDate> findByIdWithoutLock(@Param("settlementDateId") Long settlementDateId);
+    Optional<MemberSeminarSettlementDate> findByMemberSeminarIdWithoutLock(@Param("memberSeminarId") Long memberSeminarId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
@@ -32,12 +32,12 @@ public interface MemberSeminarSettlementDateRepository extends JpaRepository<Mem
     Optional<MemberSeminarSettlementDate> findByIdForUpdate(@Param("settlementDateId") Long settlementDateId);
 
     @Query(value = """
-            SELECT ms.member_seminar_no AS memberSeminarNo,
-                   s.seminar_price AS seminarPrice,
-                   mssd.member_seminar_settlement_date_no AS settlementDateId
+            SELECT ms.id AS memberSeminarId,
+                   s.price AS price,
+                   mssd.id AS settlementDateId
             FROM member_seminar_settlement_date mssd
-            JOIN member_seminar ms ON mssd.member_seminar_no = ms.member_seminar_no
-            JOIN seminar s ON ms.seminar_no = s.seminar_no
+            JOIN member_seminar ms ON mssd.member_seminar_id = ms.id
+            JOIN seminar s ON ms.seminar_id = s.id
             WHERE mssd.date BETWEEN :startAt AND :endAt
               AND ms.del_dt IS NULL
               AND s.del_dt IS NULL
@@ -52,7 +52,7 @@ public interface MemberSeminarSettlementDateRepository extends JpaRepository<Mem
     @Query("""
             UPDATE MemberSeminarSettlementDate memberSeminarSettlementDate
             SET memberSeminarSettlementDate.date = :targetDate
-            WHERE memberSeminarSettlementDate.id = :settlementDateId
+            WHERE memberSeminarSettlementDate.memberSeminar.id = :memberSeminarId
             AND NOT EXISTS (
                 SELECT 1
                 FROM SettlementItem settlementItem
@@ -62,7 +62,7 @@ public interface MemberSeminarSettlementDateRepository extends JpaRepository<Mem
                 AND settlementItem.deleted_at IS NULL
             )
             """)
-    int updateDateIfNotSettled(
-            @Param("settlementDateId") Long settlementDateId,
+    int updateDateByMemberSeminarIdIfNotSettled(
+            @Param("memberSeminarId") Long memberSeminarId,
             @Param("targetDate") LocalDate targetDate);
 }

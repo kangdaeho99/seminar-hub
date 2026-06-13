@@ -21,13 +21,13 @@ public class MemberSeminarSettlementDate extends BaseEntity { // (선택) 등록
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_seminar_settlement_date_no", updatable = false)
+    @Column(updatable = false)
     @Comment("pk")
     private Long id;
 
     // FetchType.LAZY를 명시하여 지연 로딩 설정 (N+1 문제 방지 및 트랜잭션 테스트 용이)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_seminar_no", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Member_Seminar memberSeminar;
 
     @Column

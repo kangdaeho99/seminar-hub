@@ -33,10 +33,10 @@ public class SettlementService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateWithReadCommitted(SettlementDateUpdateRequest request) {
-        settlementDateRepository.findByIdWithoutLock(request.settlementDateId())
-                .orElseThrow(() -> new SettlementDateNotFoundException(request.settlementDateId()));
+        settlementDateRepository.findByMemberSeminarIdWithoutLock(request.memberSeminarId())
+                .orElseThrow(() -> new SettlementDateNotFoundException(request.memberSeminarId()));
 
-        settlementDateRepository.updateDateIfNotSettled(request.settlementDateId(), request.targetDate());
+        settlementDateRepository.updateDateByMemberSeminarIdIfNotSettled(request.memberSeminarId(), request.targetDate());
     }
 
     private void processSettlement(LocalDate startAt, LocalDate endAt, List<SettlementRecord> records) {
@@ -54,7 +54,7 @@ public class SettlementService {
         settlementRepository.save(settlement);
 
         List<SettlementItem> items = records.stream().map(record -> {
-            Member_Seminar ms = memberSeminarRepository.getReferenceById(record.memberSeminarNo());
+            Member_Seminar ms = memberSeminarRepository.getReferenceById(record.memberSeminarId());
             return SettlementItem.builder()
                     .settlement(settlement)
                     .memberSeminar(ms)
@@ -68,8 +68,8 @@ public class SettlementService {
     private List<SettlementRecord> mapToSettlementRecords(List<SettlementRecordProjection> projections) {
         return projections.stream()
                 .map(p -> new SettlementRecord(
-                        p.getMemberSeminarNo(),
-                        p.getSeminarPrice(),
+                        p.getMemberSeminarId(),
+                        p.getPrice(),
                         p.getSettlementDateId()
                 )).toList();
     }

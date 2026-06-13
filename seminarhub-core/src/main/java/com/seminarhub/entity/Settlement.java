@@ -16,7 +16,7 @@ public class Settlement extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long settlement_no;
+    private Long id;
 
     @Column(nullable = false)
     private java.time.LocalDate startDate;

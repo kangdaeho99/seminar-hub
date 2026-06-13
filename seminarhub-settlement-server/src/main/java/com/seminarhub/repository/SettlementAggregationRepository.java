@@ -12,8 +12,8 @@ public interface SettlementAggregationRepository extends JpaRepository<MemberSem
 
     @Query("""
             select new com.seminarhub.dto.SettlementRecord(
-                memberSeminar.member_seminar_no,
-                seminar.seminar_price,
+                memberSeminar.id,
+                seminar.price,
                 settlementDate.id
             )
             from MemberSeminarSettlementDate settlementDate

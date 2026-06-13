@@ -15,7 +15,7 @@ public class Member_Seminar_Payment_History extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long member_seminar_payment_history_no;
+    private Long id;
 
     @Column(nullable = false)
     private Long member_seminar_payment_history_amount;

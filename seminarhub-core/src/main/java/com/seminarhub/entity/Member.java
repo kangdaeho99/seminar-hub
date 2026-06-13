@@ -21,11 +21,10 @@ public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_no")
-    private Long member_no; //고유번호
+    private Long id; //고유번호
 
-    @Column(length = 500, unique = true, name = "member_id")
-    private String member_id; //회원아이디
+    @Column(length = 500, unique = true)
+    private String member_email; //회원아이디
 
     @Column(length = 500, nullable = false)
     private String member_password; //회원 비밀번호
@@ -53,12 +52,12 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Member_Seminar> member_seminar_list;
 
-    public Member(long member_no) {
-        this.member_no = member_no;
+    public Member(long id) {
+        this.id = id;
     }
 
-    public void setMember_id(String member_id) {
-        this.member_id = member_id;
+    public void setMember_email(String member_email) {
+        this.member_email = member_email;
     }
 
     public void setMember_nickname(String member_nickname) {

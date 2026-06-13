@@ -1,7 +1,7 @@
 package com.seminarhub.dto;
 
 public record SettlementRecord(
-        Long memberSeminarNo,
+        Long memberSeminarId,
         Long price,
         Long settlementDateId
 ) {}
