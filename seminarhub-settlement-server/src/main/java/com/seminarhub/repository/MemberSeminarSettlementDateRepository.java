@@ -16,38 +16,6 @@ import java.util.Optional;
 
 public interface MemberSeminarSettlementDateRepository extends JpaRepository<MemberSeminarSettlementDate, Long> {
 
-    @Query("""
-            select memberSeminarSettlementDate
-            from MemberSeminarSettlementDate memberSeminarSettlementDate
-            where memberSeminarSettlementDate.memberSeminar.id = :memberSeminarId
-            """)
-    Optional<MemberSeminarSettlementDate> findByMemberSeminarIdWithoutLock(@Param("memberSeminarId") Long memberSeminarId);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-            select memberSeminarSettlementDate
-            from MemberSeminarSettlementDate memberSeminarSettlementDate
-            where memberSeminarSettlementDate.id = :settlementDateId
-            """)
-    Optional<MemberSeminarSettlementDate> findByIdForUpdate(@Param("settlementDateId") Long settlementDateId);
-
-    @Query(value = """
-            SELECT ms.id AS memberSeminarId,
-                   s.price AS price,
-                   mssd.id AS settlementDateId
-            FROM member_seminar_settlement_date mssd
-            JOIN member_seminar ms ON mssd.member_seminar_id = ms.id
-            JOIN seminar s ON ms.seminar_id = s.id
-            WHERE mssd.date BETWEEN :startAt AND :endAt
-              AND ms.del_dt IS NULL
-              AND s.del_dt IS NULL
-            FOR UPDATE OF mssd
-            """, nativeQuery = true)
-    List<SettlementRecordProjection> findAllByDateBetweenForExclusiveLockNative(
-            @Param("startAt") LocalDate startAt,
-            @Param("endAt") LocalDate endAt);
-
-
     @Modifying(clearAutomatically = true)
     @Query("""
             UPDATE MemberSeminarSettlementDate memberSeminarSettlementDate

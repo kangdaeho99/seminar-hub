@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Comment("회원 세미나 참여(결제) 항목 정산 기준일")
 @Table(indexes = {
-        @Index(name = "idx_settlement_date_del", columnList = "date, del_dt")
+        @Index(name = "idx_mssd_ms_date_del", columnList = "member_seminar_id, date, del_dt")
 })
 public class MemberSeminarSettlementDate extends BaseEntity { // (선택) 등록/수정일이 필요하다면 BaseEntity 상속
 

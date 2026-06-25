@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(indexes = {
+        @Index(name = "idx_settlement_item_ms_del", columnList = "member_seminar_id, deleted_at")
+})
 public class SettlementItem extends BaseEntity {
 
     @Id
