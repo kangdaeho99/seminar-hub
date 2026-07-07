@@ -33,6 +33,10 @@ import org.hibernate.internal.SessionImpl;
 import lombok.extern.slf4j.Slf4j;
 import com.seminarhub.repository.SettlementItemJdbcRepository;
 import com.seminarhub.repository.MemberSeminarSettlementDateJdbcRepository;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.dao.CannotAcquireLockException;
 
 @Slf4j
 @Service
@@ -113,9 +117,6 @@ public class SettlementService {
 
         settlementRepository.save(settlement);
 
-        // =================================================================
-        // [디버깅] batchUpdate 실행 전 영속성 컨텍스트 상태 확인
-        // =================================================================
         SessionImpl session = entityManager.unwrap(SessionImpl.class);
         PersistenceContext pc = session.getPersistenceContext();
         ActionQueue actionQueue = session.getActionQueue();
@@ -123,15 +124,10 @@ public class SettlementService {
         log.info("▶ [batchUpdate 실행 전] 1차 캐시 관리 객체 수: {}", pc.getNumberOfManagedEntities());
         log.info("▶ [batchUpdate 실행 전] ActionQueue 대기 중인 Insert 쿼리 수: {}", actionQueue.numberOfInsertions());
 
-        // 1. 실제 저장 로직 실행 (Native Insert)
-        settlementItemJdbcRepository.insertSettlementItems(settlement.getId(), records);
-
-        // 2. 동시성 충돌 유발을 위한 대상 date 필드 재업데이트 (Lock 획득) - INSERT 이후 실행
         memberSeminarSettlementDateJdbcRepository.updateMemberSeminarSettlementDateToTriggerLock(records);
 
-        // =================================================================
-        // [디버깅] batchUpdate 실행 후 영속성 컨텍스트 상태 확인
-        // =================================================================
+        settlementItemJdbcRepository.insertSettlementItems(settlement.getId(), records);
+
         log.info("▶ [batchUpdate 실행 후] 1차 캐시 관리 객체 수: {}", pc.getNumberOfManagedEntities());
         log.info("▶ [batchUpdate 실행 후] ActionQueue 대기 중인 Insert 쿼리 수: {}", actionQueue.numberOfInsertions());
     }
@@ -149,11 +145,27 @@ public class SettlementService {
         processSettlement(startAt, endAt, mapToSettlementRecords(projections));
     }
 
+    @Retryable(
+        retryFor = { CannotAcquireLockException.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000) // 매 재시도마다 고정적으로 1초 대기
+    )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void aggregateWithRepeatableRead(LocalDate startAt, LocalDate endAt) {
         List<SettlementRecordProjection> projections = settlementAggregationRepository.findAggregateTarget(startAt, endAt);
         processSettlement(startAt, endAt, mapToSettlementRecords(projections));
     }
+
+//     @Transactional(isolation = Isolation.REPEATABLE_READ)
+//     public void aggregateWithRepeatableRead(LocalDate startAt, LocalDate endAt) {
+//     try {
+//         List<SettlementRecordProjection> projections = settlementAggregationRepository.findAggregateTarget(startAt, endAt);
+//         processSettlement(startAt, endAt, mapToSettlementRecords(projections));
+//     } catch (Exception e) {
+//         System.out.println("발생한 예외 타입: " + e.getClass().getName());
+//         throw e;
+//     }
+// }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void aggregateWithSerializable(LocalDate startAt, LocalDate endAt) {

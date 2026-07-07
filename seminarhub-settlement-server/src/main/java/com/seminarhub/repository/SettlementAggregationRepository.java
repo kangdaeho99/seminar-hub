@@ -46,7 +46,7 @@ public interface SettlementAggregationRepository extends JpaRepository<MemberSem
                     WHERE si.member_seminar_id = ms.id 
                     AND si.deleted_at IS NULL
               )
-            FOR UPDATE OF mssd
+            FOR NO KEY UPDATE OF mssd
             """, nativeQuery = true)
     java.util.List<com.seminarhub.dto.SettlementRecordProjection> findAggregateTargetForUpdate(
             @Param("startAt") LocalDate startAt,

@@ -40,13 +40,4 @@ public class SettlementController {
         settlementService.aggregateWithRepeatableRead(startAt, endAt);
         return SettlementApiResponse.ok();
     }
-
-    @GetMapping("/serializable/aggregate")
-    public SettlementApiResponse aggregateWithSerializable(
-            @RequestParam("startAt") LocalDate startAt,
-            @RequestParam("endAt") LocalDate endAt) {
-        settlementService.aggregateWithSerializable(startAt, endAt);
-        return SettlementApiResponse.ok();
-    }
-
 }
