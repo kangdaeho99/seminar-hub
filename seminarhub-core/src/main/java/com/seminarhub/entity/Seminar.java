@@ -40,7 +40,7 @@ public class Seminar extends BaseEntity {
     private LocalDateTime del_dt;
 
     @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY)
-    private List<Member_Seminar> member_seminar_list;
+    private List<MemberSeminar> member_seminar_list;
 
     public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
 

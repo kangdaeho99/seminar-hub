@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = {"member", "seminar", "member_seminar_payment_history"})
-public class Member_Seminar extends BaseEntity {
+public class MemberSeminar extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

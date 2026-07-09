@@ -97,10 +97,10 @@ public class Member extends BaseEntity {
             fetch = FetchType.LAZY
     )
     @Builder.Default
-    private Set<Member_Role> member_role_set = new HashSet<>();
+    private Set<MemberRole> member_role_set = new HashSet<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<Member_Seminar> member_seminar_list;
+    private List<MemberSeminar> member_seminar_list;
 
     public Member(long member_no) {
         this.member_no = member_no;
@@ -118,7 +118,7 @@ public class Member extends BaseEntity {
         this.del_dt = del_dt;
     }
 
-    public void addMemberRole(Member_Role member_role) {
+    public void addMemberRole(MemberRole member_role) {
         member_role_set.add(member_role);
     }
 
@@ -126,7 +126,7 @@ public class Member extends BaseEntity {
 
 --------------------------------------------------------------------------------
 
-## Member_Role.java
+## MemberRole.java
 package com.seminarhub.entity;
 
 
@@ -141,7 +141,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "member")
-public class Member_Role extends BaseEntity{
+public class MemberRole extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -169,7 +169,7 @@ public class Member_Role extends BaseEntity{
 
 --------------------------------------------------------------------------------
 
-## Member_Seminar.java
+## MemberSeminar.java
 package com.seminarhub.entity;
 
 import jakarta.persistence.*;
@@ -183,7 +183,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = {"member", "seminar", "member_seminar_payment_history"})
-public class Member_Seminar extends BaseEntity {
+public class MemberSeminar extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -199,7 +199,7 @@ public class Member_Seminar extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_seminar_payment_history_no")
-    private Member_Seminar_Payment_History member_seminar_payment_history;
+    private MemberSeminarPaymentHistory member_seminar_payment_history;
 
     @Column()
     private LocalDateTime del_dt;
@@ -210,7 +210,7 @@ public class Member_Seminar extends BaseEntity {
 
 --------------------------------------------------------------------------------
 
-## Member_Seminar_Payment_History.java
+## MemberSeminarPaymentHistory.java
 package com.seminarhub.entity;
 
 import jakarta.persistence.*;
@@ -224,7 +224,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @ToString
-public class Member_Seminar_Payment_History extends BaseEntity {
+public class MemberSeminarPaymentHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -235,7 +235,7 @@ public class Member_Seminar_Payment_History extends BaseEntity {
 
 //    JPA에서 제공하지 않음.
 //    @OneToOne(mappedBy = "member_seminar_payment_history")
-//    private Member_Seminar member_seminar;
+//    private MemberSeminar member_seminar;
 
     @Column()
     private LocalDateTime del_dt;
@@ -307,7 +307,7 @@ public class Role extends BaseEntity{
     private LocalDateTime del_dt;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    private List<Member_Role> member_list;
+    private List<MemberRole> member_list;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
@@ -370,7 +370,7 @@ public class Seminar extends BaseEntity {
     private LocalDateTime del_dt;
 
     @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY)
-    private List<Member_Seminar> member_seminar_list;
+    private List<MemberSeminar> member_seminar_list;
 
     public void setDel_dt(LocalDateTime del_dt){ this.del_dt = del_dt; }
 

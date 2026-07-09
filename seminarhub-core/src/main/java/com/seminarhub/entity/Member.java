@@ -47,10 +47,10 @@ public class Member extends BaseEntity {
             fetch = FetchType.LAZY
     )
     @Builder.Default
-    private Set<Member_Role> member_role_set = new HashSet<>();
+    private Set<MemberRole> member_role_set = new HashSet<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<Member_Seminar> member_seminar_list;
+    private List<MemberSeminar> member_seminar_list;
 
     public Member(long id) {
         this.id = id;
@@ -68,7 +68,7 @@ public class Member extends BaseEntity {
         this.del_dt = del_dt;
     }
 
-    public void addMemberRole(Member_Role member_role) {
+    public void addMemberRole(MemberRole member_role) {
         member_role_set.add(member_role);
     }
 

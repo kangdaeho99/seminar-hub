@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @ToString
-public class Member_Seminar_Payment_History extends BaseEntity {
+public class MemberSeminarPaymentHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class Member_Seminar_Payment_History extends BaseEntity {
 
 //    JPA에서 제공하지 않음.
 //    @OneToOne(mappedBy = "member_seminar_payment_history")
-//    private Member_Seminar member_seminar;
+//    private MemberSeminar member_seminar;
 
     @Column()
     private LocalDateTime del_dt;

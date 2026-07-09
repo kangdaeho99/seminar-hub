@@ -2,7 +2,7 @@ package com.seminarhub.init;
 
 import com.seminarhub.entity.Member;
 import com.seminarhub.entity.MemberSeminarSettlementDate;
-import com.seminarhub.entity.Member_Seminar;
+import com.seminarhub.entity.MemberSeminar;
 import com.seminarhub.entity.Seminar;
 import com.seminarhub.repository.MemberRepository;
 import com.seminarhub.repository.MemberSeminarRepository;
@@ -92,12 +92,12 @@ public class DataInitializer implements ApplicationRunner {
         log.info("[DataInitializer] [2/4] Seminars saved: ids={}, {}, {}",
                 seminarSpring.getId(), seminarJpa.getId(), seminarConcurrency.getId());
 
-        Member_Seminar ms1 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarSpring).member(member1).build());
-        Member_Seminar ms2 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarSpring).member(member2).build());
-        Member_Seminar ms3 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarJpa).member(member1).build());
-        Member_Seminar ms4 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarJpa).member(member2).build());
-        Member_Seminar ms5 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarConcurrency).member(member1).build());
-        Member_Seminar ms6 = memberSeminarRepository.save(Member_Seminar.builder().seminar(seminarConcurrency).member(member2).build());
+        MemberSeminar ms1 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarSpring).member(member1).build());
+        MemberSeminar ms2 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarSpring).member(member2).build());
+        MemberSeminar ms3 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarJpa).member(member1).build());
+        MemberSeminar ms4 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarJpa).member(member2).build());
+        MemberSeminar ms5 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarConcurrency).member(member1).build());
+        MemberSeminar ms6 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarConcurrency).member(member2).build());
         log.info("[DataInitializer] [3/4] MemberSeminars saved: 6 records");
 
         List<MemberSeminarSettlementDate> settlementDates = List.of(
@@ -117,7 +117,7 @@ public class DataInitializer implements ApplicationRunner {
         log.info("[DataInitializer] - Update target settlementDateId: {} (date={})", settlementDates.get(0).getId(), DATE_JAN_15);
     }
 
-    private MemberSeminarSettlementDate createSettlementDate(Member_Seminar memberSeminar, LocalDate date) {
+    private MemberSeminarSettlementDate createSettlementDate(MemberSeminar memberSeminar, LocalDate date) {
         MemberSeminarSettlementDate sd = new MemberSeminarSettlementDate(memberSeminar);
         sd.updateDate(date);
         return sd;

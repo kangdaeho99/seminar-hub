@@ -24,7 +24,7 @@ public class SettlementItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Member_Seminar memberSeminar;
+    private MemberSeminar memberSeminar;
 
     @Column(nullable = false)
     private BigDecimal amount;

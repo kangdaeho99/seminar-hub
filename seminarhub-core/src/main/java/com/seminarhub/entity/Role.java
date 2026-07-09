@@ -21,7 +21,7 @@ public class Role extends BaseEntity{
     private LocalDateTime del_dt;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    private List<Member_Role> member_list;
+    private List<MemberRole> member_list;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)

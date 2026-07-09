@@ -3,7 +3,7 @@ package com.seminarhub.service;
 import com.seminarhub.dto.SettlementDateUpdateRequest;
 import com.seminarhub.dto.SettlementRecord;
 import com.seminarhub.dto.SettlementRecordProjection;
-import com.seminarhub.entity.Member_Seminar;
+import com.seminarhub.entity.MemberSeminar;
 import com.seminarhub.entity.Settlement;
 import com.seminarhub.entity.SettlementItem;
 import com.seminarhub.exception.SettlementDateNotFoundException;
@@ -75,7 +75,7 @@ public class SettlementService {
     //     settlementRepository.save(settlement);
 
     //     List<SettlementItem> items = records.stream().map(record -> {
-    //         Member_Seminar ms = memberSeminarRepository.getReferenceById(record.memberSeminarId());
+    //         MemberSeminar ms = memberSeminarRepository.getReferenceById(record.memberSeminarId());
     //         return SettlementItem.builder()
     //                 .settlement(settlement)
     //                 .memberSeminar(ms)

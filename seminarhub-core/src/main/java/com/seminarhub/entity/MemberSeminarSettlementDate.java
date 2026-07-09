@@ -28,7 +28,7 @@ public class MemberSeminarSettlementDate extends BaseEntity { // (선택) 등록
     // FetchType.LAZY를 명시하여 지연 로딩 설정 (N+1 문제 방지 및 트랜잭션 테스트 용이)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Member_Seminar memberSeminar;
+    private MemberSeminar memberSeminar;
 
     @Column
     @Comment("정산 기준일, 만약 null이면 정산일 세팅전입니다.")
@@ -43,7 +43,7 @@ public class MemberSeminarSettlementDate extends BaseEntity { // (선택) 등록
     }
 
     // 생성자
-    public MemberSeminarSettlementDate(Member_Seminar memberSeminar) {
+    public MemberSeminarSettlementDate(MemberSeminar memberSeminar) {
         this.memberSeminar = memberSeminar;
     }
 

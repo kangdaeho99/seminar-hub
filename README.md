@@ -111,7 +111,7 @@
 
     -  https://passionfruit200.tistory.com/451 (  Interceptor를 활용하여 Handler Method에 회원권한체크해보기 )
 
-    -  https://passionfruit200.tistory.com/419 ( 회원권한 테이블 (Member, Member_Role, Role)을 @ManyToMany 사용하지않고 Bridge Table 사용하여 설계해보기 )
+    -  https://passionfruit200.tistory.com/419 ( 회원권한 테이블 (Member, MemberRole, Role)을 @ManyToMany 사용하지않고 Bridge Table 사용하여 설계해보기 )
 
     -  https://passionfruit200.tistory.com/414 ( docker 적용하는 이유, Spring Boot 3.0.x 에 docker를 AWS EC2와 함께 적용해보기 [1] )
 
@@ -131,7 +131,7 @@
 
 ## 📒 현재 DB 구조 ( 회원관련쪽 진행중 )
 
-> Member, Member_Role, Role 회원 관련 DB 구성이 완료된 상태입니다.
+> Member, MemberRole, Role 회원 관련 DB 구성이 완료된 상태입니다.
 
 
 ![DB 배포구조](https://github.com/kangdaeho99/seminar-hub/assets/48047377/60ebef9e-a0e5-4d58-866f-1dc20dda7dc6)
