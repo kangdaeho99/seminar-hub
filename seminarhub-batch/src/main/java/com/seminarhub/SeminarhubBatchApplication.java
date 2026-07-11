@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.seminarhub;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableBatchProcessing
 @SpringBootApplication
-public class DemoApplication {
+public class SeminarhubBatchApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(SeminarhubBatchApplication.class, args);
 	}
 
 }
