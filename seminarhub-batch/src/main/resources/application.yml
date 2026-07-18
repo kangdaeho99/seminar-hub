@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: seminarhub-batch
+  profiles:
+    active: ${ACTIVE_PROFILE:local}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: ${ACTIVE_PROFILE:local}
+    import: optional:file:.env[.properties], optional:file:../.env[.properties]
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/seminar-hub?reWriteBatchedInserts=true}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.transaction.interceptor: INFO
+    org.springframework.orm.jpa.JpaTransactionManager: INFO
+    org.hibernate.SQL: INFO
+    org.springframework.jdbc.core.JdbcTemplate: INFO
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari.pool.HikariPool: DEBUG
