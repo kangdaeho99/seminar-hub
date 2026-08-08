@@ -40,3 +40,4 @@ application-real-db.properties
 .vscode/
 .env
 .gemini/
+.workflow

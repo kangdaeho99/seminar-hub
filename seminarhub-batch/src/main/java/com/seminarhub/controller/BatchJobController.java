@@ -1,5 +1,7 @@
 package com.seminarhub.controller;
 
+import com.seminarhub.dto.BatchJobResponse;
+import com.seminarhub.dto.DeliveryStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -7,9 +9,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import com.seminarhub.dto.BatchJobResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,15 +35,18 @@ public class BatchJobController {
     /**
      * 배송 상태 업데이트 Job 수동 실행
      *
+     * @param request 배송 상태 업데이트 요청 DTO (startAt, endAt)
      * @return Job 실행 결과 (jobId, status, startTime)
      */
     @PostMapping("/delivery/status-update")
-    public ResponseEntity<BatchJobResponse> runDeliveryStatusUpdateJob() {
+    public ResponseEntity<BatchJobResponse> runDeliveryStatusUpdateJob(
+            @RequestBody(required = false) DeliveryStatusUpdateRequest request) {
         try {
-            // JobParameters에 실행 시각을 포함해 동일 파라미터로 중복 실행되지 않도록 구분
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("requestedAt", LocalDateTime.now().toString())
-                    .toJobParameters();
+            JobParametersBuilder builder = new JobParametersBuilder();
+            builder.addLocalDateTime("startAt", request.getStartAt());
+            builder.addLocalDateTime("endAt", request.getEndAt());
+
+            JobParameters jobParameters = builder.toJobParameters();
 
             log.info("배송 상태 업데이트 Job 수동 실행 요청: params={}", jobParameters);
 

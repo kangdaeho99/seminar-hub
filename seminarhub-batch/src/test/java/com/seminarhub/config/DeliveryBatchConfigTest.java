@@ -79,8 +79,14 @@ class DeliveryBatchConfigTest {
     @Test
     @DisplayName("deliveryStatusUpdateJob — PENDING 배송 데이터를 읽어 정상적으로 Job이 완료된다")
     void deliveryStatusUpdateJob_success() throws Exception {
+        // given
+        org.springframework.batch.core.JobParameters jobParameters = new org.springframework.batch.core.JobParametersBuilder()
+                .addString("startAt", "2026-01-01T15:00:00")
+                .addString("endAt", "2026-01-01T16:00:00")
+                .toJobParameters();
+
         // when
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 
         // then
         assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
