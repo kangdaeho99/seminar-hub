@@ -27,4 +27,3 @@ public class BatchConfig extends DefaultBatchConfiguration {
     //     return new JobLauncherApplicationRunner(jobLauncher, jobExplorer, jobRepository);
     // }
 }
-
