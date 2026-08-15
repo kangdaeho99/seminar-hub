@@ -95,9 +95,9 @@ public class DeliveryBatchConfig {
     @Bean
     public TaskExecutor deliveryTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(500);
+        executor.setCorePoolSize(5);   // 스레드 축소
+        executor.setMaxPoolSize(10);   // 스레드 축소 (300 TPS 방어)
+        executor.setQueueCapacity(500); // CHUNK_SIZE에 맞춰 큐 확장
         executor.setThreadNamePrefix("async-batch-");
         executor.setRejectedExecutionHandler(new BlockingRejectedExecutionHandler());
         executor.setWaitForTasksToCompleteOnShutdown(true);
