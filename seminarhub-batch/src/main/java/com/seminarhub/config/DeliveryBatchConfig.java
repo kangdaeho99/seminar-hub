@@ -95,11 +95,13 @@ public class DeliveryBatchConfig {
     @Bean
     public TaskExecutor deliveryTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);   
-        executor.setMaxPoolSize(10);   
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(10);
         executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("async-batch-");
         executor.setRejectedExecutionHandler(new BlockingRejectedExecutionHandler());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
         return executor;
     }
 
