@@ -4,8 +4,10 @@ import com.seminarhub.entity.Delivery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.SkipListener;
 
+import java.util.concurrent.Future;
+
 @Slf4j
-public class DeliverySkipListener implements SkipListener<Delivery, Delivery> {
+public class DeliverySkipListener implements SkipListener<Delivery, Future<Delivery>> {
 
     @Override
     public void onSkipInRead(Throwable t) {
@@ -13,12 +15,12 @@ public class DeliverySkipListener implements SkipListener<Delivery, Delivery> {
     }
 
     @Override
-    public void onSkipInWrite(Delivery item, Throwable t) {
-        log.warn(">>> [SKIP] Writer에서 에러 발생. Delivery ID: {}, Cause: {}", item != null ? item.getId() : "null", t.getMessage());
+    public void onSkipInWrite(Future<Delivery> item, Throwable t) {
+        log.warn(">>> [SKIP] 비동기 처리 또는 Writer에서 오류 발생. Cause: {}", t.getMessage());
     }
 
     @Override
     public void onSkipInProcess(Delivery item, Throwable t) {
-        log.warn(">>> [SKIP] Processor에서 API 에러로 인해 다음 배송 건 스킵됨. Delivery ID: {}, Cause: {}", item != null ? item.getId() : "null", t.getMessage());
+        log.warn(">>> [SKIP] Processor 작업 제출 중 오류 발생. Delivery ID: {}, Cause: {}", item != null ? item.getId() : "null", t.getMessage());
     }
 }

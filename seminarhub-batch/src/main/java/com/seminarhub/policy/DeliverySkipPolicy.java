@@ -8,8 +8,12 @@ public class DeliverySkipPolicy implements SkipPolicy {
 
     @Override
     public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
-        if (t instanceof DeliveryStatusUpdateException) {
-            return true;
+        Throwable cause = t;
+        while (cause != null) {
+            if (cause instanceof DeliveryStatusUpdateException) {
+                return true;
+            }
+            cause = cause.getCause();
         }
         return false;
     }
