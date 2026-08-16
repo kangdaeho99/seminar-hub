@@ -14,12 +14,12 @@ import com.seminarhub.validator.DeliveryJobParametersValidator;
 import com.seminarhub.writer.DeliveryItemWriter;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersValidator;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.integration.async.AsyncItemWriter;
@@ -107,8 +107,7 @@ public class DeliveryBatchConfig {
 
     @Bean
     public AsyncItemProcessor<Delivery, Delivery> asyncDeliveryProcessor() {
-        AsyncItemProcessor<Delivery, Delivery> processor = new AsyncItemProcessor<>();
-        processor.setDelegate(deliveryProcessor());
+        AsyncItemProcessor<Delivery, Delivery> processor = new AsyncItemProcessor<>(deliveryProcessor());
         processor.setTaskExecutor(deliveryTaskExecutor());
         return processor;
     }
@@ -120,8 +119,6 @@ public class DeliveryBatchConfig {
 
     @Bean
     public AsyncItemWriter<Delivery> asyncDeliveryWriter() {
-        AsyncItemWriter<Delivery> writer = new AsyncItemWriter<>();
-        writer.setDelegate(deliveryWriter());
-        return writer;
+        return new AsyncItemWriter<>(deliveryWriter());
     }
 }

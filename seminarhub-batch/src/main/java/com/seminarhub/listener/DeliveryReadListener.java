@@ -2,7 +2,7 @@ package com.seminarhub.listener;
 
 import com.seminarhub.entity.Delivery;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.listener.ItemReadListener;
 
 @Slf4j
 public class DeliveryReadListener implements ItemReadListener<Delivery> {

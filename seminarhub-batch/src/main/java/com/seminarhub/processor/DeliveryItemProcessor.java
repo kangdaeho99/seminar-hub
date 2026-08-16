@@ -3,7 +3,7 @@ package com.seminarhub.processor;
 import com.seminarhub.entity.Delivery;
 import com.seminarhub.entity.enums.DeliveryStatus;
 import com.seminarhub.util.DeliveryStatusExternalApiUtil;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 public class DeliveryItemProcessor implements ItemProcessor<Delivery, Delivery> {
 

@@ -10,13 +10,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,9 +83,9 @@ class DeliveryBatchConfigTest {
     @DisplayName("deliveryStatusUpdateJob — PENDING 배송 데이터를 읽어 정상적으로 Job이 완료된다")
     void deliveryStatusUpdateJob_success() throws Exception {
         // given
-        org.springframework.batch.core.JobParameters jobParameters = new org.springframework.batch.core.JobParametersBuilder()
-                .addString("startAt", "2026-01-01T15:00:00")
-                .addString("endAt", "2026-01-01T16:00:00")
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLocalDateTime("startAt", LocalDateTime.parse("2026-01-01T15:00:00"))
+                .addLocalDateTime("endAt", LocalDateTime.parse("2026-01-01T16:00:00"))
                 .toJobParameters();
 
         // when

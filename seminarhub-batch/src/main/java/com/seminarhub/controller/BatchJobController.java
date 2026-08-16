@@ -4,10 +4,10 @@ import com.seminarhub.dto.BatchJobResponse;
 import com.seminarhub.dto.DeliveryStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,13 +53,13 @@ public class BatchJobController {
             JobExecution jobExecution = jobLauncher.run(deliveryStatusUpdateJob, jobParameters);
 
             BatchJobResponse response = BatchJobResponse.success(
-                    jobExecution.getJobId(),
+                    jobExecution.getId(),
                     jobExecution.getJobInstance().getJobName(),
                     jobExecution.getStatus().name(),
                     jobExecution.getStartTime()
             );
 
-            log.info("Job 실행 완료: jobId={}, status={}", jobExecution.getJobId(), jobExecution.getStatus());
+            log.info("Job 실행 완료: jobId={}, status={}", jobExecution.getId(), jobExecution.getStatus());
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

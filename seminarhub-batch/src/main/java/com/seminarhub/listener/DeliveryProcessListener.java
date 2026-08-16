@@ -2,7 +2,7 @@ package com.seminarhub.listener;
 
 import com.seminarhub.entity.Delivery;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.listener.ItemProcessListener;
 
 import java.util.concurrent.Future;
 

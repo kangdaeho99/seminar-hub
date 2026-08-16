@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = {"member", "seminar", "member_seminar_payment_history"})
+@ToString
 public class MemberSeminar extends BaseEntity {
 
     @Id

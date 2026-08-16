@@ -3,7 +3,7 @@ package com.seminarhub.reader;
 import com.seminarhub.entity.Delivery;
 import com.seminarhub.entity.enums.DeliveryStatus;
 import com.seminarhub.repository.DeliveryRepository;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 

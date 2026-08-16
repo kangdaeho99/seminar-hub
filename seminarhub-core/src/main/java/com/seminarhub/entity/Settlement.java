@@ -11,7 +11,7 @@ import com.seminarhub.enums.SettlementStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = "memberSeminar")
+@ToString
 public class Settlement extends BaseEntity {
 
     @Id
