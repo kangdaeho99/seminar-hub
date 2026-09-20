@@ -1,6 +1,7 @@
 package com.seminarhub.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.seminarhub.config.QuerydslConfig;
 import com.seminarhub.domain.settlement.service.SettlementSearchQuery;
@@ -76,6 +77,21 @@ class SettlementRepositoryIntegrationTest {
 
         List<Settlement> selected = repository.search(query(List.of(oldest.getId())));
         assertEquals(List.of(oldest.getId()), selected.stream().map(Settlement::getId).toList());
+    }
+
+    @Test
+    void activeLookupsExcludeSoftDeletedRows() {
+        Settlement deleted = repository.save(settlement(40, LocalDateTime.of(2026, 2, 1, 0, 0)));
+        repository.flush();
+
+        assertEquals(oldest.getId(), repository.findActiveById(oldest.getId()).orElseThrow().getId());
+        assertTrue(repository.findActiveById(deleted.getId()).isEmpty());
+        assertEquals(
+                List.of(oldest.getId(), newest.getId()),
+                repository.findActiveByIds(List.of(oldest.getId(), deleted.getId(), newest.getId())).stream()
+                        .map(Settlement::getId)
+                        .sorted()
+                        .toList());
     }
 
     @Test

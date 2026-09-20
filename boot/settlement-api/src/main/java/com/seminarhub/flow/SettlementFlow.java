@@ -1,7 +1,9 @@
 package com.seminarhub.flow;
 
 import com.seminarhub.domain.settlement.service.SettlementSearchQuery;
+import com.seminarhub.dto.SettlementCreateRequest;
 import com.seminarhub.dto.SettlementDateUpdateRequest;
+import com.seminarhub.dto.SettlementUpdateRequest;
 import com.seminarhub.entity.Settlement;
 import com.seminarhub.global.dto.CursorRequest;
 import com.seminarhub.usecase.SettlementUseCase;
@@ -17,6 +19,13 @@ import org.springframework.stereotype.Component;
 public class SettlementFlow {
 
     private final SettlementUseCase useCase;
+
+    public Settlement create(SettlementCreateRequest request) { return useCase.create(request); }
+    public Settlement read(Long id) { return useCase.read(id); }
+    public List<Settlement> readAll(List<Long> ids) { return useCase.readAll(ids); }
+    public Settlement update(Long id, SettlementUpdateRequest request) { return useCase.update(id, request); }
+    public Settlement delete(Long id) { return useCase.delete(id); }
+    public List<Settlement> deleteAll(List<Long> ids) { return useCase.deleteAll(ids); }
 
     public List<Settlement> findAll(SettlementSearchQuery query) { return useCase.findAll(query); }
     public Page<Settlement> findPage(SettlementSearchQuery query, Pageable pageable) {

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +44,7 @@ public class SettlementExceptionHandler {
             BindException.class,
             HandlerMethodValidationException.class,
             MethodArgumentTypeMismatchException.class,
+            MissingServletRequestParameterException.class,
             ConstraintViolationException.class
     })
     public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {

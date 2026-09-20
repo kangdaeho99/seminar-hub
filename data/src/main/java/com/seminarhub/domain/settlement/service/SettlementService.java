@@ -14,6 +14,7 @@ import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.spi.ActionQueue;
@@ -37,6 +38,42 @@ public class SettlementService {
     private final EntityManager entityManager;
     private final SettlementItemJdbcRepository settlementItemJdbcRepository;
     private final MemberSeminarSettlementDateJdbcRepository memberSeminarSettlementDateJdbcRepository;
+
+    @Transactional
+    public Settlement save(Settlement settlement) {
+        return settlementRepository.save(settlement);
+    }
+
+    public Optional<Settlement> findById(Long id) {
+        return settlementRepository.findActiveById(id);
+    }
+
+    public List<Settlement> findByIds(List<Long> ids) {
+        return settlementRepository.findActiveByIds(ids);
+    }
+
+    @Transactional
+    public Settlement update(
+            Settlement settlement,
+            LocalDate startDate,
+            LocalDate endDate,
+            BigDecimal amount,
+            SettlementStatus settlementStatus) {
+        settlement.update(startDate, endDate, amount, settlementStatus);
+        return settlementRepository.save(settlement);
+    }
+
+    @Transactional
+    public Settlement delete(Settlement settlement) {
+        settlement.delete();
+        return settlementRepository.save(settlement);
+    }
+
+    @Transactional
+    public List<Settlement> deleteAll(List<Settlement> settlements) {
+        settlements.forEach(Settlement::delete);
+        return settlementRepository.saveAll(settlements);
+    }
 
     public List<Settlement> findAll(SettlementSearchQuery query) {
         return settlementRepository.search(query);

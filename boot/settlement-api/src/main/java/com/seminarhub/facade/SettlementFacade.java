@@ -3,9 +3,11 @@ package com.seminarhub.facade;
 import com.seminarhub.domain.settlement.service.SettlementSearchQuery;
 import com.seminarhub.dto.CursorResponse;
 import com.seminarhub.dto.Pagination;
+import com.seminarhub.dto.SettlementCreateRequest;
 import com.seminarhub.dto.SettlementDateUpdateRequest;
 import com.seminarhub.dto.SettlementResponse;
 import com.seminarhub.dto.SettlementSearchRequest;
+import com.seminarhub.dto.SettlementUpdateRequest;
 import com.seminarhub.entity.Settlement;
 import com.seminarhub.flow.SettlementFlow;
 import com.seminarhub.global.dto.CursorRequest;
@@ -21,6 +23,30 @@ import org.springframework.stereotype.Component;
 public class SettlementFacade {
 
     private final SettlementFlow flow;
+
+    public SettlementResponse create(SettlementCreateRequest request) {
+        return SettlementResponse.from(flow.create(request));
+    }
+
+    public SettlementResponse read(Long id) {
+        return SettlementResponse.from(flow.read(id));
+    }
+
+    public List<SettlementResponse> readAll(List<Long> ids) {
+        return toResponses(flow.readAll(ids));
+    }
+
+    public SettlementResponse update(Long id, SettlementUpdateRequest request) {
+        return SettlementResponse.from(flow.update(id, request));
+    }
+
+    public SettlementResponse delete(Long id) {
+        return SettlementResponse.from(flow.delete(id));
+    }
+
+    public List<SettlementResponse> deleteAll(List<Long> ids) {
+        return toResponses(flow.deleteAll(ids));
+    }
 
     public List<SettlementResponse> findAll(SettlementSearchRequest request) {
         return toResponses(flow.findAll(toQuery(request)));
