@@ -9,6 +9,10 @@ import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.CannotSerializeTransactionException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,9 +39,13 @@ public class SettlementExceptionHandler {
     }
 
     @ExceptionHandler({
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            BindException.class,
+            HandlerMethodValidationException.class,
+            MethodArgumentTypeMismatchException.class,
+            ConstraintViolationException.class
     })
-    public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException exception) {
+    public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {
         log.warn("Settlement bad request. message={}", exception.getMessage(), exception);
         return new BadRequestException(exception.getMessage(), exception).toResponseEntity();
     }

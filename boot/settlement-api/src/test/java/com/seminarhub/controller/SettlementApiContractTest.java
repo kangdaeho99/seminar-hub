@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.seminarhub.exception.SettlementDateNotFoundException;
 import com.seminarhub.exception.SettlementExceptionHandler;
-import com.seminarhub.service.SettlementService;
+import com.seminarhub.facade.SettlementFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.PessimisticLockingFailureException;
@@ -19,13 +19,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 class SettlementApiContractTest {
 
-    private SettlementService settlementService;
+    private SettlementFacade settlementFacade;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        settlementService = mock(SettlementService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new SettlementController(settlementService))
+        settlementFacade = mock(SettlementFacade.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new SettlementController(settlementFacade))
                 .setControllerAdvice(new SettlementExceptionHandler())
                 .build();
     }
@@ -46,7 +46,7 @@ class SettlementApiContractTest {
     @Test
     void keepsNotFoundStatusForMissingSettlementDates() throws Exception {
         doThrow(new SettlementDateNotFoundException(1L))
-                .when(settlementService)
+                .when(settlementFacade)
                 .updateWithReadCommitted(any());
 
         mockMvc.perform(post("/settlement/read-committed/update")
@@ -62,7 +62,7 @@ class SettlementApiContractTest {
     @Test
     void mapsConcurrencyFailuresToConflict() throws Exception {
         doThrow(new PessimisticLockingFailureException("locked"))
-                .when(settlementService)
+                .when(settlementFacade)
                 .updateWithReadCommitted(any());
 
         mockMvc.perform(post("/settlement/read-committed/update")
@@ -78,7 +78,7 @@ class SettlementApiContractTest {
     @Test
     void mapsUnexpectedFailuresToInternalServerError() throws Exception {
         doThrow(new RuntimeException("unexpected"))
-                .when(settlementService)
+                .when(settlementFacade)
                 .updateWithReadCommitted(any());
 
         mockMvc.perform(post("/settlement/read-committed/update")
