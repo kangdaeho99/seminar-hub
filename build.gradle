@@ -3,11 +3,75 @@ plugins {
     alias(libs.plugins.spring.dependency.management) apply false
 }
 
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+ext {
+    querydslVersion = '5.1.0'
+    lombokVersion = '1.18.32'
+    springRetryVersion = '2.0.11'
+}
+
+group = 'org.zerock'
+version = '0.0.1-SNAPSHOT'
+
 allprojects {
-    group = 'org.zerock'
-    version = '0.0.1-SNAPSHOT'
+    group = rootProject.group
+    version = rootProject.version
 
     repositories {
         mavenCentral()
+    }
+}
+
+def libraryProjects = [
+        project(':common'),
+        project(':data')
+]
+
+def applicationProjects = [
+        project(':boot:settlement-api'),
+        project(':batch')
+]
+
+def javaProjects = libraryProjects + applicationProjects
+
+configure(libraryProjects) {
+    apply plugin: 'java-library'
+}
+
+configure(applicationProjects) {
+    apply plugin: 'java'
+}
+
+configure(javaProjects) {
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
     }
 }

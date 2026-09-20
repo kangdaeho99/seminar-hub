@@ -1,0 +1,27 @@
+def generatedDir = layout.buildDirectory.dir('generated/querydsl')
+
+sourceSets {
+    main {
+        java {
+            srcDir generatedDir
+        }
+    }
+}
+
+tasks.named('compileJava', JavaCompile) {
+    options.generatedSourceOutputDirectory.set(generatedDir)
+}
+
+dependencies {
+    implementation project(':common')
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework:spring-jdbc'
+    implementation "com.querydsl:querydsl-jpa:${rootProject.ext.querydslVersion}:jakarta"
+
+    annotationProcessor "com.querydsl:querydsl-apt:${rootProject.ext.querydslVersion}:jakarta"
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}

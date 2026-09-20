@@ -2,19 +2,8 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-querydsl = "5.1.0" # Boot 4 호환을 위해 최신 버전으로 상향 필요
-lombok = "1.18.32"
 spring-boot = "4.0.0" # 타겟 버전
 spring-dependency-management = "1.1.7"
-jakarta-persistence = "3.2.0" # Boot 4 스펙에 맞춰 상향 예상
-jakarta-annotation = "2.1.1"
-
-[libraries]
-querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
-querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
-lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
-jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakarta-persistence" }
-jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jakarta-annotation" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
