@@ -3,15 +3,20 @@ package com.seminarhub.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.seminarhub.config.QuerydslConfig;
+import com.seminarhub.domain.member.domain.Member;
+import com.seminarhub.domain.member.repository.MemberRepository;
+import com.seminarhub.domain.seminar.domain.MemberSeminar;
+import com.seminarhub.domain.seminar.domain.Seminar;
+import com.seminarhub.domain.seminar.repository.MemberSeminarRepository;
+import com.seminarhub.domain.seminar.repository.SeminarRepository;
+import com.seminarhub.domain.settlement.domain.Settlement;
+import com.seminarhub.domain.settlement.domain.SettlementItem;
+import com.seminarhub.domain.settlement.enums.SettlementStatus;
+import com.seminarhub.domain.settlement.repository.SettlementItemRepository;
+import com.seminarhub.domain.settlement.repository.SettlementRepository;
 import com.seminarhub.domain.settlement.service.SettlementSearchQuery;
 import com.seminarhub.domain.settlement.service.SettlementItemSearchQuery;
-import com.seminarhub.entity.Member;
-import com.seminarhub.entity.MemberSeminar;
-import com.seminarhub.entity.Seminar;
-import com.seminarhub.entity.Settlement;
-import com.seminarhub.entity.SettlementItem;
-import com.seminarhub.enums.SettlementStatus;
+import com.seminarhub.global.config.QuerydslConfig;
 import com.seminarhub.global.dto.CursorRequest;
 import com.seminarhub.global.dto.Direction;
 import java.math.BigDecimal;
@@ -45,8 +50,8 @@ class SettlementRepositoryIntegrationTest {
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
-    @EntityScan("com.seminarhub.entity")
-    @EnableJpaRepositories("com.seminarhub.repository")
+    @EntityScan("com.seminarhub.domain")
+    @EnableJpaRepositories("com.seminarhub.domain")
     @Import(QuerydslConfig.class)
     static class TestApplication {}
 
@@ -84,11 +89,11 @@ class SettlementRepositoryIntegrationTest {
         Settlement deleted = repository.save(settlement(40, LocalDateTime.of(2026, 2, 1, 0, 0)));
         repository.flush();
 
-        assertEquals(oldest.getId(), repository.findActiveById(oldest.getId()).orElseThrow().getId());
-        assertTrue(repository.findActiveById(deleted.getId()).isEmpty());
+        assertEquals(oldest.getId(), repository.findByIdAndDeletedAtIsNull(oldest.getId()).orElseThrow().getId());
+        assertTrue(repository.findByIdAndDeletedAtIsNull(deleted.getId()).isEmpty());
         assertEquals(
                 List.of(oldest.getId(), newest.getId()),
-                repository.findActiveByIds(List.of(oldest.getId(), deleted.getId(), newest.getId())).stream()
+                repository.findAllByIdInAndDeletedAtIsNull(List.of(oldest.getId(), deleted.getId(), newest.getId())).stream()
                         .map(Settlement::getId)
                         .sorted()
                         .toList());
@@ -141,13 +146,14 @@ class SettlementRepositoryIntegrationTest {
     }
 
     private Settlement settlement(long amount, LocalDateTime deletedAt) {
-        return Settlement.builder()
+        Settlement settlement = Settlement.builder()
                 .startDate(LocalDate.of(2026, 1, 1))
                 .endDate(LocalDate.of(2026, 1, 31))
                 .amount(BigDecimal.valueOf(amount))
-                .settlement_status(SettlementStatus.COMPLETED)
-                .deleted_at(deletedAt)
+                .settlementStatus(SettlementStatus.COMPLETED)
                 .build();
+        if (deletedAt != null) settlement.delete();
+        return settlement;
     }
 
     private SettlementSearchQuery query(List<Long> ids) {

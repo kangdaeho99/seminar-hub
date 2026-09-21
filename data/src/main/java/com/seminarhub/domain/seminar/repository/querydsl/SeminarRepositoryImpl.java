@@ -1,0 +1,11 @@
+package com.seminarhub.domain.seminar.repository.querydsl;
+import static com.seminarhub.domain.seminar.domain.QSeminar.seminar;
+import com.querydsl.core.BooleanBuilder; import com.querydsl.core.types.dsl.ComparableExpressionBase; import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.seminarhub.domain.seminar.domain.Seminar; import com.seminarhub.domain.seminar.service.SeminarSearchQuery; import com.seminarhub.global.dto.CursorRequest; import com.seminarhub.global.repository.QuerydslRepositorySupport;
+import java.util.List; import org.springframework.data.domain.Page; import org.springframework.data.domain.Pageable; import org.springframework.stereotype.Repository; import org.springframework.util.StringUtils;
+@Repository public class SeminarRepositoryImpl extends QuerydslRepositorySupport<Seminar> implements SeminarRepositoryCustom {
+    public SeminarRepositoryImpl(JPAQueryFactory f) { super(f, seminar, seminar.id, seminar.createdAt, seminar.updatedAt, seminar.deletedAt); }
+    public List<Seminar> search(SeminarSearchQuery q) { return findAll(condition(q)); } public Page<Seminar> search(SeminarSearchQuery q, Pageable p) { return findAll(condition(q), p, this::sort); } public List<Seminar> search(SeminarSearchQuery q, CursorRequest c) { return findByCursor(condition(q), c); }
+    private BooleanBuilder condition(SeminarSearchQuery q) { BooleanBuilder b=auditCondition(q); if(StringUtils.hasText(q.name()))b.and(seminar.name.containsIgnoreCase(q.name())); if(StringUtils.hasText(q.explanation()))b.and(seminar.explanation.containsIgnoreCase(q.explanation())); if(q.price()!=null)b.and(seminar.price.eq(q.price())); if(q.priceMin()!=null)b.and(seminar.price.goe(q.priceMin())); if(q.priceMax()!=null)b.and(seminar.price.loe(q.priceMax())); if(q.maxParticipants()!=null)b.and(seminar.maxParticipants.eq(q.maxParticipants())); if(q.participantsCount()!=null)b.and(seminar.participantsCount.eq(q.participantsCount())); return b; }
+    private ComparableExpressionBase<?> sort(String n){return switch(n){case"id"->seminar.id;case"name"->seminar.name;case"price"->seminar.price;case"maxParticipants"->seminar.maxParticipants;case"participantsCount"->seminar.participantsCount;case"createdAt"->seminar.createdAt;case"updatedAt"->seminar.updatedAt;case"deletedAt"->seminar.deletedAt;default->null;};}
+}

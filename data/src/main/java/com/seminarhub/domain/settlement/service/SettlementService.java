@@ -1,15 +1,15 @@
 package com.seminarhub.domain.settlement.service;
 
-import com.seminarhub.dto.SettlementRecord;
-import com.seminarhub.dto.SettlementRecordProjection;
-import com.seminarhub.entity.Settlement;
-import com.seminarhub.enums.SettlementStatus;
+import com.seminarhub.domain.settlement.domain.Settlement;
+import com.seminarhub.domain.settlement.enums.SettlementStatus;
+import com.seminarhub.domain.settlement.repository.MemberSeminarSettlementDateJdbcRepository;
+import com.seminarhub.domain.settlement.repository.SettlementAggregationRepository;
+import com.seminarhub.domain.settlement.repository.SettlementItemJdbcRepository;
+import com.seminarhub.domain.settlement.repository.SettlementRecord;
+import com.seminarhub.domain.settlement.repository.SettlementRecordProjection;
+import com.seminarhub.domain.settlement.repository.SettlementRepository;
+import com.seminarhub.domain.seminar.repository.MemberSeminarSettlementDateRepository;
 import com.seminarhub.global.dto.CursorRequest;
-import com.seminarhub.repository.MemberSeminarSettlementDateJdbcRepository;
-import com.seminarhub.repository.MemberSeminarSettlementDateRepository;
-import com.seminarhub.repository.SettlementAggregationRepository;
-import com.seminarhub.repository.SettlementItemJdbcRepository;
-import com.seminarhub.repository.SettlementRepository;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,11 +45,11 @@ public class SettlementService {
     }
 
     public Optional<Settlement> findById(Long id) {
-        return settlementRepository.findActiveById(id);
+        return settlementRepository.findByIdAndDeletedAtIsNull(id);
     }
 
     public List<Settlement> findByIds(List<Long> ids) {
-        return settlementRepository.findActiveByIds(ids);
+        return settlementRepository.findAllByIdInAndDeletedAtIsNull(ids);
     }
 
     @Transactional
@@ -60,19 +60,19 @@ public class SettlementService {
             BigDecimal amount,
             SettlementStatus settlementStatus) {
         settlement.update(startDate, endDate, amount, settlementStatus);
-        return settlementRepository.save(settlement);
+        return settlement;
     }
 
     @Transactional
     public Settlement delete(Settlement settlement) {
         settlement.delete();
-        return settlementRepository.save(settlement);
+        return settlement;
     }
 
     @Transactional
     public List<Settlement> deleteAll(List<Settlement> settlements) {
         settlements.forEach(Settlement::delete);
-        return settlementRepository.saveAll(settlements);
+        return settlements;
     }
 
     public List<Settlement> findAll(SettlementSearchQuery query) {
@@ -134,7 +134,7 @@ public class SettlementService {
                 .startDate(startAt)
                 .endDate(endAt)
                 .amount(BigDecimal.valueOf(totalAmount))
-                .settlement_status(SettlementStatus.COMPLETED)
+                .settlementStatus(SettlementStatus.COMPLETED)
                 .build();
         settlementRepository.save(settlement);
 

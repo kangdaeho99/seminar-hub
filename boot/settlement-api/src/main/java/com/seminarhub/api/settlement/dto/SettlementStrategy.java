@@ -1,0 +1,10 @@
+package com.seminarhub.api.settlement.dto;
+
+public enum SettlementStrategy {
+    READ_COMMITTED,
+    READ_COMMITTED_PESSIMISTIC_WRITE,
+    REPEATABLE_READ,
+    REPEATABLE_READ_PESSIMISTIC_WRITE,
+    SERIALIZABLE,
+    SERIALIZABLE_PESSIMISTIC_WRITE
+}

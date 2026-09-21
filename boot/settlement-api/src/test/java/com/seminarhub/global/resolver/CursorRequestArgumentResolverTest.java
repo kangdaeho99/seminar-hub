@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.seminarhub.exception.SettlementExceptionHandler;
+import com.seminarhub.global.error.SettlementExceptionHandler;
 import com.seminarhub.global.annotation.CursorDefault;
 import com.seminarhub.global.dto.CursorRequest;
 import org.junit.jupiter.api.BeforeEach;
