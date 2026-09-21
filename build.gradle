@@ -30,7 +30,7 @@ def libraryProjects = [
 
 def applicationProjects = [
         project(':boot:settlement-api'),
-        project(':batch')
+        project(':boot:batch')
 ]
 
 def javaProjects = libraryProjects + applicationProjects
