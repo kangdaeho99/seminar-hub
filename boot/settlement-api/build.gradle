@@ -9,16 +9,16 @@ tasks.named('jar') {
 dependencies {
     implementation project(':common')
     implementation project(':data')
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
-    implementation "org.springframework.retry:spring-retry:${rootProject.ext.springRetryVersion}"
-    implementation 'org.springframework.boot:spring-boot-starter-aspectj'
+    implementation libs.bootStarterDataJpa
+    implementation libs.bootStarterWeb
+    implementation libs.bootStarterValidation
+    implementation libs.springdocOpenapiStarterWebmvcUi
+    implementation libs.springRetry
+    implementation libs.bootStarterAspectj
 
-    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly libs.postgresql
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.bootStarterTest
+    testImplementation libs.bootStarterWebmvcTest
+    testRuntimeOnly libs.junitPlatformLauncher
 }

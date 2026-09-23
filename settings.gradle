@@ -6,6 +6,5 @@ rootProject.name = 'seminar-hub'
 
 include 'common'
 include 'data'
-include 'boot'
 include 'boot:settlement-api'
 include 'boot:batch'

@@ -1,9 +1,9 @@
 dependencies {
-    implementation 'org.springframework:spring-context'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations'
-    api 'org.springframework:spring-web'
+    implementation libs.springContext
+    implementation libs.jacksonAnnotations
+    implementation libs.springWeb
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.bootStarterTest
+    testImplementation libs.jacksonDatabind
+    testRuntimeOnly libs.junitPlatformLauncher
 }

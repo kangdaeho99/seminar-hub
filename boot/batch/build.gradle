@@ -9,17 +9,17 @@ tasks.named('jar') {
 dependencies {
     implementation project(':common')
     implementation project(':data')
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-batch'
-    implementation 'org.springframework.batch:spring-batch-integration'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation libs.bootStarterDataJpa
+    implementation libs.bootStarterBatch
+    implementation libs.springBatchIntegration
+    implementation libs.bootStarterJdbc
+    implementation libs.bootStarterWeb
 
-    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly libs.postgresql
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testImplementation 'org.springframework.batch:spring-batch-test'
-    testRuntimeOnly 'com.h2database:h2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.bootStarterTest
+    testImplementation libs.bootStarterWebmvcTest
+    testImplementation libs.springBatchTest
+    testRuntimeOnly libs.h2
+    testRuntimeOnly libs.junitPlatformLauncher
 }

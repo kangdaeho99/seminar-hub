@@ -2,10 +2,40 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-spring-boot = "4.0.0" # 타겟 버전
-spring-dependency-management = "1.1.7"
+querydsl = "5.1.0"
+lombok = "1.18.32"
+springRetry = "2.0.11"
+springdoc = "3.0.3"
 
-[plugins]
-spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
-foojay-resolver = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "1.0.0" }
+[libraries]
+
+springContext.module = "org.springframework:spring-context"
+springWeb.module = "org.springframework:spring-web"
+springJdbc.module = "org.springframework:spring-jdbc"
+
+jacksonAnnotations.module = "com.fasterxml.jackson.core:jackson-annotations"
+jacksonDatabind.module = "com.fasterxml.jackson.core:jackson-databind"
+
+bootStarterTest.module = "org.springframework.boot:spring-boot-starter-test"
+bootStarterDataJpa.module = "org.springframework.boot:spring-boot-starter-data-jpa"
+bootStarterBatch.module = "org.springframework.boot:spring-boot-starter-batch"
+bootStarterJdbc.module = "org.springframework.boot:spring-boot-starter-jdbc"
+bootStarterWeb.module = "org.springframework.boot:spring-boot-starter-web"
+bootStarterValidation.module = "org.springframework.boot:spring-boot-starter-validation"
+bootStarterAspectj.module = "org.springframework.boot:spring-boot-starter-aspectj"
+bootStarterWebmvcTest.module = "org.springframework.boot:spring-boot-starter-webmvc-test"
+
+springBatchIntegration.module = "org.springframework.batch:spring-batch-integration"
+springBatchTest.module = "org.springframework.batch:spring-batch-test"
+
+postgresql.module = "org.postgresql:postgresql"
+h2.module = "com.h2database:h2"
+junitPlatformLauncher.module = "org.junit.platform:junit-platform-launcher"
+jakartaAnnotationApi.module = "jakarta.annotation:jakarta.annotation-api"
+jakartaPersistenceApi.module = "jakarta.persistence:jakarta.persistence-api"
+
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+springRetry = { module = "org.springframework.retry:spring-retry", version.ref = "springRetry" }
+springdocOpenapiStarterWebmvcUi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+querydslJpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
+querydslApt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }

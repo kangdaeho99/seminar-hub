@@ -1,15 +1,9 @@
 plugins {
-    alias(libs.plugins.spring.boot) apply false
-    alias(libs.plugins.spring.dependency.management) apply false
+    id 'org.springframework.boot' version '4.0.0' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
 }
 
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
-
-ext {
-    querydslVersion = '5.1.0'
-    lombokVersion = '1.18.32'
-    springRetryVersion = '2.0.11'
-}
 
 group = 'org.zerock'
 version = '0.0.1-SNAPSHOT'
@@ -23,27 +17,8 @@ allprojects {
     }
 }
 
-def libraryProjects = [
-        project(':common'),
-        project(':data')
-]
-
-def applicationProjects = [
-        project(':boot:settlement-api'),
-        project(':boot:batch')
-]
-
-def javaProjects = libraryProjects + applicationProjects
-
-configure(libraryProjects) {
-    apply plugin: 'java-library'
-}
-
-configure(applicationProjects) {
+subprojects {
     apply plugin: 'java'
-}
-
-configure(javaProjects) {
     apply plugin: 'io.spring.dependency-management'
 
     java {
@@ -65,10 +40,10 @@ configure(javaProjects) {
     }
 
     dependencies {
-        compileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
-        annotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
-        testCompileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
-        testAnnotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        compileOnly libs.lombok
+        annotationProcessor libs.lombok
+        testCompileOnly libs.lombok
+        testAnnotationProcessor libs.lombok
     }
 
     tasks.withType(Test).configureEach {
@@ -76,57 +51,41 @@ configure(javaProjects) {
     }
 }
 
-
-// 텍스트 파일로 코드를 추출하는 커스텀 Task
-tasks.register("exportAllCode") {
+tasks.register('exportAllCode') {
     group = 'custom'
     description = '서브프로젝트의 모든 코드를 추출합니다.'
 
-    // 1. Configuration 단계: Project 객체 참조를 피하기 위해 단순 경로(String) 리스트만 미리 수집
-    def subprojectDirs = subprojects.collect { it.projectDir.absolutePath }
     def rootDirPath = layout.projectDirectory.asFile.absolutePath
-    def outputFilePath = layout.projectDirectory.file("exported_all_code.txt")
-    
+    def outputFile = layout.projectDirectory.file('exported_all_code.txt').asFile
     def targetExtensions = ['java', 'gradle', 'kts', 'yml', 'yaml', 'properties', 'xml']
     def excludeDirs = ['build', 'out', '.gradle', 'bin', 'generated', 'srcnotuse', 'test-results']
 
-    doLast {
-        def outputFile = outputFilePath.asFile
-        outputFile.text = "=== Multi-Module Project Code Export ===\n\n"
+    def subprojectsData = subprojects.collect { subproject ->
+        [
+                files: subproject.fileTree(subproject.projectDir) {
+                    include targetExtensions.collect { extension -> "**/*.${extension}" }
+                    exclude excludeDirs.collect { directory -> "**/${directory}/**" }
+                }.files.sort { left, right -> left.absolutePath <=> right.absolutePath }
+        ]
+    }
 
-        // 2. 실행 단계: Groovy의 표준 파일 순회 기능(traverse) 사용
-        subprojectDirs.each { dirPath ->
-            def baseDir = new File(dirPath)
-            if (baseDir.exists()) {
-                baseDir.traverse(
-                    type: groovy.io.FileType.FILES,
-                    preDir: { dir ->
-                        // 제외할 폴더를 만나면 하위 탐색 생략 (속도 향상)
-                        if (excludeDirs.contains(dir.name)) {
-                            return groovy.io.FileVisitResult.SKIP_SUBTREE
-                        }
-                    }
-                ) { file ->
-                    // 확장자 확인
-                    def fileName = file.name
-                    def dotIndex = fileName.lastIndexOf('.')
-                    
-                    if (dotIndex > 0) {
-                        def ext = fileName.substring(dotIndex + 1)
-                        if (targetExtensions.contains(ext)) {
-                            // 루트 경로를 제외한 상대 경로 문자열 만들기
-                            def relativePath = file.absolutePath.replace(rootDirPath + File.separator, "")
-                            
-                            outputFile << "=================================================================\n"
-                            outputFile << "File: ${relativePath}\n"
-                            outputFile << "=================================================================\n"
-                            outputFile << file.text
-                            outputFile << "\n\n"
-                        }
-                    }
+    doLast {
+        outputFile.withWriter('UTF-8') { writer ->
+            writer << '=== Multi-Module Project Code Export ===\n\n'
+
+            subprojectsData.each { data ->
+                data.files.each { file ->
+                    def relativePath = file.absolutePath.replace(rootDirPath + File.separator, '')
+
+                    writer << "=================================================================\n"
+                    writer << "File: ${relativePath}\n"
+                    writer << "=================================================================\n"
+                    writer << file.getText('UTF-8')
+                    writer << '\n\n'
                 }
             }
         }
+
         println "모든 코드가 성공적으로 추출되었습니다: ${outputFile.absolutePath}"
     }
 }
