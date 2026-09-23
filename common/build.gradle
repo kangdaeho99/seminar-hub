@@ -1,4 +1,26 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.dependency.management)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "${libs.springBootBom.get()}"
+    }
+}
+
 dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
     implementation libs.springContext
     implementation libs.jacksonAnnotations
     implementation libs.springWeb
@@ -6,4 +28,8 @@ dependencies {
     testImplementation libs.bootStarterTest
     testImplementation libs.jacksonDatabind
     testRuntimeOnly libs.junitPlatformLauncher
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

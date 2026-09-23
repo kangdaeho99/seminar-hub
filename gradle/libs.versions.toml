@@ -6,8 +6,16 @@ querydsl = "5.1.0"
 lombok = "1.18.32"
 springRetry = "2.0.11"
 springdoc = "3.0.3"
+spring-boot = "4.0.0"
+spring-dependency-management = "1.1.7"
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 
 [libraries]
+
+springBootBom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 
 springContext.module = "org.springframework:spring-context"
 springWeb.module = "org.springframework:spring-web"

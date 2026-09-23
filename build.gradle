@@ -1,89 +1,58 @@
-plugins {
-    id 'org.springframework.boot' version '4.0.0' apply false
-    id 'io.spring.dependency-management' version '1.1.7' apply false
-}
-
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
-
-group = 'org.zerock'
-version = '0.0.1-SNAPSHOT'
-
 allprojects {
-    group = rootProject.group
-    version = rootProject.version
-
     repositories {
         mavenCentral()
     }
 }
-
-subprojects {
-    apply plugin: 'java'
-    apply plugin: 'io.spring.dependency-management'
-
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
-    }
-
-    configurations {
-        compileOnly {
-            extendsFrom annotationProcessor
-        }
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom SpringBootPlugin.BOM_COORDINATES
-        }
-    }
-
-    dependencies {
-        compileOnly libs.lombok
-        annotationProcessor libs.lombok
-        testCompileOnly libs.lombok
-        testAnnotationProcessor libs.lombok
-    }
-
-    tasks.withType(Test).configureEach {
-        useJUnitPlatform()
-    }
-}
-
 tasks.register('exportAllCode') {
     group = 'custom'
-    description = '서브프로젝트의 모든 코드를 추출합니다.'
+    description = '서브프로젝트 및 루트 프로젝트의 모든 코드를 추출합니다.'
 
-    def rootDirPath = layout.projectDirectory.asFile.absolutePath
-    def outputFile = layout.projectDirectory.file('exported_all_code.txt').asFile
-    def targetExtensions = ['java', 'gradle', 'kts', 'yml', 'yaml', 'properties', 'xml']
+    // [설정 단계] 실행(doLast)에 필요한 변수와 파일 목록을 미리 수집합니다.
+    def rootDirPath = project.rootDir.absolutePath
+    def outputFile = file("${rootDirPath}/exported_all_code.txt")
+    def targetExtensions = ['java', 'gradle', 'kts', 'yml', 'yaml', 'properties', 'xml', 'toml']
     def excludeDirs = ['build', 'out', '.gradle', 'bin', 'generated', 'srcnotuse', 'test-results']
 
-    def subprojectsData = subprojects.collect { subproject ->
-        [
-                files: subproject.fileTree(subproject.projectDir) {
-                    include targetExtensions.collect { extension -> "**/*.${extension}" }
-                    exclude excludeDirs.collect { directory -> "**/${directory}/**" }
-                }.files.sort { left, right -> left.absolutePath <=> right.absolutePath }
-        ]
+    // FileCollection을 하나 만들어서 추출할 모든 파일 대상을 담습니다.
+    def allSourceFiles = project.files()
+
+    // 1. 루트 프로젝트의 필수 설정 파일 수집
+    allSourceFiles.from(project.fileTree(project.rootDir) {
+        include 'gradle/libs.versions.toml'
+        include '*.gradle'
+        include '*.gradle.kts'
+        include '*.properties'
+    })
+
+    // 2. 서브프로젝트의 코드 파일들 수집
+    // doLast 밖이므로 subprojects 호출이 안전합니다.
+    project.subprojects.each { subproject ->
+        allSourceFiles.from(project.fileTree(subproject.projectDir) {
+            targetExtensions.each { ext -> include "**/*.${ext}" }
+            excludeDirs.each { dir -> exclude "**/${dir}/**" }
+        })
     }
 
     doLast {
+        // [실행 단계] 여기서는 project 객체를 절대 호출하지 않고, 위에서 만든 변수만 사용합니다.
         outputFile.withWriter('UTF-8') { writer ->
             writer << '=== Multi-Module Project Code Export ===\n\n'
 
-            subprojectsData.each { data ->
-                data.files.each { file ->
-                    def relativePath = file.absolutePath.replace(rootDirPath + File.separator, '')
+            // allSourceFiles.files 를 호출하여 최종 파일 목록을 꺼냅니다.
+            allSourceFiles.files
+                    .findAll { it.isFile() }
+                    .unique { it.absolutePath } // 중복 방지
+                    .sort { left, right -> left.absolutePath <=> right.absolutePath }
+                    .each { file ->
+                        // 루트 경로를 제거하여 상대 경로로 표시
+                        def relativePath = file.absolutePath.replace(rootDirPath + File.separator, '')
 
-                    writer << "=================================================================\n"
-                    writer << "File: ${relativePath}\n"
-                    writer << "=================================================================\n"
-                    writer << file.getText('UTF-8')
-                    writer << '\n\n'
-                }
-            }
+                        writer << "=================================================================\n"
+                        writer << "File: ${relativePath}\n"
+                        writer << "=================================================================\n"
+                        writer << file.getText('UTF-8')
+                        writer << '\n\n'
+                    }
         }
 
         println "모든 코드가 성공적으로 추출되었습니다: ${outputFile.absolutePath}"

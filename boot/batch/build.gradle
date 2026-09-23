@@ -1,5 +1,13 @@
 plugins {
-    id 'org.springframework.boot'
+    id 'java'
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 tasks.named('jar') {
@@ -7,12 +15,16 @@ tasks.named('jar') {
 }
 
 dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
     implementation project(':common')
     implementation project(':data')
     implementation libs.bootStarterDataJpa
     implementation libs.bootStarterBatch
     implementation libs.springBatchIntegration
-    implementation libs.bootStarterJdbc
     implementation libs.bootStarterWeb
 
     runtimeOnly libs.postgresql
@@ -22,4 +34,8 @@ dependencies {
     testImplementation libs.springBatchTest
     testRuntimeOnly libs.h2
     testRuntimeOnly libs.junitPlatformLauncher
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

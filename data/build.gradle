@@ -1,3 +1,20 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.dependency.management)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "${libs.springBootBom.get()}"
+    }
+}
+
 def generatedDir = layout.buildDirectory.dir('generated/querydsl')
 
 sourceSets {
@@ -13,6 +30,11 @@ tasks.named('compileJava', JavaCompile) {
 }
 
 dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
     implementation project(':common')
     implementation libs.bootStarterDataJpa
     implementation libs.springJdbc
@@ -29,4 +51,8 @@ dependencies {
     testImplementation libs.bootStarterTest
     testRuntimeOnly libs.h2
     testRuntimeOnly libs.junitPlatformLauncher
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }
