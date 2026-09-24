@@ -31,8 +31,6 @@ dependencies {
 
     testImplementation libs.bootStarterTest
     testImplementation libs.bootStarterWebmvcTest
-    testImplementation libs.springBatchTest
-    testRuntimeOnly libs.h2
     testRuntimeOnly libs.junitPlatformLauncher
 }
 

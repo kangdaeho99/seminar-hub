@@ -21,7 +21,6 @@ dependencies {
     testCompileOnly libs.lombok
     testAnnotationProcessor libs.lombok
 
-    implementation libs.springContext
     implementation libs.jacksonAnnotations
     implementation libs.springWeb
 

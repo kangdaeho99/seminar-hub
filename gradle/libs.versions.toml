@@ -34,10 +34,8 @@ bootStarterAspectj.module = "org.springframework.boot:spring-boot-starter-aspect
 bootStarterWebmvcTest.module = "org.springframework.boot:spring-boot-starter-webmvc-test"
 
 springBatchIntegration.module = "org.springframework.batch:spring-batch-integration"
-springBatchTest.module = "org.springframework.batch:spring-batch-test"
 
 postgresql.module = "org.postgresql:postgresql"
-h2.module = "com.h2database:h2"
 junitPlatformLauncher.module = "org.junit.platform:junit-platform-launcher"
 jakartaAnnotationApi.module = "jakarta.annotation:jakarta.annotation-api"
 jakartaPersistenceApi.module = "jakarta.persistence:jakarta.persistence-api"

@@ -49,7 +49,6 @@ dependencies {
     annotationProcessor libs.jakartaPersistenceApi
 
     testImplementation libs.bootStarterTest
-    testRuntimeOnly libs.h2
     testRuntimeOnly libs.junitPlatformLauncher
 }
 

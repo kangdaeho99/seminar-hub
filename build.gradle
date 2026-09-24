@@ -1,8 +1,59 @@
-allprojects {
+subprojects {
     repositories {
         mavenCentral()
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 tasks.register('exportAllCode') {
     group = 'custom'
     description = '서브프로젝트 및 루트 프로젝트의 모든 코드를 추출합니다.'
