@@ -15,20 +15,6 @@ dependencyManagement {
     }
 }
 
-def generatedDir = layout.buildDirectory.dir('generated/querydsl')
-
-sourceSets {
-    main {
-        java {
-            srcDir generatedDir
-        }
-    }
-}
-
-tasks.named('compileJava', JavaCompile) {
-    options.generatedSourceOutputDirectory.set(generatedDir)
-}
-
 dependencies {
     compileOnly libs.lombok
     annotationProcessor libs.lombok
