@@ -21,15 +21,11 @@ dependencies {
 
     implementation project(':common')
     implementation libs.bootStarterDataJpa
-    implementation variantOf(libs.querydslJpa) {
-        classifier('jakarta')
-    }
+    implementation libs.querydslJpa
 
     annotationProcessor variantOf(libs.querydslApt) {
-        classifier('jakarta')
+        classifier('jpa')
     }
-    annotationProcessor libs.jakartaAnnotationApi
-    annotationProcessor libs.jakartaPersistenceApi
 
     testImplementation libs.bootStarterTest
     testRuntimeOnly libs.junitPlatformLauncher
@@ -38,3 +34,5 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
+
+

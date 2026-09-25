@@ -2,7 +2,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-querydsl = "5.1.0"
+querydsl = "7.5"
 lombok = "1.18.32"
 springRetry = "2.0.11"
 springdoc = "3.0.3"
@@ -37,11 +37,9 @@ springBatchIntegration.module = "org.springframework.batch:spring-batch-integrat
 
 postgresql.module = "org.postgresql:postgresql"
 junitPlatformLauncher.module = "org.junit.platform:junit-platform-launcher"
-jakartaAnnotationApi.module = "jakarta.annotation:jakarta.annotation-api"
-jakartaPersistenceApi.module = "jakarta.persistence:jakarta.persistence-api"
 
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 springRetry = { module = "org.springframework.retry:spring-retry", version.ref = "springRetry" }
 springdocOpenapiStarterWebmvcUi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
-querydslJpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
-querydslApt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
+querydslJpa = { module = "io.github.openfeign.querydsl:querydsl-jpa", version.ref = "querydsl" }
+querydslApt = { module = "io.github.openfeign.querydsl:querydsl-apt", version.ref = "querydsl" }
