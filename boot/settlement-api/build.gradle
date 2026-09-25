@@ -17,8 +17,6 @@ tasks.named('jar') {
 dependencies {
     compileOnly libs.lombok
     annotationProcessor libs.lombok
-    testCompileOnly libs.lombok
-    testAnnotationProcessor libs.lombok
 
     implementation project(':common')
     implementation project(':data')
@@ -27,12 +25,10 @@ dependencies {
     implementation libs.bootStarterValidation
     implementation libs.springdocOpenapiStarterWebmvcUi
     implementation libs.springRetry
-    implementation libs.bootStarterAspectj
 
     runtimeOnly libs.postgresql
 
     testImplementation libs.bootStarterTest
-    testImplementation libs.bootStarterWebmvcTest
     testRuntimeOnly libs.junitPlatformLauncher
 }
 

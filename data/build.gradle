@@ -18,12 +18,9 @@ dependencyManagement {
 dependencies {
     compileOnly libs.lombok
     annotationProcessor libs.lombok
-    testCompileOnly libs.lombok
-    testAnnotationProcessor libs.lombok
 
     implementation project(':common')
     implementation libs.bootStarterDataJpa
-    implementation libs.springJdbc
     implementation variantOf(libs.querydslJpa) {
         classifier('jakarta')
     }
