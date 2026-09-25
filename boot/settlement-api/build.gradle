@@ -20,8 +20,8 @@ dependencies {
 
     implementation project(':common')
     implementation project(':data')
-    implementation libs.bootStarterDataJpa
-    implementation libs.bootStarterWeb
+    implementation libs.springDataJpa
+    implementation libs.bootStarterWebmvc
     implementation libs.bootStarterValidation
     implementation libs.springdocOpenapiStarterWebmvcUi
     implementation libs.springRetry
@@ -35,3 +35,6 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
+
+
+

@@ -20,10 +20,9 @@ dependencies {
 
     implementation project(':common')
     implementation project(':data')
-    implementation libs.bootStarterDataJpa
-    implementation libs.bootStarterBatch
+    implementation libs.bootStarterBatchJdbc
     implementation libs.springBatchIntegration
-    implementation libs.bootStarterWeb
+    implementation libs.bootStarterWebmvc
 
     runtimeOnly libs.postgresql
 

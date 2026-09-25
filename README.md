@@ -5,7 +5,7 @@
 
 ## 📕 Tech Stack
 - Java
-- Spring Boot 3.0.2
+- Spring Boot 4.0.0 (현재 빌드: common, data, settlement-api, batch)
 - Spring Cloud
   - Spring Cloud Config
   - Spring Cloud Netflix Eureka

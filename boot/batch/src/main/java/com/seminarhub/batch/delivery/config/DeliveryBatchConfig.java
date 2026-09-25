@@ -9,10 +9,9 @@ import com.seminarhub.batch.delivery.listener.DeliveryWriteListener;
 import com.seminarhub.batch.delivery.policy.DeliverySkipPolicy;
 import com.seminarhub.batch.delivery.processor.DeliveryItemProcessor;
 import com.seminarhub.batch.delivery.reader.DeliveryKeysetItemReader;
-import com.seminarhub.domain.delivery.repository.DeliveryRepository;
+import com.seminarhub.domain.delivery.service.DeliveryService;
 import com.seminarhub.batch.delivery.validator.DeliveryJobParametersValidator;
 import com.seminarhub.batch.delivery.writer.DeliveryItemWriter;
-import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.Job;
@@ -39,8 +38,7 @@ public class DeliveryBatchConfig {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
-    private final DeliveryRepository deliveryRepository;
-    private final EntityManagerFactory entityManagerFactory;
+    private final DeliveryService deliveryService;
 
     private static final int CHUNK_SIZE = 500;
 
@@ -81,7 +79,7 @@ public class DeliveryBatchConfig {
             @Value("#{jobParameters['startAt']}") LocalDateTime startAt,
             @Value("#{jobParameters['endAt']}") LocalDateTime endAt) {
         return new DeliveryKeysetItemReader(
-                deliveryRepository,
+                deliveryService,
                 startAt,
                 endAt,
                 CHUNK_SIZE);
@@ -114,7 +112,7 @@ public class DeliveryBatchConfig {
 
     @Bean
     public DeliveryItemWriter deliveryWriter() {
-        return new DeliveryItemWriter(entityManagerFactory);
+        return new DeliveryItemWriter(deliveryService);
     }
 
     @Bean
