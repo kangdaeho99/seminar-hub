@@ -14,9 +14,9 @@ import org.springframework.data.repository.query.Param;
 public interface DeliveryRepository extends JpaRepository<Delivery, Long>, DeliveryRepositoryCustom {
     Optional<Delivery> findByIdAndDeletedAtIsNull(Long id);
     List<Delivery> findAllByIdInAndDeletedAtIsNull(Collection<Long> ids);
-    @Query("select d from Delivery d join fetch d.memberSeminar where d.id = :id")
-    Optional<Delivery> findByIdWithMemberSeminar(@Param("id") Long id);
-    Optional<Delivery> findByMemberSeminar_Id(Long memberSeminarId);
+    @Query("select d from Delivery d join fetch d.memberSeminarItem where d.id = :id")
+    Optional<Delivery> findByIdWithMemberSeminarItem(@Param("id") Long id);
+    Optional<Delivery> findByMemberSeminarItem_Id(Long memberSeminarItemId);
     Page<Delivery> findByDeliveryStatus(DeliveryStatus status, Pageable pageable);
     @Query("SELECT d FROM Delivery d WHERE d.createdAt >= :startAt AND d.createdAt <= :endAt")
     Page<Delivery> findByInstDtBetween(@Param("startAt") LocalDateTime startAt, @Param("endAt") LocalDateTime endAt, Pageable pageable);

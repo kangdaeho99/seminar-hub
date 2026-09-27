@@ -87,7 +87,7 @@ public class SettlementUseCase {
     }
 
     public void updateWithReadCommitted(SettlementDateUpdateRequest request) {
-        settlementService.updateWithReadCommitted(request.memberSeminarId(), request.targetDate());
+        settlementService.updateWithReadCommitted(request.memberSeminarItemId(), request.targetDate());
     }
 
     public void aggregateWithReadCommittedPessimisticWrite(LocalDate startAt, LocalDate endAt) {

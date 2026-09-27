@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record SettlementItemResponse(
         Long id,
         Long settlementId,
-        Long memberSeminarId,
+        Long memberSeminarItemId,
         BigDecimal amount,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
@@ -15,7 +15,7 @@ public record SettlementItemResponse(
 
     public static SettlementItemResponse from(SettlementItem item) {
         return new SettlementItemResponse(
-                item.getId(), item.getSettlement().getId(), item.getMemberSeminar().getId(), item.getAmount(),
+                item.getId(), item.getSettlement().getId(), item.getMemberSeminarItem().getId(), item.getAmount(),
                 item.getCreatedAt(), item.getUpdatedAt(), item.getDeletedAt());
     }
 }

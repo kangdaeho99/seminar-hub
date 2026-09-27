@@ -3,9 +3,11 @@ package com.seminarhub.api.settlement.init;
 import com.seminarhub.domain.member.domain.Member;
 import com.seminarhub.domain.member.repository.MemberRepository;
 import com.seminarhub.domain.seminar.domain.MemberSeminar;
+import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.domain.seminar.domain.MemberSeminarSettlementDate;
 import com.seminarhub.domain.seminar.domain.Seminar;
 import com.seminarhub.domain.seminar.repository.MemberSeminarRepository;
+import com.seminarhub.domain.seminar.repository.MemberSeminarItemRepository;
 import com.seminarhub.domain.seminar.repository.MemberSeminarSettlementDateRepository;
 import com.seminarhub.domain.seminar.repository.SeminarRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class DataInitializer implements ApplicationRunner {
     private final MemberRepository memberRepository;
     private final SeminarRepository seminarRepository;
     private final MemberSeminarRepository memberSeminarRepository;
+    private final MemberSeminarItemRepository memberSeminarItemRepository;
     private final MemberSeminarSettlementDateRepository settlementDateRepository;
 
     @Override
@@ -92,33 +95,36 @@ public class DataInitializer implements ApplicationRunner {
         log.info("[DataInitializer] [2/4] Seminars saved: ids={}, {}, {}",
                 seminarSpring.getId(), seminarJpa.getId(), seminarConcurrency.getId());
 
-        MemberSeminar ms1 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarSpring).member(member1).build());
-        MemberSeminar ms2 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarSpring).member(member2).build());
-        MemberSeminar ms3 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarJpa).member(member1).build());
-        MemberSeminar ms4 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarJpa).member(member2).build());
-        MemberSeminar ms5 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarConcurrency).member(member1).build());
-        MemberSeminar ms6 = memberSeminarRepository.save(MemberSeminar.builder().seminar(seminarConcurrency).member(member2).build());
-        log.info("[DataInitializer] [3/4] MemberSeminars saved: 6 records");
+        MemberSeminar order1 = memberSeminarRepository.save(MemberSeminar.builder().member(member1).build());
+        MemberSeminar order2 = memberSeminarRepository.save(MemberSeminar.builder().member(member2).build());
+        List<MemberSeminarItem> items = memberSeminarItemRepository.saveAll(List.of(
+                MemberSeminarItem.builder().memberSeminar(order1).seminar(seminarSpring).build(),
+                MemberSeminarItem.builder().memberSeminar(order2).seminar(seminarSpring).build(),
+                MemberSeminarItem.builder().memberSeminar(order1).seminar(seminarJpa).build(),
+                MemberSeminarItem.builder().memberSeminar(order2).seminar(seminarJpa).build(),
+                MemberSeminarItem.builder().memberSeminar(order1).seminar(seminarConcurrency).build(),
+                MemberSeminarItem.builder().memberSeminar(order2).seminar(seminarConcurrency).build()));
+        log.info("[DataInitializer] [3/4] MemberSeminars saved: 2 orders, 6 items");
 
         List<MemberSeminarSettlementDate> settlementDates = List.of(
-                createSettlementDate(ms1, DATE_JAN_15),
-                createSettlementDate(ms2, DATE_JAN_15),
-                createSettlementDate(ms3, DATE_JAN_20),
-                createSettlementDate(ms4, DATE_JAN_20),
-                createSettlementDate(ms5, DATE_FEB_01),
-                createSettlementDate(ms6, DATE_FEB_01)
+                createSettlementDate(items.get(0), DATE_JAN_15),
+                createSettlementDate(items.get(1), DATE_JAN_15),
+                createSettlementDate(items.get(2), DATE_JAN_20),
+                createSettlementDate(items.get(3), DATE_JAN_20),
+                createSettlementDate(items.get(4), DATE_FEB_01),
+                createSettlementDate(items.get(5), DATE_FEB_01)
         );
         settlementDateRepository.saveAll(settlementDates);
         log.info("[DataInitializer] [4/4] SettlementDates saved: 6 records");
 
         log.info("[DataInitializer] ✅ Test data initialized successfully.");
-        log.info("[DataInitializer] - Members: 2, Seminars: 3, MemberSeminars: 6, SettlementDates: 6");
+        log.info("[DataInitializer] - Members: 2, Seminars: 3, MemberSeminars: 2, Items: 6, SettlementDates: 6");
         log.info("[DataInitializer] - Test aggregate range: 2025-01-01 ~ 2025-01-31 → expected 4 rows (260,000원)");
         log.info("[DataInitializer] - Update target settlementDateId: {} (date={})", settlementDates.get(0).getId(), DATE_JAN_15);
     }
 
-    private MemberSeminarSettlementDate createSettlementDate(MemberSeminar memberSeminar, LocalDate date) {
-        MemberSeminarSettlementDate sd = new MemberSeminarSettlementDate(memberSeminar);
+    private MemberSeminarSettlementDate createSettlementDate(MemberSeminarItem item, LocalDate date) {
+        MemberSeminarSettlementDate sd = new MemberSeminarSettlementDate(item);
         sd.updateDate(date);
         return sd;
     }

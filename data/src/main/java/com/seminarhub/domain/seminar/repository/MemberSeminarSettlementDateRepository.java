@@ -11,8 +11,8 @@ public interface MemberSeminarSettlementDateRepository extends JpaRepository<Mem
     @Modifying(clearAutomatically = true)
     @Query("""
             UPDATE MemberSeminarSettlementDate d SET d.date = :targetDate
-            WHERE d.memberSeminar.id = :memberSeminarId AND NOT EXISTS (
+            WHERE d.memberSeminarItem.id = :memberSeminarItemId AND NOT EXISTS (
             SELECT 1 FROM SettlementItem i JOIN i.settlement s
-            WHERE i.memberSeminar = d.memberSeminar AND s.deletedAt IS NULL AND i.deletedAt IS NULL)""")
-    int updateDateByMemberSeminarIdIfNotSettled(@Param("memberSeminarId") Long memberSeminarId, @Param("targetDate") LocalDate targetDate);
+            WHERE i.memberSeminarItem = d.memberSeminarItem AND s.deletedAt IS NULL AND i.deletedAt IS NULL)""")
+    int updateDateByMemberSeminarItemIdIfNotSettled(@Param("memberSeminarItemId") Long memberSeminarItemId, @Param("targetDate") LocalDate targetDate);
 }

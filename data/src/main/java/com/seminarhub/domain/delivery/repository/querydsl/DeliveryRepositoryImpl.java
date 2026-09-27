@@ -21,8 +21,8 @@ public class DeliveryRepositoryImpl extends QuerydslRepositorySupport<Delivery> 
     public List<Delivery> search(DeliverySearchQuery q, CursorRequest c) { return findByCursor(condition(q), c); }
     private BooleanBuilder condition(DeliverySearchQuery q) {
         BooleanBuilder b = auditCondition(q);
-        if (q.memberSeminarId() != null) b.and(delivery.memberSeminar.id.eq(q.memberSeminarId()));
-        if (!CollectionUtils.isEmpty(q.memberSeminarIds())) b.and(delivery.memberSeminar.id.in(q.memberSeminarIds()));
+        if (q.memberSeminarItemId() != null) b.and(delivery.memberSeminarItem.id.eq(q.memberSeminarItemId()));
+        if (!CollectionUtils.isEmpty(q.memberSeminarItemIds())) b.and(delivery.memberSeminarItem.id.in(q.memberSeminarItemIds()));
         if (q.deliveryStatus() != null) b.and(delivery.deliveryStatus.eq(q.deliveryStatus()));
         if (!CollectionUtils.isEmpty(q.deliveryStatuses())) b.and(delivery.deliveryStatus.in(q.deliveryStatuses()));
         if (StringUtils.hasText(q.trackingNumber())) b.and(delivery.trackingNumber.containsIgnoreCase(q.trackingNumber()));
@@ -30,7 +30,7 @@ public class DeliveryRepositoryImpl extends QuerydslRepositorySupport<Delivery> 
         return b;
     }
     private ComparableExpressionBase<?> sort(String n) { return switch (n) {
-        case "id" -> delivery.id; case "memberSeminarId" -> delivery.memberSeminar.id;
+        case "id" -> delivery.id; case "memberSeminarItemId" -> delivery.memberSeminarItem.id;
         case "deliveryStatus" -> delivery.deliveryStatus; case "trackingNumber" -> delivery.trackingNumber;
         case "courierCompany" -> delivery.courierCompany; case "createdAt" -> delivery.createdAt;
         case "updatedAt" -> delivery.updatedAt; case "deletedAt" -> delivery.deletedAt; default -> null; }; }

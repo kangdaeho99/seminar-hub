@@ -8,7 +8,7 @@ import java.util.List;
 public record SettlementItemSearchQuery(
         Long id, List<Long> ids,
         Long settlementId, List<Long> settlementIds,
-        Long memberSeminarId, List<Long> memberSeminarIds,
+        Long memberSeminarItemId, List<Long> memberSeminarItemIds,
         BigDecimal amount, BigDecimal amountMin, BigDecimal amountMax,
         LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt,
         LocalDateTime createdStartAt, LocalDateTime createdEndAt,

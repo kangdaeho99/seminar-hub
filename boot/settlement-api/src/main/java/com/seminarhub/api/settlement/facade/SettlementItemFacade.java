@@ -41,7 +41,7 @@ public class SettlementItemFacade {
 
     private SettlementItemSearchQuery toQuery(SettlementItemSearchRequest r) {
         return new SettlementItemSearchQuery(
-                r.id(), r.ids(), r.settlementId(), r.settlementIds(), r.memberSeminarId(), r.memberSeminarIds(),
+                r.id(), r.ids(), r.settlementId(), r.settlementIds(), r.memberSeminarItemId(), r.memberSeminarItemIds(),
                 r.amount(), r.amountMin(), r.amountMax(), r.createdAt(), r.updatedAt(), r.deletedAt(),
                 r.createdStartAt(), r.createdEndAt(), r.updatedStartAt(), r.updatedEndAt(), r.deletedStartAt(),
                 r.deletedEndAt());

@@ -1,6 +1,6 @@
 package com.seminarhub.domain.settlement.service;
 
-import com.seminarhub.domain.seminar.domain.MemberSeminar;
+import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.domain.settlement.domain.Settlement;
 import com.seminarhub.domain.settlement.domain.SettlementItem;
 import com.seminarhub.domain.settlement.repository.SettlementItemRepository;
@@ -48,8 +48,8 @@ public class SettlementItemService {
 
     @Transactional
     public SettlementItem update(
-            SettlementItem item, Settlement settlement, MemberSeminar memberSeminar, BigDecimal amount) {
-        item.update(settlement, memberSeminar, amount);
+            SettlementItem item, Settlement settlement, MemberSeminarItem memberSeminarItem, BigDecimal amount) {
+        item.update(settlement, memberSeminarItem, amount);
         return item;
     }
 

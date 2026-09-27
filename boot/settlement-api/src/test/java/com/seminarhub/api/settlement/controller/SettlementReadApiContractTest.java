@@ -81,7 +81,7 @@ class SettlementReadApiContractTest {
         mockMvc.perform(get("/settlement/items/list").param("settlementIds", "3,4"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].settlementId").value(3))
-                .andExpect(jsonPath("$.data[0].memberSeminarId").value(12));
+                .andExpect(jsonPath("$.data[0].memberSeminarItemId").value(12));
     }
 
     @Test

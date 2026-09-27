@@ -35,7 +35,7 @@ class SettlementApiContractTest {
         mockMvc.perform(post("/settlement/read-committed/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"memberSeminarId":1,"targetDate":"2026-09-20"}
+                                {"memberSeminarItemId":1,"targetDate":"2026-09-20"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -52,7 +52,7 @@ class SettlementApiContractTest {
         mockMvc.perform(post("/settlement/read-committed/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"memberSeminarId":1,"targetDate":"2026-09-20"}
+                                {"memberSeminarItemId":1,"targetDate":"2026-09-20"}
                                 """))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.origin").value("SEMINAR_HUB"))
@@ -68,7 +68,7 @@ class SettlementApiContractTest {
         mockMvc.perform(post("/settlement/read-committed/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"memberSeminarId":1,"targetDate":"2026-09-20"}
+                                {"memberSeminarItemId":1,"targetDate":"2026-09-20"}
                                 """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.origin").value("COMMON"))
@@ -84,7 +84,7 @@ class SettlementApiContractTest {
         mockMvc.perform(post("/settlement/read-committed/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"memberSeminarId":1,"targetDate":"2026-09-20"}
+                                {"memberSeminarItemId":1,"targetDate":"2026-09-20"}
                                 """))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.origin").value("COMMON"))

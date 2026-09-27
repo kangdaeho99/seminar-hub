@@ -29,8 +29,8 @@ public class SettlementItemRepositoryImpl extends QuerydslRepositorySupport<Sett
         BooleanBuilder b = auditCondition(q);
         if (q.settlementId() != null) b.and(settlementItem.settlement.id.eq(q.settlementId()));
         if (!CollectionUtils.isEmpty(q.settlementIds())) b.and(settlementItem.settlement.id.in(q.settlementIds()));
-        if (q.memberSeminarId() != null) b.and(settlementItem.memberSeminar.id.eq(q.memberSeminarId()));
-        if (!CollectionUtils.isEmpty(q.memberSeminarIds())) b.and(settlementItem.memberSeminar.id.in(q.memberSeminarIds()));
+        if (q.memberSeminarItemId() != null) b.and(settlementItem.memberSeminarItem.id.eq(q.memberSeminarItemId()));
+        if (!CollectionUtils.isEmpty(q.memberSeminarItemIds())) b.and(settlementItem.memberSeminarItem.id.in(q.memberSeminarItemIds()));
         if (q.amount() != null) b.and(settlementItem.amount.eq(q.amount()));
         if (q.amountMin() != null) b.and(settlementItem.amount.goe(q.amountMin()));
         if (q.amountMax() != null) b.and(settlementItem.amount.loe(q.amountMax()));
@@ -41,7 +41,7 @@ public class SettlementItemRepositoryImpl extends QuerydslRepositorySupport<Sett
         return switch (name) {
             case "id" -> settlementItem.id;
             case "settlementId" -> settlementItem.settlement.id;
-            case "memberSeminarId" -> settlementItem.memberSeminar.id;
+            case "memberSeminarItemId" -> settlementItem.memberSeminarItem.id;
             case "amount" -> settlementItem.amount;
             case "createdAt" -> settlementItem.createdAt;
             case "updatedAt" -> settlementItem.updatedAt;

@@ -1,6 +1,6 @@
 package com.seminarhub.domain.settlement.domain;
 
-import com.seminarhub.domain.seminar.domain.MemberSeminar;
+import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.global.domain.base.AuditMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Table(indexes = @Index(name = "idx_settlement_item_ms_del", columnList = "member_seminar_id, deleted_at"))
+@Table(indexes = @Index(name = "idx_settlement_item_msi_del", columnList = "member_seminar_item_id, deleted_at"))
 public class SettlementItem extends AuditMetadata {
 
     @Id
@@ -39,14 +39,14 @@ public class SettlementItem extends AuditMetadata {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private MemberSeminar memberSeminar;
+    private MemberSeminarItem memberSeminarItem;
 
     @Column(nullable = false)
     private BigDecimal amount;
 
-    public void update(Settlement settlement, MemberSeminar memberSeminar, BigDecimal amount) {
+    public void update(Settlement settlement, MemberSeminarItem memberSeminarItem, BigDecimal amount) {
         if (settlement != null) this.settlement = settlement;
-        if (memberSeminar != null) this.memberSeminar = memberSeminar;
+        if (memberSeminarItem != null) this.memberSeminarItem = memberSeminarItem;
         if (amount != null) this.amount = amount;
         markUpdated();
     }

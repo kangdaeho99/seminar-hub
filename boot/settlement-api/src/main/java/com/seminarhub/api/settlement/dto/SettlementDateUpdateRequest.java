@@ -3,7 +3,7 @@ package com.seminarhub.api.settlement.dto;
 import java.time.LocalDate;
 
 public record SettlementDateUpdateRequest(
-        Long memberSeminarId,
+        Long memberSeminarItemId,
         LocalDate targetDate
 ) {
 }

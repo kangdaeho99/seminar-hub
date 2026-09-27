@@ -88,8 +88,8 @@ public class SettlementService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void updateWithReadCommitted(Long memberSeminarId, LocalDate targetDate) {
-        settlementDateRepository.updateDateByMemberSeminarIdIfNotSettled(memberSeminarId, targetDate);
+    public void updateWithReadCommitted(Long memberSeminarItemId, LocalDate targetDate) {
+        settlementDateRepository.updateDateByMemberSeminarItemIdIfNotSettled(memberSeminarItemId, targetDate);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -125,7 +125,7 @@ public class SettlementService {
     private void processSettlement(
             LocalDate startAt, LocalDate endAt, List<SettlementRecordProjection> projections) {
         List<SettlementRecord> records = projections.stream()
-                .map(p -> new SettlementRecord(p.getMemberSeminarId(), p.getPrice(), p.getSettlementDateId()))
+                .map(p -> new SettlementRecord(p.getMemberSeminarItemId(), p.getPrice(), p.getSettlementDateId()))
                 .toList();
         if (records.isEmpty()) return;
 

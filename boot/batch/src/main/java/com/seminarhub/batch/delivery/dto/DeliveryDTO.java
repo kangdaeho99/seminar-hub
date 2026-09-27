@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class DeliveryDTO {
     
     private Long id;
-    private Long memberSeminarId;
+    private Long memberSeminarItemId;
     private DeliveryStatus deliveryStatus;
     private String trackingNumber;
     private String courierCompany;

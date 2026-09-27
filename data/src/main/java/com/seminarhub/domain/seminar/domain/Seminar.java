@@ -3,13 +3,10 @@ package com.seminarhub.domain.seminar.domain;
 import com.seminarhub.global.domain.base.AuditMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = "memberSeminars")
+@ToString
 public class Seminar extends AuditMetadata {
 
     @Id
@@ -42,9 +39,6 @@ public class Seminar extends AuditMetadata {
 
     @Column
     private Long participantsCount;
-
-    @OneToMany(mappedBy = "seminar", fetch = FetchType.LAZY)
-    private List<MemberSeminar> memberSeminars;
 
     public void update(String name, String explanation, Long price, Long maxParticipants, Long participantsCount) {
         if (name != null) this.name = name;

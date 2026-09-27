@@ -1,7 +1,7 @@
 package com.seminarhub.domain.delivery.domain;
 
 import com.seminarhub.domain.delivery.enums.DeliveryStatus;
-import com.seminarhub.domain.seminar.domain.MemberSeminar;
+import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.global.domain.base.AuditMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -27,7 +27,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = "memberSeminar")
+@ToString(exclude = "memberSeminarItem")
 public class Delivery extends AuditMetadata {
 
     @Id
@@ -35,8 +35,8 @@ public class Delivery extends AuditMetadata {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_seminar_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private MemberSeminar memberSeminar;
+    @JoinColumn(name = "member_seminar_item_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private MemberSeminarItem memberSeminarItem;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -48,8 +48,8 @@ public class Delivery extends AuditMetadata {
     @Column(length = 50)
     private String courierCompany;
 
-    public void update(MemberSeminar memberSeminar, DeliveryStatus status, String trackingNumber, String courierCompany) {
-        if (memberSeminar != null) this.memberSeminar = memberSeminar;
+    public void update(MemberSeminarItem memberSeminarItem, DeliveryStatus status, String trackingNumber, String courierCompany) {
+        if (memberSeminarItem != null) this.memberSeminarItem = memberSeminarItem;
         if (status != null) this.deliveryStatus = status;
         if (trackingNumber != null) this.trackingNumber = trackingNumber;
         if (courierCompany != null) this.courierCompany = courierCompany;
