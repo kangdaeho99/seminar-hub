@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    alias(libs.plugins.spring.dependency.management)
 }
 
 java {
@@ -13,6 +14,13 @@ application {
     mainClass = 'org.example2.Main'
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "${libs.springBootBom.get()}"
+    }
+}
+
 dependencies {
+    implementation libs.springContext
     runtimeOnly 'com.h2database:h2:2.5.250'
 }
