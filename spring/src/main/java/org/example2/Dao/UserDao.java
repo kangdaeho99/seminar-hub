@@ -1,19 +1,14 @@
 package org.example2.Dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class UserDao {
+public abstract class UserDao {
 
-    private static final String DB_URL = "jdbc:h2:./springbook";
-    private static final String DB_USER = "sa";
-    private static final String DB_PASSWORD = "";
-
-    public UserDao() throws SQLException, ClassNotFoundException {
+    public UserDao() throws ClassNotFoundException, SQLException {
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users ("
@@ -56,10 +51,5 @@ public class UserDao {
         return user;
     }
 
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
-        // Class.forName("com.mysql.jdbc.Driver");
-        Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-        return c;
-    }
-
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 }
