@@ -5,8 +5,7 @@ import java.sql.SQLException;
 public class DaoFactory {
     
     public UserDao userDao() throws ClassNotFoundException, SQLException {
-        ConnectionMaker connectionMaker = new DConnectionMaker();
-        UserDao userDao = new UserDao(connectionMaker);
+        UserDao userDao = new UserDao(connectionMaker());
         return userDao;
     }
 
@@ -16,7 +15,7 @@ public class DaoFactory {
     //     return userDao;
     // }
 
-    // public ConnectionMaker connectionMaker(){
-    //     return new DConnectionMaker();
-    // }
+    public ConnectionMaker connectionMaker(){
+        return new DConnectionMaker();
+    }
 }
