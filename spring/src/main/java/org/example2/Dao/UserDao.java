@@ -8,10 +8,10 @@ import java.sql.Statement;
 
 public class UserDao {
 
-    private SimpleConnectionMaker connectionMaker;
+    private ConnectionMaker connectionMaker;
 
     public UserDao() throws ClassNotFoundException, SQLException {
-        connectionMaker = new SimpleConnectionMaker();
+        connectionMaker = new DConnectionMaker();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users ("
@@ -55,6 +55,6 @@ public class UserDao {
     }
 
     public Connection getConnection() throws ClassNotFoundException, SQLException {
-        return connectionMaker.makeNewConnection();
+        return connectionMaker.makeConnection();
     }
 }
