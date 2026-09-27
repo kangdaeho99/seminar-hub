@@ -10,8 +10,8 @@ public class UserDao {
 
     private ConnectionMaker connectionMaker;
 
-    public UserDao() throws ClassNotFoundException, SQLException {
-        connectionMaker = new DConnectionMaker();
+    public UserDao(ConnectionMaker connectionMaker) throws ClassNotFoundException, SQLException {
+       this.connectionMaker = connectionMaker;
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users ("
