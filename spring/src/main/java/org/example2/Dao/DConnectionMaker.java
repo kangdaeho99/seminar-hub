@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DConnectionMaker implements ConnectionMaker {
 
     @Override 
-    public Connection makeConnection() throws ClassNotFoundException, SQLException {
+    public Connection makeConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:h2:./springbook", "sa", "");
     }
 }
