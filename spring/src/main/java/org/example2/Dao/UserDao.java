@@ -6,9 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public abstract class UserDao {
+public class UserDao {
+
+    private SimpleConnectionMaker connectionMaker;
 
     public UserDao() throws ClassNotFoundException, SQLException {
+        connectionMaker = new SimpleConnectionMaker();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users ("
@@ -51,5 +54,7 @@ public abstract class UserDao {
         return user;
     }
 
-    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
+    public Connection getConnection() throws ClassNotFoundException, SQLException {
+        return connectionMaker.makeNewConnection();
+    }
 }

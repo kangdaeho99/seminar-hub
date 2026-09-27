@@ -5,12 +5,11 @@ import java.util.UUID;
 
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
-import org.example2.Dao.NUserDao;
 
 public class Main {
     
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        UserDao dao = new NUserDao();
+        UserDao dao = new UserDao();
 
         User user = new User();
         user.setId("whiteship-" + UUID.randomUUID());
