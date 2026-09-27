@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+application {
+    mainClass = 'org.example2.Main'
+}
+
+dependencies {
+    runtimeOnly 'com.h2database:h2:2.5.250'
+}
