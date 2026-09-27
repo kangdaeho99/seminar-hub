@@ -1,24 +1,25 @@
 package org.example2.Dao;
 
-import java.beans.BeanProperty;
-import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration 
 public class CountingDaoFactory {
 
-    @Bean
+    @Bean(initMethod = "initialize")
     public UserDao userDao() throws ClassNotFoundException, SQLException{
-        return new UserDao(connectionMaker());
+        UserDao userDao = new UserDao();
+        userDao.setConnectionMaker(connectionMaker());
+        return userDao;
     }
 
     @Bean 
     public ConnectionMaker connectionMaker(){
-        return new CountingConnectionMaker(realConnectionMaker());
+        CountingConnectionMaker ccm = new CountingConnectionMaker();
+        ccm.setRealConnectionMaker(realConnectionMaker());
+        return ccm;
     }
 
     @Bean 

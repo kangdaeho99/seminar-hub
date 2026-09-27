@@ -8,9 +8,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DaoFactory {
     
-    @Bean
+    @Bean(initMethod = "initialize")
     public UserDao userDao() throws ClassNotFoundException, SQLException {
-        UserDao userDao = new UserDao(connectionMaker());
+        UserDao userDao = new UserDao();
+        userDao.setConnectionMaker(connectionMaker());
         return userDao;
     }
 

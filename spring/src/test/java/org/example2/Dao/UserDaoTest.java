@@ -20,8 +20,6 @@ public class UserDaoTest {
         System.out.println(dao1);
         System.out.println(dao2);
 
-
-
     }
 
     
