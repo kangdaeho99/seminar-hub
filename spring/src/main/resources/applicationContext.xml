@@ -1,0 +1,10 @@
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id = "userDao" class = "org.example2.Dao.UserDao" init-method = "initialize">
+        <property name="connectionMaker" ref="connectionMaker"/>
+    </bean>
+
+    <bean id = "connectionMaker" class = "org.example2.Dao.DConnectionMaker"/>
+</beans>
