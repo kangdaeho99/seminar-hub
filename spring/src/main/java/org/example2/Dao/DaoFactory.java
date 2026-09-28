@@ -2,14 +2,20 @@ package org.example2.Dao;
 
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+
 // Java-based configuration example kept for comparison with applicationContext.xml.
-// @Configuration
+@Configuration
 public class DaoFactory {
     
-    // @Bean(initMethod = "initialize")
+    @Bean(initMethod = "initialize")
     public UserDao userDao() throws ClassNotFoundException, SQLException {
         UserDao userDao = new UserDao();
-        userDao.setConnectionMaker(connectionMaker());
+        userDao.setDataSource(dataSource());
         return userDao;
     }
 
@@ -19,8 +25,14 @@ public class DaoFactory {
     //     return userDao;
     // }
 
-    // @Bean
-    public ConnectionMaker connectionMaker(){
-        return new DConnectionMaker();
+    @Bean
+    public DataSource dataSource(){
+        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+
+        dataSource.setDriverClass(org.h2.Driver.class);
+        dataSource.setUrl("jdbc:h2:./springbook");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
+        return dataSource;
     }
 }
