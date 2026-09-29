@@ -24,4 +24,10 @@ dependencies {
     implementation libs.springContext
     implementation libs.springJdbc
     implementation 'com.h2database:h2:2.5.250'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly libs.junitPlatformLauncher
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
