@@ -42,7 +42,7 @@ public class UserDao {
         c.close();
     }
 
-    public User get(String id) throws SQLException {``
+    public User get(String id) throws SQLException {
         try (Connection c = getConnection();
              PreparedStatement ps = c.prepareStatement("select * from users where id = ?")) {
             ps.setString(1, id);
