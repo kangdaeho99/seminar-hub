@@ -1,12 +1,13 @@
 package org.example2.Dao;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.transaction.event.TransactionalEventListener;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserDaoTest {
 
@@ -32,24 +33,19 @@ public class UserDaoTest {
         /// ///////////////////////////////////
 
         User user = new User();
-        user.setId("user");
-        user.setName("백기선");
-        user.setPassword("married");
+        user.setId(UUID.randomUUID().toString());
+        user.setName("박성철");
+        user.setPassword("springno1");
 
         daoFromIoC.add(user);
 
         System.out.println(user.getId() + "등록 성공");
 
         User user2 = daoFromIoC.get(user.getId());
-        if(!user.getName().equals(user2.getName())){
-            System.out.println("테스트 실패 (name)");
-        }
-        else if(!user.getPassword().equals(user2.getPassword())){
-            System.out.println("테스트 실패 (password)");
-        }
-        else {
-            System.out.println("조회 테스트 성공");
-        }
+
+        assertEquals(user.getName(), user2.getName());
+        assertEquals(user.getPassword(), user2.getPassword());
+
         System.out.println(user2.getName());
         System.out.println(user2.getPassword());
         System.out.println(user2.getId() + " 조회 성공");
