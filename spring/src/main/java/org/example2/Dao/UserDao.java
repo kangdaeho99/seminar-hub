@@ -6,12 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 public class UserDao {
 
-    private ConnectionMaker connectionMaker;
+    private DataSource dataSource;
 
-    public void setConnectionMaker(ConnectionMaker connectionMaker){
-        this.connectionMaker = connectionMaker;
+    public void setDataSource(DataSource dataSource){
+        this.dataSource = dataSource;
     }
 
     public void initialize() throws ClassNotFoundException, SQLException {
@@ -58,6 +60,6 @@ public class UserDao {
     }
 
     public Connection getConnection() throws ClassNotFoundException, SQLException {
-        return connectionMaker.makeConnection();
+        return dataSource.getConnection();
     }
 }

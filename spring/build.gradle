@@ -22,5 +22,6 @@ dependencyManagement {
 
 dependencies {
     implementation libs.springContext
-    runtimeOnly 'com.h2database:h2:2.5.250'
+    implementation libs.springJdbc
+    implementation 'com.h2database:h2:2.5.250'
 }
