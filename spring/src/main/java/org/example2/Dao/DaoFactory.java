@@ -13,13 +13,13 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 public class DaoFactory {
     
     @Bean(initMethod = "initialize")
-    public UserDao userDao() throws ClassNotFoundException, SQLException {
+    public UserDao userDao() throws SQLException {
         UserDao userDao = new UserDao();
         userDao.setDataSource(dataSource());
         return userDao;
     }
 
-    // public AccountDao userDao() throws ClassNotFoundException, SQLException {
+    // public AccountDao userDao() throws SQLException {
     //     ConnectionMaker connectionMaker = new DConnectionMaker();
     //     UserDao userDao = new UserDao(connectionMaker);
     //     return userDao;

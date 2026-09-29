@@ -8,7 +8,7 @@ import org.example2.Dao.UserDao;
 
 public class Main {
     
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException {
         // UserDao dao = new UserDao();
 
         // User user = new User();

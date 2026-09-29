@@ -8,6 +8,8 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+
 public class UserDao {
 
     private DataSource dataSource;
@@ -16,7 +18,7 @@ public class UserDao {
         this.dataSource = dataSource;
     }
 
-    public void initialize() throws ClassNotFoundException, SQLException {
+    public void initialize() throws SQLException {
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users ("
@@ -26,7 +28,7 @@ public class UserDao {
         }
     }
 
-    public void add(User user) throws ClassNotFoundException, SQLException {
+    public void add(User user) throws SQLException {
         Connection c = getConnection();
 
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values (?, ?, ?)");
@@ -40,26 +42,53 @@ public class UserDao {
         c.close();
     }
 
-    public User get(String id) throws  ClassNotFoundException, SQLException {
-        Connection c = getConnection();
+    public User get(String id) throws SQLException {``
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement("select * from users where id = ?")) {
+            ps.setString(1, id);
 
-        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
-        ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new EmptyResultDataAccessException(1);
+                }
+
+                User user = new User();
+                user.setId(rs.getString("id"));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+                return user;
+            }
+        }
+    }
+
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    public void deleteAll() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        PreparedStatement ps = c.prepareStatement("delete from users");
+        ps.executeUpdate();
+
+        ps.close();
+        c.close();;
+    }
+
+    public int getCount() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        PreparedStatement ps = c.prepareStatement("select count(*) from users");
 
         ResultSet rs = ps.executeQuery();
         rs.next();
-        User user = new User();
-        user.setId(rs.getString("id"));
-        user.setName(rs.getString("name"));
-        user.setPassword(rs.getString("password"));
+        int count = rs.getInt(1);
 
         rs.close();
         ps.close();
         c.close();
-        return user;
-    }
 
-    public Connection getConnection() throws ClassNotFoundException, SQLException {
-        return dataSource.getConnection();
+        return count;
     }
+    
 }
