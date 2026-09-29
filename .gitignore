@@ -28,7 +28,7 @@ out/
 **/src/main/generated/
 application-real-db.properties
 *.log
-/springbook.mv.db
+springbook.mv.db
 
 ### NetBeans ###
 /nbproject/private/
