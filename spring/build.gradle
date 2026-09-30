@@ -23,8 +23,9 @@ dependencyManagement {
 dependencies {
     implementation libs.springContext
     implementation libs.springJdbc
-    implementation 'com.h2database:h2:2.5.250'
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation libs.h2
+    testImplementation libs.junitJupiter
+    testImplementation libs.springTest
     testRuntimeOnly libs.junitPlatformLauncher
 }
 
