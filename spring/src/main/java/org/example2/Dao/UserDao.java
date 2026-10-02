@@ -18,6 +18,10 @@ public class UserDao {
         this.dataSource = dataSource;
     }
 
+    public DataSource getDataSource() {
+        return this.dataSource;
+    }
+
     public void initialize() throws SQLException {
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
