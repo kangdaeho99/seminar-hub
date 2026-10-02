@@ -1,0 +1,18 @@
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id = "userDao" class = "org.example2.Dao.UserDao" init-method = "initialize">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 테스트 전용 메모리 DB: 컨텍스트가 닫히면 연결과 데이터가 정리된다. -->
+    <bean id = "dataSource" class = "org.springframework.jdbc.datasource.SingleConnectionDataSource">
+        <property name = "driverClassName" value = "org.h2.Driver" />
+        <property name = "url" value = "jdbc:h2:mem:springbook-test" />
+        <property name = "username" value = "sa" />
+        <property name = "password" value = "" />
+        <property name = "suppressClose" value = "true" />
+    </bean>
+
+</beans>

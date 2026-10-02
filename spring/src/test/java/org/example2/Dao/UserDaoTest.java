@@ -10,9 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -20,15 +18,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class) // JUnit Jupiter에 스프링 테스트 컨텍스트 기능 연결
-@ContextConfiguration(locations = "classpath:applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
-@DirtiesContext 
+@ContextConfiguration(locations = "classpath:test-applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
 public class UserDaoTest {
 
     @Autowired
     private ApplicationContext context; //테스트 오브젝트가 만들어지고 나면 스프링 테스트 컨텍스트에 의해 자동으로 값이 주입된다.
 
     @Autowired 
-    private SimpleDriverDataSource dataSource;
+    private SingleConnectionDataSource dataSource;
 
     @Autowired 
     private DataSource dataSource2;
@@ -52,16 +49,10 @@ public class UserDaoTest {
         System.out.println(this.context);
         System.out.println(this);
 
-        DataSource dataSource = new SingleConnectionDataSource("jdbc:h2:./springbook", "sa", "", true);
-        dao.setDataSource(dataSource);
-
         System.out.println("dao:::::::::::::::::::::" + this.dao);
         System.out.println("dataSource:::::::::::::::::::::" + this.dataSource);
         System.out.println("dataSource2:::::::::::::::::::::" + this.dataSource2);
-        System.out.println("dao.getDataSource():::::::::::::::::::::" + this.dao.getDataSource());
 
-
-        
     }
 
     @Test
