@@ -75,15 +75,9 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException { //deleteAll이 클라이언트의 역할
-        // StatementStrategy strategy = new DeleteAllStatement(); // 선정한 전략 클래스의 오브젝트 생성
-        // jdbcContextWithStatementStrategy(strategy); // 컨텍스트를 호출. 전략 오브젝트 전달 (컨텍스트란 전략을 받아서 실행하는 공통 작업 흐름을 담당)
-        this.jdbcContext.workWithStatementStrategy((new StatementStrategy() { //익명 내부 클래스로 전략 오브젝트를 생성하여 바로 전달
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                return c.prepareStatement("delete from users");
-            }
-        }));
+        this.jdbcContext.executeSql("delete from users");
     }
+
 
     public int getCount() throws SQLException {
         Connection c = null;
