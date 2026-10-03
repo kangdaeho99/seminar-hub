@@ -37,7 +37,7 @@ public class UserDaoTest {
     private User user3;
     
     @BeforeEach
-    public void setUp() throws SQLException{
+    public void setUp() throws SQLException {
         // ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         // ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         // this.dao = context.getBean("userDao", UserDao.class);
@@ -49,7 +49,7 @@ public class UserDaoTest {
         dao = new UserDao();
         DataSource dataSource = new SingleConnectionDataSource(
             "jdbc:h2:mem:springbook-test", "sa", "", true);
-            dao.setDataSource(dataSource);
+        dao.setDataSource(dataSource);
         dao.initialize();
     }
 
