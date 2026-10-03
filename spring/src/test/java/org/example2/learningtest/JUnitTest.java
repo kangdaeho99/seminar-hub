@@ -1,6 +1,6 @@
 package org.example2.learningtest;
 
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,24 +8,23 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class JUnitTest {
-    // static Set<JUnitTest> testObjects = new HashSet<JUnitTest>();
-    static JUnitTest testObject;
+    private static final Set<JUnitTest> testObjects = new HashSet<>();
 
     @Test 
     public void test1() {
-        assertNotSame(this, testObject);
-        testObject = this;
+        assertFalse(testObjects.contains(this), "각 테스트는 새로운 객체에서 실행되어야 한다");
+        testObjects.add(this);
     }
 
     @Test 
     public void test2() {
-        assertNotSame(this, testObject);
-        testObject = this;
+        assertFalse(testObjects.contains(this), "각 테스트는 새로운 객체에서 실행되어야 한다");
+        testObjects.add(this);
     }
 
     @Test 
     public void test3() {
-        assertNotSame(this, testObject);
-        testObject = this;
+        assertFalse(testObjects.contains(this), "각 테스트는 새로운 객체에서 실행되어야 한다");
+        testObjects.add(this);
     }
 }
