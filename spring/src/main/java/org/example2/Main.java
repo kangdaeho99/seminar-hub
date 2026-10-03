@@ -1,14 +1,8 @@
 package org.example2;
 
-import java.sql.SQLException;
-import java.util.UUID;
-
-import org.example2.Dao.User;
-import org.example2.Dao.UserDao;
-
 public class Main {
     
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         // UserDao dao = new UserDao();
 
         // User user = new User();

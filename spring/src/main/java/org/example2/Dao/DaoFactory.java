@@ -1,7 +1,5 @@
 package org.example2.Dao;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
@@ -13,7 +11,7 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 public class DaoFactory {
     
     @Bean(initMethod = "initialize")
-    public UserDao userDao() throws SQLException {
+    public UserDao userDao() {
         UserDao userDao = new UserDao();
         userDao.setDataSource(dataSource());
         return userDao;

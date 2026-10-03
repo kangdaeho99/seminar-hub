@@ -1,6 +1,5 @@
 package org.example2.Dao;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -12,7 +11,6 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // @ContextConfiguration(locations = "classpath:test-applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
 public class UserDaoTest {
@@ -33,7 +31,7 @@ public class UserDaoTest {
     private User user3;
     
     @BeforeEach
-    public void setUp() throws SQLException {
+    public void setUp() {
         // ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         // ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         // this.dao = context.getBean("userDao", UserDao.class);
@@ -51,7 +49,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void addAndGet() throws SQLException {
+    public void addAndGet() {
         this.dao.deleteAll();
         assertEquals(this.dao.getCount(), 0);
 
@@ -69,7 +67,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void getAll() throws SQLException {
+    public void getAll() {
         this.dao.deleteAll();
 
         this.dao.add(this.user1);
@@ -98,7 +96,7 @@ public class UserDaoTest {
     }
 
     @Test 
-    public void count() throws SQLException {
+    public void count() {
         this.dao.deleteAll();
         assertEquals(this.dao.getCount(), 0);
 
@@ -113,7 +111,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void getUserFailure() throws SQLException {
+    public void getUserFailure() {
         this.dao.deleteAll();
         assertEquals(this.dao.getCount(), 0);
 
