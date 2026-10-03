@@ -104,6 +104,9 @@ public class UserDaoTest {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getPassword(), actual.getPassword());
+        assertEquals(expected.getLevel(), actual.getLevel());
+        assertEquals(expected.getLogin(), actual.getLogin());
+        assertEquals(expected.getRecommend(), actual.getRecommend());
     }
 
     @Test 
@@ -130,5 +133,25 @@ public class UserDaoTest {
 
     }
 
+    @Test 
+    public void update() {
+        this.dao.deleteAll();
+
+        this.dao.add(this.user1);
+        this.dao.add(this.user2);
+
+        this.user1.setName("오민규");
+        this.user1.setPassword("springno6");
+        this.user1.setLevel(Level.GOLD);
+        this.user1.setLogin(1000);
+        this.user1.setRecommend(999);
+
+        this.dao.update(this.user1);
+
+        User user1update = this.dao.get(this.user1.getId());
+        checkSameUser(this.user1, user1update);
+        User user2same = this.dao.get(this.user2.getId());
+        checkSameUser(this.user2, user2same);
+    }
 }
 

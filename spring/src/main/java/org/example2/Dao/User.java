@@ -31,8 +31,14 @@ public class User {
     public int getLogin() {
         return login;
     }
+    public void setLogin(int login) {
+        this.login = login;
+    }
     public int getRecommend() {
         return recommend;
+    }
+    public void setRecommend(int recommend) {
+        this.recommend = recommend;
     }
     
     public String getId() {
