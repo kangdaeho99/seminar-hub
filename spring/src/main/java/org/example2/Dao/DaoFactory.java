@@ -35,4 +35,13 @@ public class DaoFactory {
         dataSource.setPassword("");
         return dataSource;
     }
+
+    @Bean
+    public JdbcContext jdbcContext() {
+        JdbcContext jdbcContext = new JdbcContext();
+        jdbcContext.setDataSource(dataSource());
+        return jdbcContext;
+    }
+
+    
 }

@@ -14,6 +14,12 @@ public class UserDao {
 
     private DataSource dataSource;
 
+    private JdbcContext jdbcContext;
+
+    public void setJdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
+    }
+
     public void setDataSource(DataSource dataSource){
         this.dataSource = dataSource;
     }
@@ -33,26 +39,7 @@ public class UserDao {
     }
 
     public void add(final User user) throws SQLException {
-
-        class AddStatement implements StatementStrategy {
-            User user;
-
-            public AddStatement(User user) {
-                this.user = user;
-            }
-
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
-                ps.setString(1, user.getId());
-                ps.setString(2, user.getName());
-                ps.setString(3, user.getPassword());
-                return ps;
-            }
-        }
-
-        // StatementStrategy strategy = new AddStatement(user);
-        jdbcContextWithStatementStrategy(
+        this.jdbcContext.workWithStatementStrategy(
             new StatementStrategy() {
                 @Override
                 public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
@@ -91,39 +78,12 @@ public class UserDao {
     public void deleteAll() throws SQLException { //deleteAll이 클라이언트의 역할
         // StatementStrategy strategy = new DeleteAllStatement(); // 선정한 전략 클래스의 오브젝트 생성
         // jdbcContextWithStatementStrategy(strategy); // 컨텍스트를 호출. 전략 오브젝트 전달 (컨텍스트란 전략을 받아서 실행하는 공통 작업 흐름을 담당)
-        jdbcContextWithStatementStrategy(new StatementStrategy() { //익명 내부 클래스로 전략 오브젝트를 생성하여 바로 전달
+        this.jdbcContext.workWithStatementStrategy((new StatementStrategy() { //익명 내부 클래스로 전략 오브젝트를 생성하여 바로 전달
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 return c.prepareStatement("delete from users");
             }
-        });
-    }
-
-    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException { //클라이언트가 컨텍스트를 호출할 떄 넘겨줄 전략 파라미터
-        Connection c = null; 
-        PreparedStatement ps = null; 
-
-        try {
-            c = dataSource.getConnection();
-            ps = stmt.makePreparedStatement(c);
-            ps.executeUpdate();
-        } catch(SQLException e) {
-            throw e; 
-        } finally {
-            if( ps != null ) {
-                try {
-                    ps.close();;
-                } catch(SQLException e) {
-                }
-            }
-            if( c != null ) {
-                try {
-                    c.close();;
-                } catch(SQLException e) {
-                }
-            }
-        }
-
+        }));
     }
 
     public int getCount() throws SQLException {

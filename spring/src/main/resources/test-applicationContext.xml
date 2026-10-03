@@ -15,4 +15,8 @@
         <property name = "suppressClose" value = "true" />
     </bean>
 
+    <bean id = "jdbcContext" class = "org.example2.Dao.JdbcContext">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
 </beans>

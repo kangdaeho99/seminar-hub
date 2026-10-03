@@ -14,4 +14,8 @@
         <property name = "password" value = "" />
     </bean>
 
+    <bean id = "jdbcContext" class = "org.example2.Dao.JdbcContext">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
 </beans>
