@@ -33,17 +33,8 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
-        Connection c = getConnection();
-
-        PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values (?, ?, ?)");
-        ps.setString(1, user.getId());
-        ps.setString(2, user.getName());
-        ps.setString(3, user.getPassword());
-
-        ps.executeUpdate();
-
-        ps.close();
-        c.close();
+        StatementStrategy strategy = new AddStatement(user);
+        jdbcContextWithStatementStrategy(strategy);
     }
 
     public User get(String id) throws SQLException {
@@ -81,7 +72,6 @@ public class UserDao {
         try {
             c = dataSource.getConnection();
             ps = stmt.makePreparedStatement(c);
-
             ps.executeUpdate();
         } catch(SQLException e) {
             throw e; 
