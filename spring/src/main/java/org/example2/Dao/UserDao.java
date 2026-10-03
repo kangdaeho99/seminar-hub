@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 
-abstract public class UserDao {
+public class UserDao {
 
     private DataSource dataSource;
 
@@ -70,15 +70,15 @@ abstract public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        Connection c = dataSource.getConnection();
-        PreparedStatement ps = c.prepareStatement("delete from users");
+        Connection c = null;
+        PreparedStatement ps = null;
 
         try { // 예외가 발생할가능성이 있는 코드를 모두 try 블록으로 묶어준다.
             c = dataSource.getConnection(); 
 
-            // ps = c.prepareStatement("delete from users"); // 변하는 부분
-            ps = makeStatement(c); // 변하지 않는 부분
-            
+            StatementStrategy strategy = new DeleteAllStatement();
+            ps = strategy.makePreparedStatement(c);
+
             ps.executeUpdate();
         } catch(SQLException e){ // 에러가 발생했을때 부가적인 작업을 해줄 수 있도록 catch 브록을 해준다. 그렇지 않으면 Connection을 close() 하지 못하고 메소드를 빠져나갈 수 있다.
             throw e;
@@ -99,8 +99,6 @@ abstract public class UserDao {
             }
         }
     }
-
-    abstract protected PreparedStatement makeStatement(Connection c) throws SQLException;
 
     public int getCount() throws SQLException {
         Connection c = null;

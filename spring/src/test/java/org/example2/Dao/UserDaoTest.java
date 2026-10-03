@@ -1,7 +1,5 @@
 package org.example2.Dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -48,13 +46,7 @@ public class UserDaoTest {
         this.user2 = new User("leegw700", "이길원", "springno2");
         this.user3 = new User("bumjin", "박범진", "springno3");
 
-        dao = new UserDao() {
-            @Override
-            protected PreparedStatement makeStatement(Connection c)
-                    throws SQLException {
-                return c.prepareStatement("delete from users");
-            }
-        };
+        dao = new UserDao();
         DataSource dataSource = new SingleConnectionDataSource(
             "jdbc:h2:mem:springbook-test", "sa", "", true);
         dao.setDataSource(dataSource);
