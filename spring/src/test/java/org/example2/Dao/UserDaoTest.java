@@ -37,9 +37,9 @@ public class UserDaoTest {
         // ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         // this.dao = context.getBean("userDao", UserDaoJdbc.class);
         // this.dao = this.context.getBean("userDao",UserDaoJdbc.class);
-        this.user1 = new User("gyumee", "박성철", "springno1");
-        this.user2 = new User("leegw700", "이길원", "springno2");
-        this.user3 = new User("bumjin", "박범진", "springno3");
+        this.user1 = new User("gyumee", "박성철", "springno1", Level.BASIC, 1, 0);
+        this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10);
+        this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40);
 
         dao = new UserDaoJdbc();
         DataSource dataSource = new SingleConnectionDataSource(
