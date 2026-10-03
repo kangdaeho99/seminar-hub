@@ -3,6 +3,7 @@ package org.example2.Dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -38,8 +39,17 @@ public class UserDao {
 
     public User get(String id) throws SQLException {
         return this.jdbcTemplate.queryForObject("select * from users where id = ?",
+            this.userMapper, id
+        );
+    }
+
+    // public List<User> getAll() throws SQLException {
+    //     return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
+    // }
+
+    public List<User> getAll() {
+        return this.jdbcTemplate.query("select * from users order by id", 
             new RowMapper<User>() {
-                @Override
                 public User mapRow(ResultSet rs, int rowNum) throws SQLException {
                     User user = new User();
                     user.setId(rs.getString("id"));
@@ -47,7 +57,7 @@ public class UserDao {
                     user.setPassword(rs.getString("password"));
                     return user;
                 }
-            }, id
+            }
         );
     }
 

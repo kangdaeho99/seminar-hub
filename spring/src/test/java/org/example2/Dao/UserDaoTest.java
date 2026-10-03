@@ -1,6 +1,7 @@
 package org.example2.Dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -11,6 +12,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // @ContextConfiguration(locations = "classpath:test-applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
 public class UserDaoTest {
@@ -64,6 +66,35 @@ public class UserDaoTest {
         User userget2 = this.dao.get(this.user2.getId());
         assertEquals(this.user2.getName(), userget2.getName());
         assertEquals(this.user2.getPassword(), userget2.getPassword());
+    }
+
+    @Test
+    public void getAll() throws SQLException {
+        this.dao.deleteAll();
+
+        this.dao.add(this.user1);
+        List<User> users1 = this.dao.getAll();
+        assertEquals(1, users1.size());
+        checkSameUser(this.user1, users1.get(0));
+
+        this.dao.add(this.user2);
+        List<User> users2 = this.dao.getAll();
+        assertEquals(2, users2.size());
+        checkSameUser(this.user1, users2.get(0));
+        checkSameUser(this.user2, users2.get(1));
+
+        this.dao.add(this.user3);
+        List<User> users3 = this.dao.getAll();
+        assertEquals(3, users3.size());
+        checkSameUser(this.user3, users3.get(0));
+        checkSameUser(this.user1, users3.get(1));
+        checkSameUser(this.user2, users3.get(2));
+    }
+
+    private void checkSameUser(User expected, User actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getPassword(), actual.getPassword());
     }
 
     @Test 
