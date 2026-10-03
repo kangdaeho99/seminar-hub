@@ -1,6 +1,5 @@
 package org.example2.Dao;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -12,17 +11,21 @@ import org.springframework.jdbc.core.RowMapper;
 
 public class UserDao {
 
-    private DataSource dataSource;
-
     private JdbcTemplate jdbcTemplate;
+
+    private final RowMapper<User> userMapper = new RowMapper<User>() {
+        @Override
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            User user = new User();
+            user.setId(rs.getString("id"));
+            user.setName(rs.getString("name"));
+            user.setPassword(rs.getString("password"));
+            return user;
+        }
+    };
 
     public void setDataSource(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.dataSource = dataSource;
-    }
-
-    public DataSource getDataSource() {
-        return this.dataSource;
     }
 
     public void initialize() throws SQLException {
@@ -43,26 +46,8 @@ public class UserDao {
         );
     }
 
-    // public List<User> getAll() throws SQLException {
-    //     return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
-    // }
-
     public List<User> getAll() {
-        return this.jdbcTemplate.query("select * from users order by id", 
-            new RowMapper<User>() {
-                public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    User user = new User();
-                    user.setId(rs.getString("id"));
-                    user.setName(rs.getString("name"));
-                    user.setPassword(rs.getString("password"));
-                    return user;
-                }
-            }
-        );
-    }
-
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+        return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
     }
 
     public void deleteAll() throws SQLException {
