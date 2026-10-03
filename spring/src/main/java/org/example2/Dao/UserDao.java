@@ -16,12 +16,11 @@ public class UserDao {
 
     private JdbcContext jdbcContext;
 
-    public void setJdbcContext(JdbcContext jdbcContext) {
-        this.jdbcContext = jdbcContext;
-    }
-
     public void setDataSource(DataSource dataSource){
         this.dataSource = dataSource;
+        // UserDao가 JdbcContext를 직접 생성하고 같은 DataSource를 수동으로 주입한다.
+        this.jdbcContext = new JdbcContext();
+        this.jdbcContext.setDataSource(dataSource);
     }
 
     public DataSource getDataSource() {

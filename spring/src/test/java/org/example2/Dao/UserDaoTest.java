@@ -50,12 +50,7 @@ public class UserDaoTest {
         DataSource dataSource = new SingleConnectionDataSource(
             "jdbc:h2:mem:springbook-test", "sa", "", true);
 
-        // JdbcContext와 UserDao가 같은 테스트용 DataSource를 사용하도록 주입한다.
-        JdbcContext jdbcContext = new JdbcContext();
-        jdbcContext.setDataSource(dataSource);
-
         dao.setDataSource(dataSource);
-        dao.setJdbcContext(jdbcContext);
         dao.initialize();
     }
 
