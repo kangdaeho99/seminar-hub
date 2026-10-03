@@ -69,35 +69,37 @@ public class UserDao {
         return dataSource.getConnection();
     }
 
-    public void deleteAll() throws SQLException {
-        Connection c = null;
-        PreparedStatement ps = null;
+    public void deleteAll() throws SQLException { //deleteAll이 클라이언트의 역할
+        StatementStrategy strategy = new DeleteAllStatement(); // 선정한 전략 클래스의 오브젝트 생성
+        jdbcContextWithStatementStrategy(strategy); // 컨텍스트를 호출. 전략 오브젝트 전달 (컨텍스트란 전략을 받아서 실행하는 공통 작업 흐름을 담당)
+    }
 
-        try { // 예외가 발생할가능성이 있는 코드를 모두 try 블록으로 묶어준다.
-            c = dataSource.getConnection(); 
+    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException { //클라이언트가 컨텍스트를 호출할 떄 넘겨줄 전략 파라미터
+        Connection c = null; 
+        PreparedStatement ps = null; 
 
-            StatementStrategy strategy = new DeleteAllStatement();
-            ps = strategy.makePreparedStatement(c);
+        try {
+            c = dataSource.getConnection();
+            ps = stmt.makePreparedStatement(c);
 
             ps.executeUpdate();
-        } catch(SQLException e){ // 에러가 발생했을때 부가적인 작업을 해줄 수 있도록 catch 브록을 해준다. 그렇지 않으면 Connection을 close() 하지 못하고 메소드를 빠져나갈 수 있다.
-            throw e;
-        } finally { //finally 이므로 블록에서 예외가 발생했을 때나 안했을 때나 모두 실행된다.
-            if ( ps != null) {
+        } catch(SQLException e) {
+            throw e; 
+        } finally {
+            if( ps != null ) {
                 try {
-                    ps.close();
-                } catch (SQLException e) { // ps.close() 메소드에서도 SQLException이 발생할 수 있기 때문에 이를 잡아줘야 한다. 그렇지 않으면 Connection을 close() 하지 못하고 메소드를 빠져나갈 수 있다.
+                    ps.close();;
+                } catch(SQLException e) {
                 }
             }
-
             if( c != null ) {
                 try {
-                    c.close(); // connection 반환
+                    c.close();;
                 } catch(SQLException e) {
-
                 }
             }
         }
+
     }
 
     public int getCount() throws SQLException {
