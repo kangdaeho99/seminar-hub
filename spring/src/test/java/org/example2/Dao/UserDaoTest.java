@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
@@ -25,7 +26,7 @@ public class UserDaoTest {
     // private DataSource dataSource2;
 
     // @Autowired
-    private UserDao dao;
+    private UserDaoJdbc dao;
     private User user1;
     private User user2;
     private User user3;
@@ -34,19 +35,29 @@ public class UserDaoTest {
     public void setUp() {
         // ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         // ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        // this.dao = context.getBean("userDao", UserDao.class);
-        // this.dao = this.context.getBean("userDao",UserDao.class);
+        // this.dao = context.getBean("userDao", UserDaoJdbc.class);
+        // this.dao = this.context.getBean("userDao",UserDaoJdbc.class);
         this.user1 = new User("gyumee", "박성철", "springno1");
         this.user2 = new User("leegw700", "이길원", "springno2");
         this.user3 = new User("bumjin", "박범진", "springno3");
 
-        dao = new UserDao();
+        dao = new UserDaoJdbc();
         DataSource dataSource = new SingleConnectionDataSource(
             "jdbc:h2:mem:springbook-test", "sa", "", true);
 
         dao.setDataSource(dataSource);
         dao.initialize();
     }
+
+
+    @Test
+    public void duplicateKey() {
+        dao.deleteAll();
+
+        dao.add(user1);
+        assertThrows(DataAccessException.class, () -> dao.add(user1));
+    }
+
 
     @Test
     public void addAndGet() {

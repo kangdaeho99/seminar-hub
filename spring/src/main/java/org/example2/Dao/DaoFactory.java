@@ -12,7 +12,7 @@ public class DaoFactory {
     
     @Bean(initMethod = "initialize")
     public UserDao userDao() {
-        UserDao userDao = new UserDao();
+        UserDaoJdbc userDao = new UserDaoJdbc();
         userDao.setDataSource(dataSource());
         return userDao;
     }
