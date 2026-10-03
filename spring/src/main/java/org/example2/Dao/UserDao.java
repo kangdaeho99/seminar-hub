@@ -75,7 +75,10 @@ public class UserDao {
 
         try { // 예외가 발생할가능성이 있는 코드를 모두 try 블록으로 묶어준다.
             c = dataSource.getConnection(); 
-            ps = c.prepareStatement("delete from users");
+
+            // ps = c.prepareStatement("delete from users"); // 변하는 부분
+            ps = makeStatement(c); // 변하지 않는 부분
+            
             ps.executeUpdate();
         } catch(SQLException e){ // 에러가 발생했을때 부가적인 작업을 해줄 수 있도록 catch 브록을 해준다. 그렇지 않으면 Connection을 close() 하지 못하고 메소드를 빠져나갈 수 있다.
             throw e;
@@ -95,6 +98,11 @@ public class UserDao {
                 }
             }
         }
+    }
+
+    private PreparedStatement makeStatement(Connection c) throws SQLException {
+        PreparedStatement ps = c.prepareStatement("delete from users");
+        return ps;
     }
 
     public int getCount() throws SQLException {
