@@ -18,19 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class) // JUnit Jupiter에 스프링 테스트 컨텍스트 기능 연결
-@ContextConfiguration(locations = "classpath:test-applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
+// @ContextConfiguration(locations = "classpath:test-applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
 public class UserDaoTest {
 
-    @Autowired
-    private ApplicationContext context; //테스트 오브젝트가 만들어지고 나면 스프링 테스트 컨텍스트에 의해 자동으로 값이 주입된다.
+    // @Autowired
+    // private ApplicationContext context; //테스트 오브젝트가 만들어지고 나면 스프링 테스트 컨텍스트에 의해 자동으로 값이 주입된다.
 
-    @Autowired 
-    private SingleConnectionDataSource dataSource;
+    // @Autowired 
+    // private SingleConnectionDataSource dataSource;
 
-    @Autowired 
-    private DataSource dataSource2;
+    // @Autowired 
+    // private DataSource dataSource2;
 
-    @Autowired
+    // @Autowired
     private UserDao dao;
     private User user1;
     private User user2;
@@ -46,13 +46,10 @@ public class UserDaoTest {
         this.user2 = new User("leegw700", "이길원", "springno2");
         this.user3 = new User("bumjin", "박범진", "springno3");
 
-        System.out.println(this.context);
-        System.out.println(this);
-
-        System.out.println("dao:::::::::::::::::::::" + this.dao);
-        System.out.println("dataSource:::::::::::::::::::::" + this.dataSource);
-        System.out.println("dataSource2:::::::::::::::::::::" + this.dataSource2);
-
+        dao = new UserDao();
+        DataSource dataSource = new SingleConnectionDataSource(
+            "jdbc:h2:mem:springbook-test", "sa", "", true);
+        dao.setDataSource(dataSource);
     }
 
     @Test
