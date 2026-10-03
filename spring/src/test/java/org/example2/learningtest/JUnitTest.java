@@ -24,26 +24,26 @@ public class JUnitTest {
 
     @Test 
     public void test1() {
-        assertFalse(testObjects.contains(this), "각 테스트는 새로운 객체에서 실행되어야 한다");
+        assertFalse(testObjects.contains(this));
         testObjects.add(this);
-        assertTrue(contextObject == null || contextObject == this.context, "각 테스트는 같은 Spring IoC 컨테이너를 공유해야 한다");
+        assertTrue(contextObject == null || contextObject == this.context);
         contextObject = this.context;
     }
 
     @Test 
     public void test2() {
-        assertFalse(testObjects.contains(this), "각 테스트는 새로운 객체에서 실행되어야 한다");
+        assertFalse(testObjects.contains(this));
         testObjects.add(this);
-        assertTrue(contextObject == null || contextObject == this.context, "각 테스트는 같은 Spring IoC 컨테이너를 공유해야 한다");
+        assertTrue(contextObject == null || contextObject == this.context);
         contextObject = this.context;
     }
 
     @Test 
     public void test3() {
-        assertFalse(testObjects.contains(this), "각 테스트는 새로운 객체에서 실행되어야 한다");
+        assertFalse(testObjects.contains(this));
         testObjects.add(this);
 
-        assertTrue(contextObject == null || contextObject == this.context, "각 테스트는 같은 Spring IoC 컨테이너를 공유해야 한다");
+        assertTrue(contextObject == null || contextObject == this.context);
         contextObject = this.context;
     }
 }
