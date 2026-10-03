@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -35,9 +36,13 @@ public class UserDao {
             + "password VARCHAR(100) NOT NULL)");
     }
 
-    public void add(final User user) {
-        this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)",
-            user.getId(), user.getName(), user.getPassword());
+    public void add(final User user) throws DuplicateUserIdException{
+        try {
+            this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)",
+                user.getId(), user.getName(), user.getPassword());
+        } catch (DuplicateKeyException e) {
+            throw new DuplicateUserIdException(e); //예외 전환
+        }
     }
 
     public User get(String id) {
