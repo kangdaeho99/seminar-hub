@@ -1,10 +1,12 @@
 package org.example2.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.example2.Dao.DefaultUserLevelUpgradePolicy;
 import org.example2.Dao.Level;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
@@ -74,7 +76,6 @@ public class UserServiceTest {
         for (User user : users) {
             user.setEmail(user.getId() + "@example.com");
         }
-        userDao.deleteAll();
     }
 
     @Test 
@@ -88,6 +89,7 @@ public class UserServiceTest {
 
     @Test
     public void add() {
+        userDao.deleteAll();
         User withoutLevel = users.get(0);
         withoutLevel.setLevel(null);
         User withLevel = users.get(4);
@@ -102,23 +104,32 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevelsWithoutTransaction() {
-        for (User user : users) {
-            userDao.add(user);
-        }
+    public void upgradeLevels() {
+        UserServiceImpl userServiceImpl = new UserServiceImpl();
+        MockUserDao mockUserDao = new MockUserDao(users);
+        userServiceImpl.setUserDao(mockUserDao);
+
+        // 별도로 분리한 등급 정책도 같은 Mock DAO를 사용해야 DB에 접근하지 않는다.
+        DefaultUserLevelUpgradePolicy policy = new DefaultUserLevelUpgradePolicy();
+        policy.setUserDao(mockUserDao);
+        userServiceImpl.setUserLevelUpgradePolicy(policy);
+
+        MockMailSender mockMailSender = new MockMailSender();
+        userServiceImpl.setMailSender(mockMailSender);
 
         userServiceImpl.upgradeLevels();
 
-        checkLevelUpgraded(users.get(0), false);
-        checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(2), false);
-        checkLevelUpgraded(users.get(3), true);
-        checkLevelUpgraded(users.get(4), false);
-        checkTransactionReleased();
+        List<User> updated = mockUserDao.getUpdated();
+        assertEquals(2, updated.size());
+        checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
+        checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
+        assertEquals(Arrays.asList("joytouch@example.com", "madnite1@example.com"),
+                mockMailSender.getRequests());
     }
 
     @Test
-    public void upgradeLevels() {
+    public void upgradeLevelsWithTransaction() {
+        userDao.deleteAll();
         MockMailSender mockMailSender = new MockMailSender();
         userServiceImpl.setMailSender(mockMailSender);
 
@@ -142,6 +153,7 @@ public class UserServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     public void upgradeAllOrNothing(boolean failWithError) {
+        userDao.deleteAll();
         TestUserService testUserService = new TestUserService(users.get(3).getId(), failWithError);
         testUserService.setUserDao(userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
@@ -174,6 +186,54 @@ public class UserServiceTest {
     private void checkTransactionReleased() {
         assertFalse(TransactionSynchronizationManager.isSynchronizationActive());
         assertFalse(TransactionSynchronizationManager.hasResource(dataSource));
+    }
+
+    private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+        assertEquals(expectedId, updated.getId());
+        assertEquals(expectedLevel, updated.getLevel());
+    }
+
+    private static class MockUserDao implements UserDao {
+        private final List<User> users;
+        private final List<User> updated = new ArrayList<>();
+
+        MockUserDao(List<User> users) {
+            this.users = users;
+        }
+
+        public List<User> getUpdated() {
+            return updated;
+        }
+
+        @Override
+        public List<User> getAll() {
+            return users;
+        }
+
+        @Override
+        public void update(User user) {
+            updated.add(user);
+        }
+
+        @Override
+        public void add(User user) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public User get(String id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void deleteAll() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getCount() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private static class TestUserService extends UserServiceImpl {
