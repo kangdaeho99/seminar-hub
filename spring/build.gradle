@@ -27,6 +27,7 @@ dependencies {
     implementation libs.springJdbc
     implementation libs.h2
     testImplementation libs.junitJupiter
+    testImplementation libs.mockitoCore
     testImplementation libs.springTest
     testRuntimeOnly libs.junitPlatformLauncher
 }

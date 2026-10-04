@@ -19,7 +19,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,11 +31,17 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations={"classpath:test-applicationContext.xml"}) 
@@ -125,6 +134,41 @@ public class UserServiceTest {
         checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
         assertEquals(Arrays.asList("joytouch@example.com", "madnite1@example.com"),
                 mockMailSender.getRequests());
+    }
+
+    @Test
+    public void MockUpgradeLevels() {
+        UserServiceImpl userServiceImpl = new UserServiceImpl();
+
+        // 직접 작성한 MockUserDao 대신 Mockito가 만든 대역을 사용한다.
+        UserDao mockUserDao = mock(UserDao.class);
+        when(mockUserDao.getAll()).thenReturn(users);
+        userServiceImpl.setUserDao(mockUserDao);
+
+        DefaultUserLevelUpgradePolicy policy = new DefaultUserLevelUpgradePolicy();
+        policy.setUserDao(mockUserDao);
+        userServiceImpl.setUserLevelUpgradePolicy(policy);
+
+        MailSender mockMailSender = mock(MailSender.class);
+        userServiceImpl.setMailSender(mockMailSender);
+
+        userServiceImpl.upgradeLevels();
+
+        // update()에 전달한 사용자와 호출 횟수를 검증한다.
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(mockUserDao).getAll();
+        verify(mockUserDao, times(2)).update(userCaptor.capture());
+        List<User> updated = userCaptor.getAllValues();
+        checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
+        checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
+
+        // 실제 메일을 보내지 않고 send()에 전달한 메시지를 검증한다.
+        ArgumentCaptor<SimpleMailMessage> mailCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mockMailSender, times(2)).send(mailCaptor.capture());
+        List<SimpleMailMessage> messages = mailCaptor.getAllValues();
+        assertArrayEquals(new String[]{"joytouch@example.com"}, messages.get(0).getTo());
+        assertArrayEquals(new String[]{"madnite1@example.com"}, messages.get(1).getTo());
+        verifyNoMoreInteractions(mockUserDao, mockMailSender);
     }
 
     @Test

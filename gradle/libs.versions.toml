@@ -43,6 +43,7 @@ springBatchIntegration.module = "org.springframework.batch:spring-batch-integrat
 postgresql.module = "org.postgresql:postgresql"
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 junitJupiter.module = "org.junit.jupiter:junit-jupiter"
+mockitoCore.module = "org.mockito:mockito-core"
 junitPlatformLauncher.module = "org.junit.platform:junit-platform-launcher"
 
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
