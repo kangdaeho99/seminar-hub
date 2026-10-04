@@ -6,6 +6,7 @@ import java.util.List;
 import org.example2.Dao.Level;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
+import org.example2.Dao.UserLevelUpgradePolicy;
 import org.example2.Dao.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.example2.Dao.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static org.example2.Dao.UserService.MIN_RECOCOMEND_FOR_GOLD;
+import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
+import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -28,6 +29,9 @@ public class UserServiceTest {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    UserLevelUpgradePolicy userLevelUpgradePolicy;
 
     List<User> users;
 
@@ -46,6 +50,7 @@ public class UserServiceTest {
     @Test 
     public void bean() {
         assertNotNull(this.userService);
+        assertNotNull(this.userLevelUpgradePolicy);
     }
 
     @Test

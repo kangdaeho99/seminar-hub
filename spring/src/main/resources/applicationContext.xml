@@ -4,6 +4,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id = "userService" class = "org.example2.Dao.UserService">
         <property name="userDao" ref="userDao"/>
+        <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
+    </bean>
+
+    <bean id = "userLevelUpgradePolicy" class = "org.example2.Dao.DefaultUserLevelUpgradePolicy">
+        <property name="userDao" ref="userDao"/>
     </bean>
 
     <bean id = "userDao" class = "org.example2.Dao.UserDaoJdbc" init-method = "initialize">

@@ -23,10 +23,19 @@ public class DaoFactory {
     //     return userDao;
     // }
 
+    @Bean
     public UserService userService() {
         UserService userService = new UserService();
         userService.setUserDao(userDao());
+        userService.setUserLevelUpgradePolicy(userLevelUpgradePolicy());
         return userService;
+    }
+
+    @Bean
+    public UserLevelUpgradePolicy userLevelUpgradePolicy() {
+        DefaultUserLevelUpgradePolicy policy = new DefaultUserLevelUpgradePolicy();
+        policy.setUserDao(userDao());
+        return policy;
     }
 
     @Bean
