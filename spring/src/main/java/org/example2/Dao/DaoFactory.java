@@ -23,6 +23,12 @@ public class DaoFactory {
     //     return userDao;
     // }
 
+    public UserService userService() {
+        UserService userService = new UserService();
+        userService.setUserDao(userDao());
+        return userService;
+    }
+
     @Bean
     public DataSource dataSource(){
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();

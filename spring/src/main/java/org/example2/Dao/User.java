@@ -22,6 +22,14 @@ public class User {
 
     }
 
+    public void upgradeLevel() {
+        Level nextLevel = this.level.nextLevel();
+        if (nextLevel == null) {
+            throw new IllegalStateException(this.level + " 등급은 업그레이드가 불가능합니다.");
+        }
+        this.level = nextLevel;
+    }
+
     public Level getLevel() {
         return level;
     }
