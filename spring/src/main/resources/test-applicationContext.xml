@@ -1,10 +1,17 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
     <bean id = "userService" class = "org.example2.Dao.UserService">
         <property name="userDao" ref="userDao"/>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <bean id = "userLevelUpgradePolicy" class = "org.example2.Dao.DefaultUserLevelUpgradePolicy">
@@ -15,13 +22,7 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <!-- 테스트 전용 메모리 DB: 컨텍스트가 닫히면 연결과 데이터가 정리된다. -->
-    <bean id = "dataSource" class = "org.springframework.jdbc.datasource.SingleConnectionDataSource">
-        <property name = "driverClassName" value = "org.h2.Driver" />
-        <property name = "url" value = "jdbc:h2:mem:springbook-test" />
-        <property name = "username" value = "sa" />
-        <property name = "password" value = "" />
-        <property name = "suppressClose" value = "true" />
-    </bean>
+    <!-- 여러 연결을 사용해 트랜잭션 동기화를 검증하고, 컨텍스트 종료 시 DB를 정리한다. -->
+    <jdbc:embedded-database id="dataSource" type="H2" generate-name="true"/>
 
 </beans>

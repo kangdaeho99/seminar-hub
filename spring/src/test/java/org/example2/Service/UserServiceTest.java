@@ -3,6 +3,8 @@ package org.example2.Service;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.example2.Dao.Level;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
@@ -14,11 +16,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations={"classpath:test-applicationContext.xml"}) 
@@ -32,6 +38,12 @@ public class UserServiceTest {
 
     @Autowired
     UserLevelUpgradePolicy userLevelUpgradePolicy;
+
+    @Autowired
+    DataSource dataSource;
+
+    @Autowired
+    PlatformTransactionManager transactionManager;
 
     List<User> users;
 
@@ -51,6 +63,7 @@ public class UserServiceTest {
     public void bean() {
         assertNotNull(this.userService);
         assertNotNull(this.userLevelUpgradePolicy);
+        assertNotNull(this.transactionManager);
     }
 
     @Test
@@ -67,6 +80,59 @@ public class UserServiceTest {
         checkLevelUpgraded(users.get(3), true);
         checkLevelUpgraded(users.get(4), false);
         assertEquals(users.size(), userDao.getCount());
+        checkTransactionReleased();
+    }
+
+    @Test
+    public void upgradeAllOrNothing() {
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(userDao);
+        testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
+        testUserService.setTransactionManager(transactionManager);
+        for (User user : users) {
+            userDao.add(user);
+        }
+
+        assertThrows(TestUserServiceException.class, testUserService::upgradeLevels);
+
+        assertEquals(1, testUserService.completedUpgrades);
+        for (User user : users) {
+            checkLevelUpgraded(user, false);
+        }
+        assertEquals(users.size(), userDao.getCount());
+        checkTransactionReleased();
+
+        // 실패 후에도 같은 스레드에서 새 트랜잭션을 시작할 수 있어야 한다.
+        userService.upgradeLevels();
+        checkLevelUpgraded(users.get(1), true);
+        checkLevelUpgraded(users.get(3), true);
+        checkTransactionReleased();
+    }
+
+    private void checkTransactionReleased() {
+        assertFalse(TransactionSynchronizationManager.isSynchronizationActive());
+        assertFalse(TransactionSynchronizationManager.hasResource(dataSource));
+    }
+
+    private static class TestUserService extends UserService {
+        private final String failOnUserId;
+        private int completedUpgrades;
+
+        TestUserService(String failOnUserId) {
+            this.failOnUserId = failOnUserId;
+        }
+
+        @Override
+        protected void upgradeLevel(User user) {
+            if (user.getId().equals(failOnUserId)) {
+                throw new TestUserServiceException();
+            }
+            super.upgradeLevel(user);
+            completedUpgrades++;
+        }
+    }
+
+    private static class TestUserServiceException extends RuntimeException {
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {

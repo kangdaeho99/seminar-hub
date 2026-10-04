@@ -4,7 +4,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id = "userService" class = "org.example2.Dao.UserService">
         <property name="userDao" ref="userDao"/>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <bean id = "userLevelUpgradePolicy" class = "org.example2.Dao.DefaultUserLevelUpgradePolicy">
