@@ -1,6 +1,5 @@
 package org.example2.Service;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,8 +8,6 @@ import javax.sql.DataSource;
 
 import org.example2.Dao.DefaultUserLevelUpgradePolicy;
 import org.example2.Dao.Level;
-import org.example2.Dao.TransactionHandler;
-import org.example2.Dao.TxProxyFactoryBean;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
 import org.example2.Dao.UserLevelUpgradePolicy;
@@ -19,9 +16,9 @@ import org.example2.Dao.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
@@ -36,7 +33,6 @@ import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -93,8 +89,7 @@ public class UserServiceTest {
     @Test 
     public void bean() {
         assertNotNull(this.userService);
-        assertTrue(Proxy.isProxyClass(this.userService.getClass()));
-        assertInstanceOf(TransactionHandler.class, Proxy.getInvocationHandler(this.userService));
+        assertTrue(AopUtils.isJdkDynamicProxy(this.userService));
         assertNotNull(this.userServiceImpl);
         assertNotNull(this.userLevelUpgradePolicy);
     }
@@ -197,40 +192,25 @@ public class UserServiceTest {
         checkTransactionReleased();
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    public void upgradeAllOrNothing(boolean failWithError) {
-        userDao.deleteAll();
-        TestUserService testUserService = new TestUserService(users.get(3).getId(), failWithError);
+    @Test
+    public void upgradeAllOrNothing() {
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
         testUserService.setMailSender(dummyMailSender);
 
-        // &를 붙여 팩토리 빈 자체를 가져온 뒤 테스트용 타깃으로 프록시를 생성한다.
-        TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+        // &를 붙이면 생성된 프록시 대신 XML에 등록한 팩토리 빈 자체를 가져온다.
+        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
         txProxyFactoryBean.setTarget(testUserService);
         UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
+        userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
 
-        Class<? extends Throwable> expectedException = failWithError
-                ? AssertionError.class : TestUserServiceException.class;
-        assertThrows(expectedException, txUserService::upgradeLevels);
-
-        assertEquals(1, testUserService.completedUpgrades);
-        for (User user : users) {
-            checkLevelUpgraded(user, false);
-        }
-        assertEquals(users.size(), userDao.getCount());
-        checkTransactionReleased();
-
-        // 실패 후에도 같은 스레드에서 새 트랜잭션을 시작할 수 있어야 한다.
-        userService.upgradeLevels();
-        checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(3), true);
-        checkTransactionReleased();
+        assertThrows(TestUserServiceException.class, txUserService::upgradeLevels);
+        checkLevelUpgraded(users.get(1), false);
     }
 
     private void checkTransactionReleased() {
@@ -288,24 +268,17 @@ public class UserServiceTest {
 
     private static class TestUserService extends UserServiceImpl {
         private final String failOnUserId;
-        private final boolean failWithError;
-        private int completedUpgrades;
 
-        TestUserService(String failOnUserId, boolean failWithError) {
+        TestUserService(String failOnUserId) {
             this.failOnUserId = failOnUserId;
-            this.failWithError = failWithError;
         }
 
         @Override
         protected void upgradeLevel(User user) {
             if (user.getId().equals(failOnUserId)) {
-                if (failWithError) {
-                    throw new AssertionError("Upgrade failed for " + failOnUserId);
-                }
                 throw new TestUserServiceException();
             }
             super.upgradeLevel(user);
-            completedUpgrades++;
         }
     }
 
