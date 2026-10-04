@@ -17,9 +17,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -48,10 +48,15 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @Autowired
+    @Qualifier("userService")
     UserService userService;
 
     @Autowired
-    UserServiceImpl userServiceImpl;
+    @Qualifier("testUserService")
+    UserService testUserService;
+
+    @Autowired
+    MockMailSender mockMailSender;
 
     @Autowired
     UserDao userDao;
@@ -65,15 +70,10 @@ public class UserServiceTest {
     @Autowired
     ApplicationContext context;
 
-    DummyMailSender dummyMailSender;
-
     List<User> users;
 
     @BeforeEach
     public void setUp() {
-        dummyMailSender = new DummyMailSender();
-        userServiceImpl.setMailSender(dummyMailSender);
-
         users = Arrays.asList(
             new User("bumjin", "박범진", "springno1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
             new User("joytouch", "김영한", "springno2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, MIN_RECOCOMEND_FOR_GOLD + 10),
@@ -90,7 +90,13 @@ public class UserServiceTest {
     public void bean() {
         assertNotNull(this.userService);
         assertTrue(AopUtils.isJdkDynamicProxy(this.userService));
-        assertNotNull(this.userServiceImpl);
+        assertTrue(AopUtils.isJdkDynamicProxy(this.testUserService));
+        assertEquals(UserServiceImpl.class, AopUtils.getTargetClass(this.userService));
+        assertEquals(TestUserServiceImpl.class, AopUtils.getTargetClass(this.testUserService));
+        assertFalse(context.containsBean("userServiceImpl"));
+        assertFalse(context.isFactoryBean("userService"));
+        assertFalse(AopUtils.isAopProxy(this.userDao));
+        assertFalse(AopUtils.isAopProxy(this.userLevelUpgradePolicy));
         assertNotNull(this.userLevelUpgradePolicy);
     }
 
@@ -172,8 +178,6 @@ public class UserServiceTest {
     @Test
     public void upgradeLevelsWithTransaction() {
         userDao.deleteAll();
-        MockMailSender mockMailSender = new MockMailSender();
-        userServiceImpl.setMailSender(mockMailSender);
 
         for (User user : users) {
             userDao.add(user);
@@ -194,23 +198,17 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() {
-        TestUserService testUserService = new TestUserService(users.get(3).getId());
-        testUserService.setUserDao(userDao);
-        testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
-        testUserService.setMailSender(dummyMailSender);
-
-        // &를 붙이면 생성된 프록시 대신 XML에 등록한 팩토리 빈 자체를 가져온다.
-        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-
+        // 예외 발생용 서비스도 XML 빈으로 등록하여 자동 생성된 프록시를 통해 호출한다.
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
 
-        assertThrows(TestUserServiceException.class, txUserService::upgradeLevels);
-        checkLevelUpgraded(users.get(1), false);
+        assertThrows(TestUserServiceException.class, testUserService::upgradeLevels);
+        for (User user : users) {
+            checkLevelUpgraded(user, false);
+        }
+        checkTransactionReleased();
     }
 
     private void checkTransactionReleased() {
@@ -266,12 +264,9 @@ public class UserServiceTest {
         }
     }
 
-    private static class TestUserService extends UserServiceImpl {
-        private final String failOnUserId;
-
-        TestUserService(String failOnUserId) {
-            this.failOnUserId = failOnUserId;
-        }
+    public static class TestUserServiceImpl extends UserServiceImpl {
+        // 클래스 이름도 *ServiceImpl 조건에 맞아야 트랜잭션 프록시가 생성된다.
+        private final String failOnUserId = "madnite1";
 
         @Override
         protected void upgradeLevel(User user) {

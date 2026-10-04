@@ -4,21 +4,14 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
-    <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean" primary="true">
-        <property name="target" ref="userServiceImpl"/>
-        <property name="proxyInterfaces" value="org.example2.Dao.UserService"/>
-        <property name="interceptorNames">
-            <list>
-                <value>transactionAdvisor</value>
-            </list>
-        </property>
-    </bean>
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
 
     <bean id="transactionAdvice" class="org.example2.Dao.TransactionAdvice">
         <property name="transactionManager" ref="transactionManager"/>
     </bean>
 
-    <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+    <bean id="transactionPointcut" class="org.example2.Dao.NameMatchClassMethodPointcut">
+        <property name="mappedClassName" value="*ServiceImpl"/>
         <property name="mappedName" value="upgrade*"/>
     </bean>
 
@@ -27,17 +20,17 @@
         <property name="advice" ref="transactionAdvice"/>
     </bean>
 
-    <bean id="userServiceImpl" class="org.example2.Dao.UserServiceImpl">
+    <bean id="userService" class="org.example2.Dao.UserServiceImpl">
         <property name="userDao" ref="userDao"/>
         <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
         <property name="mailSender" ref="mailSender"/>
     </bean>
 
-    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="localhost"/>
-        <property name="port" value="25"/>
-        <property name="defaultEncoding" value="UTF-8"/>
-    </bean>
+    <!-- 테스트용 서비스도 컨테이너가 생성해야 자동 프록시 적용을 검증할 수 있다. -->
+    <bean id="testUserService" class="org.example2.Service.UserServiceTest$TestUserServiceImpl"
+          parent="userService"/>
+
+    <bean id="mailSender" class="org.example2.Service.MockMailSender"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
