@@ -14,8 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -30,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations={"classpath:test-applicationContext.xml"}) 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserServiceTest {
 
     @Autowired
@@ -47,13 +47,15 @@ public class UserServiceTest {
     @Autowired
     PlatformTransactionManager transactionManager;
 
-    @Autowired
-    MailSender mailSender;
+    DummyMailSender dummyMailSender;
 
     List<User> users;
 
     @BeforeEach
     public void setUp() {
+        dummyMailSender = new DummyMailSender();
+        userService.setMailSender(dummyMailSender);
+
         users = Arrays.asList(
             new User("bumjin", "박범진", "springno1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
             new User("joytouch", "김영한", "springno2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, MIN_RECOCOMEND_FOR_GOLD + 10),
@@ -76,6 +78,9 @@ public class UserServiceTest {
 
     @Test
     public void upgradeLevels() {
+        MockMailSender mockMailSender = new MockMailSender();
+        userService.setMailSender(mockMailSender);
+
         for (User user : users) {
             userDao.add(user);
         }
@@ -88,6 +93,8 @@ public class UserServiceTest {
         checkLevelUpgraded(users.get(3), true);
         checkLevelUpgraded(users.get(4), false);
         assertEquals(users.size(), userDao.getCount());
+        assertEquals(Arrays.asList("joytouch@example.com", "madnite1@example.com"),
+                mockMailSender.getRequests());
         checkTransactionReleased();
     }
 
@@ -97,7 +104,7 @@ public class UserServiceTest {
         testUserService.setUserDao(userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
         testUserService.setTransactionManager(transactionManager);
-        testUserService.setMailSender(mailSender);
+        testUserService.setMailSender(dummyMailSender);
         for (User user : users) {
             userDao.add(user);
         }
@@ -142,17 +149,6 @@ public class UserServiceTest {
     }
 
     private static class TestUserServiceException extends RuntimeException {
-    }
-
-    // 기존 등급 변경 테스트에서는 실제 메일을 발송하지 않는다.
-    public static class NoOpMailSender implements MailSender {
-        @Override
-        public void send(SimpleMailMessage message) {
-        }
-
-        @Override
-        public void send(SimpleMailMessage... messages) {
-        }
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {

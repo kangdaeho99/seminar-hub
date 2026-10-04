@@ -11,7 +11,11 @@
         <property name="mailSender" ref="mailSender"/>
     </bean>
 
-    <bean id="mailSender" class="org.example2.Service.UserServiceTest$NoOpMailSender"/>
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="localhost"/>
+        <property name="port" value="25"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
