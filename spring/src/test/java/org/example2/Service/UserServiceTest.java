@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -45,6 +47,9 @@ public class UserServiceTest {
     @Autowired
     PlatformTransactionManager transactionManager;
 
+    @Autowired
+    MailSender mailSender;
+
     List<User> users;
 
     @BeforeEach
@@ -56,6 +61,9 @@ public class UserServiceTest {
             new User("madnite1", "이상호", "springno4", Level.SILVER, MIN_LOGCOUNT_FOR_SILVER + 10, MIN_RECOCOMEND_FOR_GOLD),
             new User("green", "유재성", "springno5", Level.GOLD, 100, 100)
         );
+        for (User user : users) {
+            user.setEmail(user.getId() + "@example.com");
+        }
         userDao.deleteAll();
     }
 
@@ -89,6 +97,7 @@ public class UserServiceTest {
         testUserService.setUserDao(userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
         testUserService.setTransactionManager(transactionManager);
+        testUserService.setMailSender(mailSender);
         for (User user : users) {
             userDao.add(user);
         }
@@ -133,6 +142,17 @@ public class UserServiceTest {
     }
 
     private static class TestUserServiceException extends RuntimeException {
+    }
+
+    // 기존 등급 변경 테스트에서는 실제 메일을 발송하지 않는다.
+    public static class NoOpMailSender implements MailSender {
+        @Override
+        public void send(SimpleMailMessage message) {
+        }
+
+        @Override
+        public void send(SimpleMailMessage... messages) {
+        }
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {

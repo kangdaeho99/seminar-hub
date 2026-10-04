@@ -23,6 +23,7 @@ public class UserDaoJdbc implements UserDao {
             user.setLevel(Level.valueOf(rs.getInt("level")));
             user.setLogin(rs.getInt("login"));
             user.setRecommend(rs.getInt("recommend"));
+            user.setEmail(rs.getString("email"));
             return user;
         }
     };
@@ -38,22 +39,25 @@ public class UserDaoJdbc implements UserDao {
             + "password VARCHAR(100) NOT NULL, "
             + "level INTEGER NOT NULL, "
             + "login INTEGER NOT NULL, "
-            + "recommend INTEGER NOT NULL)");
+            + "recommend INTEGER NOT NULL, "
+            + "email VARCHAR(255))");
+        // 기존 파일 기반 H2 데이터베이스에도 이메일 컬럼을 추가한다.
+        this.jdbcTemplate.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255)");
     }
 
     public void add(final User user) {
         this.jdbcTemplate.update(
-            "insert into users(id, name, password, level, login, recommend) values(?,?,?,?,?,?)",
+            "insert into users(id, name, password, level, login, recommend, email) values(?,?,?,?,?,?,?)",
             user.getId(), user.getName(), user.getPassword(),
-            user.getLevel().intValue(), user.getLogin(), user.getRecommend());
+            user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getEmail());
     }
 
     @Override
     public void update(User user) {
         this.jdbcTemplate.update(
-            "update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+            "update users set name = ?, password = ?, level = ?, login = ?, recommend = ?, email = ? where id = ?",
             user.getName(), user.getPassword(), user.getLevel().intValue(),
-            user.getLogin(), user.getRecommend(), user.getId());
+            user.getLogin(), user.getRecommend(), user.getEmail(), user.getId());
     }
 
     public User get(String id) {

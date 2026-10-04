@@ -19,6 +19,8 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 springBootBom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 
 springContext.module = "org.springframework:spring-context"
+springContextSupport.module = "org.springframework:spring-context-support"
+angusMail.module = "org.eclipse.angus:jakarta.mail"
 springWeb.module = "org.springframework:spring-web"
 springJdbc.module = "org.springframework:spring-jdbc"
 springTest.module = "org.springframework:spring-test"

@@ -2,6 +2,8 @@ package org.example2.Dao;
 
 import java.util.List;
 
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -10,6 +12,16 @@ public class UserService {
     UserDao userDao;
     private UserLevelUpgradePolicy userLevelUpgradePolicy;
     private PlatformTransactionManager transactionManager;
+    private MailSender mailSender;
+    private String mailFrom = "noreply@example.com";
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void setMailFrom(String mailFrom) {
+        this.mailFrom = mailFrom;
+    }
 
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
@@ -48,6 +60,16 @@ public class UserService {
 
     protected void upgradeLevel(User user) {
         userLevelUpgradePolicy.upgradeLevel(user);
+        sendUpgradeEmail(user);
+    }
+
+    private void sendUpgradeEmail(User user) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setFrom(mailFrom);
+        message.setSubject("사용자 등급 업그레이드 안내");
+        message.setText(user.getName() + "님의 등급이 " + user.getLevel() + "(으)로 업그레이드되었습니다.");
+        mailSender.send(message);
     }
 
 }

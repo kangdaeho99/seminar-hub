@@ -22,6 +22,8 @@ dependencyManagement {
 
 dependencies {
     implementation libs.springContext
+    implementation libs.springContextSupport
+    implementation libs.angusMail
     implementation libs.springJdbc
     implementation libs.h2
     testImplementation libs.junitJupiter

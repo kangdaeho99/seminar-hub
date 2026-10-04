@@ -8,7 +8,10 @@
         <property name="userDao" ref="userDao"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
+        <property name="mailSender" ref="mailSender"/>
     </bean>
+
+    <bean id="mailSender" class="org.example2.Service.UserServiceTest$NoOpMailSender"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
