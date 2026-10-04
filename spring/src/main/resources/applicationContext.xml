@@ -2,9 +2,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="userService" class="org.example2.Dao.UserServiceTx" primary="true">
-        <property name="userService" ref="userServiceImpl"/>
+    <bean id="userService" class="org.example2.Dao.TxProxyFactoryBean" primary="true">
+        <property name="target" ref="userServiceImpl"/>
         <property name="transactionManager" ref="transactionManager"/>
+        <property name="pattern" value="upgradeLevels"/>
+        <property name="serviceInterface" value="org.example2.Dao.UserService"/>
     </bean>
 
     <bean id="userServiceImpl" class="org.example2.Dao.UserServiceImpl">

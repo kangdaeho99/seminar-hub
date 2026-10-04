@@ -30,11 +30,13 @@ public class DaoFactory {
 
     @Bean
     @Primary
-    public UserService userService() {
-        UserServiceTx userService = new UserServiceTx();
-        userService.setUserService(userServiceImpl());
-        userService.setTransactionManager(transactionManager());
-        return userService;
+    public TxProxyFactoryBean userService() {
+        TxProxyFactoryBean factory = new TxProxyFactoryBean();
+        factory.setTarget(userServiceImpl());
+        factory.setTransactionManager(transactionManager());
+        factory.setPattern("upgradeLevels");
+        factory.setServiceInterface(UserService.class);
+        return factory;
     }
 
     @Bean

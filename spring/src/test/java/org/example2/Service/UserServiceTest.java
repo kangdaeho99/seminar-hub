@@ -1,5 +1,6 @@
 package org.example2.Service;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,12 +9,13 @@ import javax.sql.DataSource;
 
 import org.example2.Dao.DefaultUserLevelUpgradePolicy;
 import org.example2.Dao.Level;
+import org.example2.Dao.TransactionHandler;
+import org.example2.Dao.TxProxyFactoryBean;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
 import org.example2.Dao.UserLevelUpgradePolicy;
 import org.example2.Dao.UserService;
 import org.example2.Dao.UserServiceImpl;
-import org.example2.Dao.UserServiceTx;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +23,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
@@ -37,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +67,7 @@ public class UserServiceTest {
     DataSource dataSource;
 
     @Autowired
-    PlatformTransactionManager transactionManager;
+    ApplicationContext context;
 
     DummyMailSender dummyMailSender;
 
@@ -90,10 +93,10 @@ public class UserServiceTest {
     @Test 
     public void bean() {
         assertNotNull(this.userService);
-        assertInstanceOf(UserServiceTx.class, this.userService);
+        assertTrue(Proxy.isProxyClass(this.userService.getClass()));
+        assertInstanceOf(TransactionHandler.class, Proxy.getInvocationHandler(this.userService));
         assertNotNull(this.userServiceImpl);
         assertNotNull(this.userLevelUpgradePolicy);
-        assertNotNull(this.transactionManager);
     }
 
     @Test
@@ -202,16 +205,19 @@ public class UserServiceTest {
         testUserService.setUserDao(userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
         testUserService.setMailSender(dummyMailSender);
-        UserServiceTx testUserServiceTx = new UserServiceTx();
-        testUserServiceTx.setUserService(testUserService);
-        testUserServiceTx.setTransactionManager(transactionManager);
+
+        // &를 붙여 팩토리 빈 자체를 가져온 뒤 테스트용 타깃으로 프록시를 생성한다.
+        TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserService);
+        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+
         for (User user : users) {
             userDao.add(user);
         }
 
         Class<? extends Throwable> expectedException = failWithError
                 ? AssertionError.class : TestUserServiceException.class;
-        assertThrows(expectedException, testUserServiceTx::upgradeLevels);
+        assertThrows(expectedException, txUserService::upgradeLevels);
 
         assertEquals(1, testUserService.completedUpgrades);
         for (User user : users) {
