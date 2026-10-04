@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
@@ -28,10 +29,18 @@ public class DaoFactory {
     // }
 
     @Bean
+    @Primary
     public UserService userService() {
-        UserService userService = new UserService();
-        userService.setUserDao(userDao());
+        UserServiceTx userService = new UserServiceTx();
+        userService.setUserService(userServiceImpl());
         userService.setTransactionManager(transactionManager());
+        return userService;
+    }
+
+    @Bean
+    public UserServiceImpl userServiceImpl() {
+        UserServiceImpl userService = new UserServiceImpl();
+        userService.setUserDao(userDao());
         userService.setUserLevelUpgradePolicy(userLevelUpgradePolicy());
         userService.setMailSender(mailSender());
         return userService;

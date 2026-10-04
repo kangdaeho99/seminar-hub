@@ -10,9 +10,13 @@ import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
 import org.example2.Dao.UserLevelUpgradePolicy;
 import org.example2.Dao.UserService;
+import org.example2.Dao.UserServiceImpl;
+import org.example2.Dao.UserServiceTx;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,6 +28,7 @@ import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SI
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -34,6 +39,9 @@ public class UserServiceTest {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserServiceImpl userServiceImpl;
 
     @Autowired
     UserDao userDao;
@@ -54,7 +62,7 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp() {
         dummyMailSender = new DummyMailSender();
-        userService.setMailSender(dummyMailSender);
+        userServiceImpl.setMailSender(dummyMailSender);
 
         users = Arrays.asList(
             new User("bumjin", "박범진", "springno1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
@@ -72,14 +80,47 @@ public class UserServiceTest {
     @Test 
     public void bean() {
         assertNotNull(this.userService);
+        assertInstanceOf(UserServiceTx.class, this.userService);
+        assertNotNull(this.userServiceImpl);
         assertNotNull(this.userLevelUpgradePolicy);
         assertNotNull(this.transactionManager);
     }
 
     @Test
+    public void add() {
+        User withoutLevel = users.get(0);
+        withoutLevel.setLevel(null);
+        User withLevel = users.get(4);
+
+        userService.add(withoutLevel);
+        userService.add(withLevel);
+
+        assertEquals(Level.BASIC, userDao.get(withoutLevel.getId()).getLevel());
+        assertEquals(Level.GOLD, userDao.get(withLevel.getId()).getLevel());
+        assertEquals(2, userDao.getCount());
+        checkTransactionReleased();
+    }
+
+    @Test
+    public void upgradeLevelsWithoutTransaction() {
+        for (User user : users) {
+            userDao.add(user);
+        }
+
+        userServiceImpl.upgradeLevels();
+
+        checkLevelUpgraded(users.get(0), false);
+        checkLevelUpgraded(users.get(1), true);
+        checkLevelUpgraded(users.get(2), false);
+        checkLevelUpgraded(users.get(3), true);
+        checkLevelUpgraded(users.get(4), false);
+        checkTransactionReleased();
+    }
+
+    @Test
     public void upgradeLevels() {
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
         for (User user : users) {
             userDao.add(user);
@@ -98,18 +139,23 @@ public class UserServiceTest {
         checkTransactionReleased();
     }
 
-    @Test
-    public void upgradeAllOrNothing() {
-        TestUserService testUserService = new TestUserService(users.get(3).getId());
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void upgradeAllOrNothing(boolean failWithError) {
+        TestUserService testUserService = new TestUserService(users.get(3).getId(), failWithError);
         testUserService.setUserDao(userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
-        testUserService.setTransactionManager(transactionManager);
         testUserService.setMailSender(dummyMailSender);
+        UserServiceTx testUserServiceTx = new UserServiceTx();
+        testUserServiceTx.setUserService(testUserService);
+        testUserServiceTx.setTransactionManager(transactionManager);
         for (User user : users) {
             userDao.add(user);
         }
 
-        assertThrows(TestUserServiceException.class, testUserService::upgradeLevels);
+        Class<? extends Throwable> expectedException = failWithError
+                ? AssertionError.class : TestUserServiceException.class;
+        assertThrows(expectedException, testUserServiceTx::upgradeLevels);
 
         assertEquals(1, testUserService.completedUpgrades);
         for (User user : users) {
@@ -130,17 +176,22 @@ public class UserServiceTest {
         assertFalse(TransactionSynchronizationManager.hasResource(dataSource));
     }
 
-    private static class TestUserService extends UserService {
+    private static class TestUserService extends UserServiceImpl {
         private final String failOnUserId;
+        private final boolean failWithError;
         private int completedUpgrades;
 
-        TestUserService(String failOnUserId) {
+        TestUserService(String failOnUserId, boolean failWithError) {
             this.failOnUserId = failOnUserId;
+            this.failWithError = failWithError;
         }
 
         @Override
         protected void upgradeLevel(User user) {
             if (user.getId().equals(failOnUserId)) {
+                if (failWithError) {
+                    throw new AssertionError("Upgrade failed for " + failOnUserId);
+                }
                 throw new TestUserServiceException();
             }
             super.upgradeLevel(user);
