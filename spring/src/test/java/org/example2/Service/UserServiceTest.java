@@ -21,6 +21,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
@@ -47,7 +49,7 @@ public class UserServiceTest {
     UserService testUserService;
 
     @Autowired 
-    PlatformTransactionManager platformTransactionManager;
+    PlatformTransactionManager transactionManager;
 
     @Autowired
     MockMailSender mockMailSender;
@@ -209,8 +211,18 @@ public class UserServiceTest {
     
     @Test 
     public void transactionSync() {
-        userService.deleteAll();
-        userService.add(users.get(0));
-        userService.add(users.get(1));
+        int initialCount = userDao.getCount();
+        DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();
+        TransactionStatus txStatus = transactionManager.getTransaction(txDefinition); 
+
+        try {
+            userService.deleteAll();
+            userService.add(users.get(0));
+            userService.add(users.get(1));
+            assertEquals(2, userDao.getCount());
+        } finally {
+            transactionManager.rollback(txStatus); 
+        }
+        assertEquals(initialCount, userDao.getCount());
     }
 }
