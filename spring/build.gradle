@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'application'
     alias(libs.plugins.spring.dependency.management)
 }
 
@@ -8,10 +7,6 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
-}
-
-application {
-    mainClass = 'org.example2.Main'
 }
 
 dependencyManagement {
@@ -25,6 +20,7 @@ dependencies {
     implementation libs.springContextSupport
     implementation libs.angusMail
     implementation libs.springJdbc
+    implementation libs.aspectjWeaver
     implementation libs.h2
     testImplementation libs.junitJupiter
     testImplementation libs.mockitoCore

@@ -13,19 +13,8 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// @ContextConfiguration(locations = "classpath:test-applicationContext.xml") // 테스트용 애플리케이션 컨텍스트 설정 위치
 public class UserDaoTest {
 
-    // @Autowired
-    // private ApplicationContext context; //테스트 오브젝트가 만들어지고 나면 스프링 테스트 컨텍스트에 의해 자동으로 값이 주입된다.
-
-    // @Autowired 
-    // private SingleConnectionDataSource dataSource;
-
-    // @Autowired 
-    // private DataSource dataSource2;
-
-    // @Autowired
     private UserDaoJdbc dao;
     private User user1;
     private User user2;
@@ -33,10 +22,6 @@ public class UserDaoTest {
     
     @BeforeEach
     public void setUp() {
-        // ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        // ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        // this.dao = context.getBean("userDao", UserDaoJdbc.class);
-        // this.dao = this.context.getBean("userDao",UserDaoJdbc.class);
         this.user1 = new User("gyumee", "박성철", "springno1", Level.BASIC, 1, 0);
         this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10);
         this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40);

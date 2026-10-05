@@ -1,4 +1,5 @@
 
+<!-- JUnitTest의 테스트 컨텍스트 공유 학습에 사용하는 빈 설정이다. -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">

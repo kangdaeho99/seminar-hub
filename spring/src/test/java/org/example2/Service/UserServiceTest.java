@@ -1,6 +1,5 @@
 package org.example2.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,10 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
@@ -68,7 +68,7 @@ public class UserServiceTest {
     DataSource dataSource;
 
     @Autowired
-    ApplicationContext context;
+    ConfigurableApplicationContext context;
 
     List<User> users;
 
@@ -94,10 +94,26 @@ public class UserServiceTest {
         assertEquals(UserServiceImpl.class, AopUtils.getTargetClass(this.userService));
         assertEquals(TestUserServiceImpl.class, AopUtils.getTargetClass(this.testUserService));
         assertFalse(context.containsBean("userServiceImpl"));
-        assertFalse(context.isFactoryBean("userService"));
+        assertFalse(context.getBeanFactory().isFactoryBean("userService"));
+        assertFalse(context.getBeanFactory().isFactoryBean("testUserService"));
         assertFalse(AopUtils.isAopProxy(this.userDao));
         assertFalse(AopUtils.isAopProxy(this.userLevelUpgradePolicy));
         assertNotNull(this.userLevelUpgradePolicy);
+    }
+
+    @Test
+    public void transactionPointcut() throws NoSuchMethodException {
+        AspectJExpressionPointcut pointcut = context.getBean(
+                "transactionPointcut", AspectJExpressionPointcut.class);
+
+        // 빈으로 등록한 표현식이 일반 서비스와 static 내부 테스트 서비스 모두에 적용된다.
+        for (Class<?> targetClass : Arrays.asList(UserServiceImpl.class, TestUserServiceImpl.class)) {
+            assertTrue(pointcut.getClassFilter().matches(targetClass));
+            assertTrue(pointcut.getMethodMatcher().matches(
+                    UserService.class.getMethod("upgradeLevels"), targetClass));
+            assertFalse(pointcut.getMethodMatcher().matches(
+                    UserService.class.getMethod("add", User.class), targetClass));
+        }
     }
 
     @Test
@@ -119,32 +135,8 @@ public class UserServiceTest {
     @Test
     public void upgradeLevels() {
         UserServiceImpl userServiceImpl = new UserServiceImpl();
-        MockUserDao mockUserDao = new MockUserDao(users);
-        userServiceImpl.setUserDao(mockUserDao);
 
-        // 별도로 분리한 등급 정책도 같은 Mock DAO를 사용해야 DB에 접근하지 않는다.
-        DefaultUserLevelUpgradePolicy policy = new DefaultUserLevelUpgradePolicy();
-        policy.setUserDao(mockUserDao);
-        userServiceImpl.setUserLevelUpgradePolicy(policy);
-
-        MockMailSender mockMailSender = new MockMailSender();
-        userServiceImpl.setMailSender(mockMailSender);
-
-        userServiceImpl.upgradeLevels();
-
-        List<User> updated = mockUserDao.getUpdated();
-        assertEquals(2, updated.size());
-        checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
-        checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
-        assertEquals(Arrays.asList("joytouch@example.com", "madnite1@example.com"),
-                mockMailSender.getRequests());
-    }
-
-    @Test
-    public void MockUpgradeLevels() {
-        UserServiceImpl userServiceImpl = new UserServiceImpl();
-
-        // 직접 작성한 MockUserDao 대신 Mockito가 만든 대역을 사용한다.
+        // Mockito 대역으로 DB와 메일 서버 없이 등급 변경과 메일 요청을 검증한다.
         UserDao mockUserDao = mock(UserDao.class);
         when(mockUserDao.getAll()).thenReturn(users);
         userServiceImpl.setUserDao(mockUserDao);
@@ -198,7 +190,7 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() {
-        // 예외 발생용 서비스도 XML 빈으로 등록하여 자동 생성된 프록시를 통해 호출한다.
+        // 예외 발생용 서비스도 빈으로 등록하여 자동 생성된 프록시를 통해 호출한다.
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
@@ -221,51 +213,9 @@ public class UserServiceTest {
         assertEquals(expectedLevel, updated.getLevel());
     }
 
-    private static class MockUserDao implements UserDao {
-        private final List<User> users;
-        private final List<User> updated = new ArrayList<>();
-
-        MockUserDao(List<User> users) {
-            this.users = users;
-        }
-
-        public List<User> getUpdated() {
-            return updated;
-        }
-
-        @Override
-        public List<User> getAll() {
-            return users;
-        }
-
-        @Override
-        public void update(User user) {
-            updated.add(user);
-        }
-
-        @Override
-        public void add(User user) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public User get(String id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void deleteAll() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getCount() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
     public static class TestUserServiceImpl extends UserServiceImpl {
-        // 클래스 이름도 *ServiceImpl 조건에 맞아야 트랜잭션 프록시가 생성된다.
+        // 외부 테스트 인스턴스 없이 스프링이 생성할 수 있는 public static 내부 클래스다.
+        // *ServiceImpl.upgrade*(..) 표현식으로 상속받은 upgradeLevels()에도 적용된다.
         private final String failOnUserId = "madnite1";
 
         @Override

@@ -24,6 +24,7 @@ angusMail.module = "org.eclipse.angus:jakarta.mail"
 springWeb.module = "org.springframework:spring-web"
 springJdbc.module = "org.springframework:spring-jdbc"
 springTest.module = "org.springframework:spring-test"
+aspectjWeaver.module = "org.aspectj:aspectjweaver"
 springDataJpa.module = "org.springframework.data:spring-data-jpa"
 
 jacksonAnnotations.module = "com.fasterxml.jackson.core:jackson-annotations"

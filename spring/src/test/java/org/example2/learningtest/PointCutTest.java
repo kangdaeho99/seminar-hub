@@ -2,16 +2,73 @@ package org.example2.learningtest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.lang.reflect.Method;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 
 public class PointCutTest {
+    @Test
+    public void methodSignaturePointcut() throws NoSuchMethodException {
+        String signature = "execution(public int org.example2.learningtest.Target.minus(int,int)"
+                + " throws java.lang.RuntimeException)";
+        checkExpression(signature, Target.class, "minus", true, int.class, int.class);
+        checkExpression(signature, Target.class, "plus", false, int.class, int.class);
+        checkExpression("execution(* *(..))", Target.class, "minus", true, int.class, int.class);
+        checkExpression("execution(* *(..))", Bean.class, "method", true);
+    }
+
+    @Test
+    public void methodNameAndArgumentsPointcut() throws NoSuchMethodException {
+        // ()는 인자 없음, (*)는 인자 하나, (..)는 인자의 타입과 개수에 제한 없음이다.
+        checkExpression("execution(* hello())", Target.class, "hello", true);
+        checkExpression("execution(* hello())", Target.class, "hello", false, String.class);
+        checkExpression("execution(* hello(*))", Target.class, "hello", false);
+        checkExpression("execution(* hello(*))", Target.class, "hello", true, String.class);
+        checkExpression("execution(* hello(..))", Target.class, "hello", true);
+        checkExpression("execution(* hello(..))", Target.class, "hello", true, String.class);
+        checkExpression("execution(* minus(..))", Target.class, "plus", false, int.class, int.class);
+    }
+
+    @Test
+    public void typeAndPackagePointcut() throws NoSuchMethodException {
+        String targetMethods = "execution(* org.example2.learningtest.Target.*(..))";
+        checkExpression(targetMethods, Target.class, "method", true);
+        checkExpression(targetMethods, Bean.class, "method", false);
+        checkExpression("execution(* org.example2.learningtest.*.*(..))", Bean.class, "method", true);
+        checkExpression("execution(* org.example2..*.*(..))", Target.class, "hello", true);
+
+        // 인터페이스에 선언된 메소드만 선택하며 Target에만 있는 method()는 제외한다.
+        String interfaceMethods = "execution(* org.example2.learningtest.TargetInterface.*(..))";
+        checkExpression(interfaceMethods, Target.class, "hello", true);
+        checkExpression(interfaceMethods, Target.class, "plus", true, int.class, int.class);
+        checkExpression(interfaceMethods, Target.class, "method", false);
+    }
+
+    @Test
+    public void expressionPointcutAdvisor() {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression("execution(* sayH*(..))");
+        checkAdviced(new HelloTarget(), pointcut, true);
+    }
+
+    private void checkExpression(String expression, Class<?> targetClass, String methodName,
+            boolean expected, Class<?>... parameterTypes) throws NoSuchMethodException {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression(expression);
+        Method method = targetClass.getMethod(methodName, parameterTypes);
+        boolean matches = pointcut.getClassFilter().matches(targetClass)
+                && pointcut.getMethodMatcher().matches(method, targetClass);
+        assertEquals(expected, matches, expression + " -> " + method);
+    }
+
     @Test
     public void classNamePointcutAdvisor() {
         //포인트컷 준비

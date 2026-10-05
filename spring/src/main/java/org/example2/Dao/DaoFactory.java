@@ -2,16 +2,18 @@ package org.example2.Dao;
 
 import javax.sql.DataSource;
 
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 
-// Java-based configuration example kept for comparison with applicationContext.xml.
+// applicationContext.xml과 같은 자동 프록시 구성을 Java 설정으로 표현한다.
 @Configuration
 public class DaoFactory {
     
@@ -22,25 +24,34 @@ public class DaoFactory {
         return userDao;
     }
 
-    // public AccountDao userDao() throws SQLException {
-    //     ConnectionMaker connectionMaker = new DConnectionMaker();
-    //     UserDao userDao = new UserDao(connectionMaker);
-    //     return userDao;
-    // }
-
     @Bean
-    @Primary
-    public TxProxyFactoryBean userService() {
-        TxProxyFactoryBean factory = new TxProxyFactoryBean();
-        factory.setTarget(userServiceImpl());
-        factory.setTransactionManager(transactionManager());
-        factory.setPattern("upgradeLevels");
-        factory.setServiceInterface(UserService.class);
-        return factory;
+    public static DefaultAdvisorAutoProxyCreator autoProxyCreator() {
+        // 빈 후처리기를 먼저 등록할 수 있도록 static 팩토리 메소드로 선언한다.
+        return new DefaultAdvisorAutoProxyCreator();
     }
 
     @Bean
-    public UserServiceImpl userServiceImpl() {
+    public TransactionAdvice transactionAdvice() {
+        TransactionAdvice advice = new TransactionAdvice();
+        advice.setTransactionManager(transactionManager());
+        return advice;
+    }
+
+    @Bean
+    public AspectJExpressionPointcut transactionPointcut() {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression("execution(* *..*ServiceImpl.upgrade*(..))");
+        return pointcut;
+    }
+
+    @Bean
+    public DefaultPointcutAdvisor transactionAdvisor() {
+        return new DefaultPointcutAdvisor(transactionPointcut(), transactionAdvice());
+    }
+
+    @Bean
+    public UserService userService() {
+        // 타깃을 등록하면 후처리기가 UserService 인터페이스의 JDK 프록시로 감싼다.
         UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
         userService.setUserLevelUpgradePolicy(userLevelUpgradePolicy());
