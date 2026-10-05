@@ -51,8 +51,8 @@ public class MemberSeminarItem extends AuditMetadata {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private MemberSeminarItemStatus orderItemStatus = MemberSeminarItemStatus.ORDERED;
+    @Column(name = "member_seminar_item_status", nullable = false, length = 30)
+    private MemberSeminarItemStatus memberSeminarItemStatus = MemberSeminarItemStatus.ORDERED;
 
     public void update(MemberSeminar memberSeminar, Seminar seminar) {
         if (memberSeminar != null) this.memberSeminar = memberSeminar;
@@ -61,7 +61,7 @@ public class MemberSeminarItem extends AuditMetadata {
     }
 
     public void syncStatus(MemberSeminarItemStatus status) {
-        this.orderItemStatus = Objects.requireNonNull(status, "status");
+        this.memberSeminarItemStatus = Objects.requireNonNull(status, "status");
         markUpdated();
     }
 

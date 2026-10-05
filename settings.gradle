@@ -2,6 +2,7 @@ rootProject.name = 'seminar-hub'
 
 include 'common'
 include 'data'
+include 'member-seminar-state-machine-common'
 include 'boot:settlement-api'
 include 'boot:batch'
 include 'spring'

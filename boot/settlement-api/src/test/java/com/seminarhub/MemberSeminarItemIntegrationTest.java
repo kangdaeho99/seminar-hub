@@ -65,7 +65,7 @@ class MemberSeminarItemIntegrationTest {
                 .memberSeminar(order).seminar(secondSeminar).build());
 
         assertThat(order.getOrderStatus()).isEqualTo(MemberSeminarStatus.ORDERED);
-        assertThat(first.getOrderItemStatus()).isEqualTo(MemberSeminarItemStatus.ORDERED);
+        assertThat(first.getMemberSeminarItemStatus()).isEqualTo(MemberSeminarItemStatus.ORDERED);
         assertThat(itemRepository.findAllByMemberSeminar_IdAndDeletedAtIsNull(order.getId()))
                 .extracting(MemberSeminarItem::getId).containsExactlyInAnyOrder(first.getId(), second.getId());
         assertThat(memberSeminarRepository.search(new MemberSeminarSearchQuery(
@@ -75,8 +75,8 @@ class MemberSeminarItemIntegrationTest {
 
         first.syncStatus(MemberSeminarItemStatus.PAID);
         order.syncStatus(MemberSeminarStatus.PAID);
-        assertThat(second.getOrderItemStatus()).isEqualTo(MemberSeminarItemStatus.ORDERED);
-        assertThat(first.getOrderItemStatus()).isEqualTo(MemberSeminarItemStatus.PAID);
+        assertThat(second.getMemberSeminarItemStatus()).isEqualTo(MemberSeminarItemStatus.ORDERED);
+        assertThat(first.getMemberSeminarItemStatus()).isEqualTo(MemberSeminarItemStatus.PAID);
 
         LocalDate date = LocalDate.of(2026, 9, 20);
         MemberSeminarSettlementDate firstDate = new MemberSeminarSettlementDate(first);

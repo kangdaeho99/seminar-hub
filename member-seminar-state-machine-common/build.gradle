@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.dependency.management)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "${libs.springBootBom.get()}"
+    }
+}
+
+dependencies {
+    implementation project(':data')
+
+    implementation(libs.squirrelFoundation) {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+}

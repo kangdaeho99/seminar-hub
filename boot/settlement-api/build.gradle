@@ -20,6 +20,7 @@ dependencies {
 
     implementation project(':common')
     implementation project(':data')
+    implementation project(':member-seminar-state-machine-common')
     implementation libs.springDataJpa
     implementation libs.bootStarterWebmvc
     implementation libs.bootStarterValidation
