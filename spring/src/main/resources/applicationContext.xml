@@ -1,41 +1,15 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
                            http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- 토비의 스프링 6.6.4: 클라이언트는 UserService를 통해 데이터에 접근하고,
-         트랜잭션 경계는 서비스 프록시에서 설정한다. DAO는 데이터 접근을 담당한다.
-         tx:advice가 TransactionInterceptor 빈을 생성하므로 class/property를 지정하지 않는다.
-         transaction-manager를 생략하면 transactionManager 빈을 사용한다. -->
-
-    <tx:advice id="transactionAdvice">
-        <tx:attributes>
-            <tx:method name="get*" read-only="true"/>
-            <tx:method name="*"/>
-        </tx:attributes>
-    </tx:advice>
-
-    <!-- REQUIRED: 기존 트랜잭션에 참여하거나 새로 시작한다.
-         REQUIRES_NEW: 기존 트랜잭션을 보류하고 독립적인 트랜잭션을 시작한다.
-         NOT_SUPPORTED: 기존 트랜잭션을 보류하고 트랜잭션 없이 실행한다.
-         필요하면 해당 tx:method에 propagation="NOT_SUPPORTED"를 지정한다.
-         XML 속성에서는 PROPAGATION_ / ISOLATION_ 접두사를 생략한다.
-         격리 수준은 DEFAULT(DB 기본값), READ_UNCOMMITTED, READ_COMMITTED,
-         REPEATABLE_READ, SERIALIZABLE이며 생략 시 DEFAULT다.
-         읽기 전용은 DB/드라이버에 전달하는 힌트이며, timeout의 단위는 초다. -->
-
-    <!-- 서비스 빈 이름은 Service로 끝나도록 통일한다(userService, testUserService).
-         타입 패턴 execution(* *..*ServiceImpl.*(..))을 대신 사용할 수도 있지만,
-         같은 서비스에 두 Advisor를 동시에 등록하지 않는다. 속성 선택은 위의 메소드 규칙이 담당한다. -->
-    <aop:config>
-        <aop:advisor id="transactionAdvisor"
-                     advice-ref="transactionAdvice"
-                     pointcut="bean(*Service)"/>
-    </aop:config>
+    <!-- 6.7.1: @Transactional에서 속성을 읽고 해당 메소드를 트랜잭션 대상으로 선정한다.
+         AnnotationTransactionAttributeSource가 속성을 제공하고,
+         TransactionAttributeSourcePointcut과 TransactionInterceptor가 이를 함께 사용한다.
+         매니저의 기본 빈 이름은 transactionManager다. 서비스 빈은 아래에서 별도로 등록한다. -->
+    <tx:annotation-driven/>
 
     <bean id="userService" class="org.example2.Dao.UserServiceImpl">
         <property name="userDao" ref="userDao"/>

@@ -20,12 +20,14 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -158,11 +160,13 @@ public class UserServiceTest {
 
     public static class TestUserServiceImpl extends UserServiceImpl {
         // 외부 테스트 인스턴스 없이 스프링이 생성할 수 있는 public static 내부 클래스다.
-        // testUserService라는 빈 이름이 bean(*Service)에 일치해 프록시가 적용된다.
+        // UserService 인터페이스의 @Transactional 속성을 읽어 프록시가 적용된다.
         private final String failOnUserId = "madnite1";
 
         @Override
         public List<User> getAll() {
+            assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
+            assertTrue(TransactionSynchronizationManager.isCurrentTransactionReadOnly());
             for (User user : super.getAll()) {
                 // 읽기 전용 트랜잭션 안에서 강제로 쓰기를 시도한다.
                 // 실제 쓰기 차단 여부는 DB/드라이버에 따라 다르며 H2는 이를 차단하지 않는다.
@@ -193,9 +197,12 @@ public class UserServiceTest {
         assertEquals(user.getRecommend(), actual.getRecommend());
     }
 
-    @Test  //일단은 어떤 예외가 던져질지 모르기 때문에 expected 없이 테스트를 작성한다.
+    @Test
     public void readOnlyTransactionAttribute() {
-        testUserService.getAll(); //트랜잭션 속성이 제대로 적용됬다면 여기서 읽기전용 속성을 위반했기 때문에 예외가 발생해야 한다. 
+        userDao.deleteAll();
+        userDao.add(users.get(0));
+        // H2는 쓰기를 차단하지 않으므로 타깃 안에서 읽기 전용 트랜잭션의 적용을 확인한다.
+        testUserService.getAll();
     }
     
 }
