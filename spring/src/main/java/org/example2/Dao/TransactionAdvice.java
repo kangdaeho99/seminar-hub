@@ -6,6 +6,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+// 이전 절의 수동 구현 비교용이다. 실제 빈 설정에서는 TransactionInterceptor를 사용한다.
 public class TransactionAdvice implements MethodInterceptor {
 
     private PlatformTransactionManager transactionManager;

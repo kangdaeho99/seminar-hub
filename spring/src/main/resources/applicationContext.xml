@@ -1,20 +1,37 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+                           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <bean id="transactionAdvice" class="org.example2.Dao.TransactionAdvice">
-        <property name="transactionManager" ref="transactionManager"/>
-    </bean>
+    <!-- 토비의 스프링 6.6.2: tx 네임스페이스로 TransactionInterceptor를 등록한다.
+         id는 생성되는 어드바이스 빈 이름이고, transaction-manager는 사용할 트랜잭션 매니저 빈의 참조다.
+         transaction-manager 생략 시에도 기본 참조 이름은 transactionManager다. -->
+    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="get*" propagation="REQUIRED" read-only="true" timeout="30"/>
+            <tx:method name="upgrade*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
 
-    <!-- 자동 프록시 생성기를 등록하고, 내장 포인트컷과 어드바이스를 연결한다.
-         AspectJ 표현식을 사용하지만 적용 기술은 Spring의 프록시 기반 AOP다. -->
+    <!-- REQUIRED: 기존 트랜잭션에 참여하거나 새로 시작한다.
+         REQUIRES_NEW: 기존 트랜잭션을 보류하고 독립적인 트랜잭션을 시작한다.
+         NOT_SUPPORTED: 기존 트랜잭션을 보류하고 트랜잭션 없이 실행한다.
+         필요하면 해당 tx:method에 propagation="NOT_SUPPORTED"를 지정한다.
+         XML 속성에서는 PROPAGATION_ / ISOLATION_ 접두사를 생략한다.
+         격리 수준은 DEFAULT(DB 기본값), READ_UNCOMMITTED, READ_COMMITTED,
+         REPEATABLE_READ, SERIALIZABLE이며 생략 시 DEFAULT다.
+         읽기 전용은 DB/드라이버에 전달하는 힌트이며, timeout의 단위는 초다. -->
+
+    <!-- 어드바이스를 서비스 전체 메소드에 연결하고, 세부 속성은 위의 이름 패턴으로 고른다. -->
     <aop:config>
         <aop:advisor id="transactionAdvisor"
                      advice-ref="transactionAdvice"
-                     pointcut="execution(* *..*ServiceImpl.upgrade*(..))"/>
+                     pointcut="execution(* *..*ServiceImpl.*(..))"/>
     </aop:config>
 
     <bean id="userService" class="org.example2.Dao.UserServiceImpl">
