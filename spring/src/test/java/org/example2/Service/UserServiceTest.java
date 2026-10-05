@@ -16,7 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.aspectj.AspectJExpressionPointcut;
+import org.springframework.aop.Pointcut;
+import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -103,10 +104,10 @@ public class UserServiceTest {
 
     @Test
     public void transactionPointcut() throws NoSuchMethodException {
-        AspectJExpressionPointcut pointcut = context.getBean(
-                "transactionPointcut", AspectJExpressionPointcut.class);
+        PointcutAdvisor advisor = context.getBean("transactionAdvisor", PointcutAdvisor.class);
+        Pointcut pointcut = advisor.getPointcut();
 
-        // 빈으로 등록한 표현식이 일반 서비스와 static 내부 테스트 서비스 모두에 적용된다.
+        // 내장/독립 포인트컷 모두 어드바이저를 통해 실제 적용 조건을 검증한다.
         for (Class<?> targetClass : Arrays.asList(UserServiceImpl.class, TestUserServiceImpl.class)) {
             assertTrue(pointcut.getClassFilter().matches(targetClass));
             assertTrue(pointcut.getMethodMatcher().matches(
