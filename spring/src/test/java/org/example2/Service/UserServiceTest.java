@@ -20,6 +20,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
@@ -40,12 +41,13 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @Autowired
-    @Qualifier("userService")
     UserService userService;
 
     @Autowired
-    @Qualifier("testUserService")
     UserService testUserService;
+
+    @Autowired 
+    PlatformTransactionManager platformTransactionManager;
 
     @Autowired
     MockMailSender mockMailSender;
@@ -205,4 +207,10 @@ public class UserServiceTest {
         testUserService.getAll();
     }
     
+    @Test 
+    public void transactionSync() {
+        userService.deleteAll();
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+    }
 }
