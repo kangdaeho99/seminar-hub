@@ -39,7 +39,8 @@ public class DaoFactory {
         TransactionInterceptor advice = new TransactionInterceptor();
         advice.setTransactionManager(transactionManager());
 
-        // 6.6.3: 조회는 get*, 그 외에는 기본 속성을 적용해 최소한의 규칙을 공유한다.
+        // 6.6.4: XML의 tx:attributes와 같은 설정이다. 서비스의 get*는 읽기 전용,
+        // 나머지 메소드는 읽기/쓰기로 실행하고 모두 REQUIRED를 사용한다.
         // REQUIRED: 기존 트랜잭션에 참여하며, 없으면 새로 시작한다.
         // REQUIRES_NEW: 기존 트랜잭션을 보류하고 독립적인 트랜잭션을 시작한다.
         // NOT_SUPPORTED: 기존 트랜잭션을 보류하고 트랜잭션 없이 실행한다.

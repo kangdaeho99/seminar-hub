@@ -162,6 +162,16 @@ public class UserServiceTest {
         private final String failOnUserId = "madnite1";
 
         @Override
+        public List<User> getAll() {
+            for (User user : super.getAll()) {
+                // 읽기 전용 트랜잭션 안에서 강제로 쓰기를 시도한다.
+                // 실제 쓰기 차단 여부는 DB/드라이버에 따라 다르며 H2는 이를 차단하지 않는다.
+                super.update(user);
+            }
+            return null;
+        }
+
+        @Override
         protected void upgradeLevel(User user) {
             if (user.getId().equals(failOnUserId)) {
                 throw new TestUserServiceException();
@@ -181,6 +191,11 @@ public class UserServiceTest {
         assertEquals(user.getPassword(), actual.getPassword());
         assertEquals(user.getLogin(), actual.getLogin());
         assertEquals(user.getRecommend(), actual.getRecommend());
+    }
+
+    @Test  //일단은 어떤 예외가 던져질지 모르기 때문에 expected 없이 테스트를 작성한다.
+    public void readOnlyTransactionAttribute() {
+        testUserService.getAll(); //트랜잭션 속성이 제대로 적용됬다면 여기서 읽기전용 속성을 위반했기 때문에 예외가 발생해야 한다. 
     }
     
 }
