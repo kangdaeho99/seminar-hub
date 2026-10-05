@@ -40,6 +40,8 @@ public class UserServiceImpl implements UserService {
         List<User> users = userDao.getAll();
         for (User user : users) {
             if (userLevelUpgradePolicy.canUpgradeLevel(user)) {
+                // 6.6.3: 같은 타깃 내부 호출은 프록시를 거치지 않아 별도 Advice가 실행되지 않는다.
+                // upgradeLevels() 진입 시 시작/참여한 트랜잭션은 계속 유지된다.
                 upgradeLevel(user);
             }
         }

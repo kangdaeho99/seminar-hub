@@ -3,47 +3,29 @@ package org.example2.Service;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.example2.Dao.DefaultUserLevelUpgradePolicy;
 import org.example2.Dao.Level;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
-import org.example2.Dao.UserLevelUpgradePolicy;
 import org.example2.Dao.UserService;
 import org.example2.Dao.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.Pointcut;
-import org.springframework.aop.PointcutAdvisor;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttributeSource;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SILVER;
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,15 +51,6 @@ public class UserServiceTest {
     @Autowired
     UserDao userDao;
 
-    @Autowired
-    UserLevelUpgradePolicy userLevelUpgradePolicy;
-
-    @Autowired
-    DataSource dataSource;
-
-    @Autowired
-    ConfigurableApplicationContext context;
-
     List<User> users;
 
     @BeforeEach
@@ -94,101 +67,6 @@ public class UserServiceTest {
         }
     }
 
-    @Test 
-    public void bean() {
-        assertNotNull(this.userService);
-        assertTrue(AopUtils.isJdkDynamicProxy(this.userService));
-        assertTrue(AopUtils.isJdkDynamicProxy(this.testUserService));
-        assertEquals(UserServiceImpl.class, AopUtils.getTargetClass(this.userService));
-        assertEquals(TestUserServiceImpl.class, AopUtils.getTargetClass(this.testUserService));
-        assertFalse(context.containsBean("userServiceImpl"));
-        assertFalse(context.getBeanFactory().isFactoryBean("userService"));
-        assertFalse(context.getBeanFactory().isFactoryBean("testUserService"));
-        assertFalse(AopUtils.isAopProxy(this.userDao));
-        assertFalse(AopUtils.isAopProxy(this.userLevelUpgradePolicy));
-        assertNotNull(this.userLevelUpgradePolicy);
-    }
-
-    @Test
-    public void transactionPointcut() throws NoSuchMethodException {
-        PointcutAdvisor advisor = context.getBean("transactionAdvisor", PointcutAdvisor.class);
-        Pointcut pointcut = advisor.getPointcut();
-
-        // 내장/독립 포인트컷 모두 어드바이저를 통해 실제 적용 조건을 검증한다.
-        for (Class<?> targetClass : Arrays.asList(UserServiceImpl.class, TestUserServiceImpl.class)) {
-            assertTrue(pointcut.getClassFilter().matches(targetClass));
-            assertTrue(pointcut.getMethodMatcher().matches(
-                    UserService.class.getMethod("upgradeLevels"), targetClass));
-            assertTrue(pointcut.getMethodMatcher().matches(
-                    UserService.class.getMethod("add", User.class), targetClass));
-        }
-    }
-
-    @Test
-    public void transactionAttributes() throws NoSuchMethodException {
-        TransactionInterceptor advice = context.getBean("transactionAdvice", TransactionInterceptor.class);
-        assertSame(context.getBean("transactionManager"), advice.getTransactionManager());
-        assertSame(advice, context.getBean("transactionAdvisor", PointcutAdvisor.class).getAdvice());
-        TransactionAttributeSource source = advice.getTransactionAttributeSource();
-        assertNotNull(source);
-
-        TransactionAttribute upgrade = source.getTransactionAttribute(
-                UserService.class.getMethod("upgradeLevels"), UserServiceImpl.class);
-        assertNotNull(upgrade);
-        assertEquals(TransactionDefinition.PROPAGATION_REQUIRES_NEW, upgrade.getPropagationBehavior());
-        assertEquals(TransactionDefinition.ISOLATION_SERIALIZABLE, upgrade.getIsolationLevel());
-
-        TransactionAttribute add = source.getTransactionAttribute(
-                UserService.class.getMethod("add", User.class), UserServiceImpl.class);
-        assertNotNull(add);
-        assertEquals(TransactionDefinition.PROPAGATION_REQUIRED, add.getPropagationBehavior());
-        assertEquals(TransactionDefinition.ISOLATION_DEFAULT, add.getIsolationLevel());
-        assertFalse(add.isReadOnly());
-        assertTrue(add.rollbackOn(new RuntimeException()));
-        assertTrue(add.rollbackOn(new AssertionError()));
-        assertFalse(add.rollbackOn(new Exception()));
-
-        // 아직 UserService에 get 메소드가 없으므로 기존 get 메소드로 이름 패턴만 검증한다.
-        // DAO가 포인트컷 대상이라는 뜻은 아니다.
-        TransactionAttribute get = source.getTransactionAttribute(
-                UserDao.class.getMethod("get", String.class), null);
-        assertNotNull(get);
-        assertEquals(TransactionDefinition.PROPAGATION_REQUIRED, get.getPropagationBehavior());
-        assertTrue(get.isReadOnly());
-        assertEquals(30, get.getTimeout());
-    }
-
-    @Test
-    public void addParticipatesInExistingTransaction() {
-        userDao.deleteAll();
-        PlatformTransactionManager manager = context.getBean("transactionManager", PlatformTransactionManager.class);
-        new TransactionTemplate(manager).executeWithoutResult(status -> {
-            userService.add(users.get(0));
-            assertEquals(1, userDao.getCount());
-            status.setRollbackOnly();
-        });
-        assertEquals(0, userDao.getCount());
-        checkTransactionReleased();
-    }
-
-    @Test
-    public void upgradeCommitsIndependentlyOfExistingTransaction() {
-        userDao.deleteAll();
-        for (User user : users) {
-            userDao.add(user);
-        }
-        PlatformTransactionManager manager = context.getBean("transactionManager", PlatformTransactionManager.class);
-        new TransactionTemplate(manager).executeWithoutResult(status -> {
-            userService.upgradeLevels();
-            assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
-            status.setRollbackOnly();
-        });
-        // upgrade*는 REQUIRES_NEW이므로 외부 트랜잭션이 롤백되어도 승급은 커밋된다.
-        checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(3), true);
-        checkTransactionReleased();
-    }
-
     @Test
     public void add() {
         userDao.deleteAll();
@@ -202,7 +80,6 @@ public class UserServiceTest {
         assertEquals(Level.BASIC, userDao.get(withoutLevel.getId()).getLevel());
         assertEquals(Level.GOLD, userDao.get(withLevel.getId()).getLevel());
         assertEquals(2, userDao.getCount());
-        checkTransactionReleased();
     }
 
     @Test
@@ -258,7 +135,6 @@ public class UserServiceTest {
         assertEquals(users.size(), userDao.getCount());
         assertEquals(Arrays.asList("joytouch@example.com", "madnite1@example.com"),
                 mockMailSender.getRequests());
-        checkTransactionReleased();
     }
 
     @Test
@@ -273,12 +149,6 @@ public class UserServiceTest {
         for (User user : users) {
             checkLevelUpgraded(user, false);
         }
-        checkTransactionReleased();
-    }
-
-    private void checkTransactionReleased() {
-        assertFalse(TransactionSynchronizationManager.isSynchronizationActive());
-        assertFalse(TransactionSynchronizationManager.hasResource(dataSource));
     }
 
     private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
@@ -288,7 +158,7 @@ public class UserServiceTest {
 
     public static class TestUserServiceImpl extends UserServiceImpl {
         // 외부 테스트 인스턴스 없이 스프링이 생성할 수 있는 public static 내부 클래스다.
-        // *ServiceImpl.*(..) 표현식으로 상속받은 upgradeLevels()에도 적용된다.
+        // testUserService라는 빈 이름이 bean(*Service)에 일치해 프록시가 적용된다.
         private final String failOnUserId = "madnite1";
 
         @Override

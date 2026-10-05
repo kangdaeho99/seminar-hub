@@ -7,14 +7,17 @@
                            http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
                            http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- 토비의 스프링 6.6.2: tx 네임스페이스로 TransactionInterceptor를 등록한다.
+    <!-- 토비의 스프링 6.6.3: 공통 메소드 이름 규칙으로 하나의 어드바이스를 공유한다.
          id는 생성되는 어드바이스 빈 이름이고, transaction-manager는 사용할 트랜잭션 매니저 빈의 참조다.
          transaction-manager 생략 시에도 기본 참조 이름은 transactionManager다. -->
-    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+
+    <tx:advice id="transactionAdvice">
         <tx:attributes>
-            <tx:method name="get*" propagation="REQUIRED" read-only="true" timeout="30"/>
-            <tx:method name="upgrade*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
-            <tx:method name="*" propagation="REQUIRED"/>
+            <!-- 조회 메소드는 get으로 시작한다. 기존 트랜잭션에 참여하면 기존 속성을 따른다. -->
+            <tx:method name="get*" read-only="true"/>
+            <!-- 나머지 메소드: REQUIRED, DEFAULT 격리 수준, 읽기/쓰기.
+                 선언 순서가 아니라 더 구체적인 이름 패턴이 우선하므로 get*가 *보다 우선한다. -->
+            <tx:method name="*"/>
         </tx:attributes>
     </tx:advice>
 
@@ -27,11 +30,13 @@
          REPEATABLE_READ, SERIALIZABLE이며 생략 시 DEFAULT다.
          읽기 전용은 DB/드라이버에 전달하는 힌트이며, timeout의 단위는 초다. -->
 
-    <!-- 어드바이스를 서비스 전체 메소드에 연결하고, 세부 속성은 위의 이름 패턴으로 고른다. -->
+    <!-- 서비스 빈 이름은 Service로 끝나도록 통일한다(userService, testUserService).
+         타입 패턴 execution(* *..*ServiceImpl.*(..))을 대신 사용할 수도 있지만,
+         같은 서비스에 두 Advisor를 동시에 등록하지 않는다. 속성 선택은 위의 메소드 규칙이 담당한다. -->
     <aop:config>
         <aop:advisor id="transactionAdvisor"
                      advice-ref="transactionAdvice"
-                     pointcut="execution(* *..*ServiceImpl.*(..))"/>
+                     pointcut="bean(*Service)"/>
     </aop:config>
 
     <bean id="userService" class="org.example2.Dao.UserServiceImpl">

@@ -9,20 +9,19 @@
                            http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd
                            http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <!-- 6.6.2의 tx 네임스페이스 설정을 이 파일 안에서 완결한다.
+    <!-- 6.6.3: 서비스 빈 이름과 공통 메소드 이름 규칙을 사용한다.
          transactionAdvice는 TransactionInterceptor로 생성되며 transactionManager 빈을 사용한다. -->
-    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+    <tx:advice id="transactionAdvice">
         <tx:attributes>
-            <tx:method name="get*" propagation="REQUIRED" read-only="true" timeout="30"/>
-            <tx:method name="upgrade*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
-            <tx:method name="*" propagation="REQUIRED"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="*"/>
         </tx:attributes>
     </tx:advice>
 
     <aop:config>
         <aop:advisor id="transactionAdvisor"
                      advice-ref="transactionAdvice"
-                     pointcut="execution(* *..*ServiceImpl.*(..))"/>
+                     pointcut="bean(*Service)"/>
     </aop:config>
 
     <bean id="userService" class="org.example2.Dao.UserServiceImpl">
