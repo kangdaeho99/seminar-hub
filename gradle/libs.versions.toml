@@ -9,7 +9,7 @@ springdoc = "3.0.3"
 spring-boot = "4.0.0"
 spring-dependency-management = "1.1.7"
 h2 = "2.5.250"
-squirrel = "0.3.9.11"
+squirrelFoundation = "0.3.10"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -50,7 +50,7 @@ junitPlatformLauncher.module = "org.junit.platform:junit-platform-launcher"
 
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 springRetry = { module = "org.springframework.retry:spring-retry", version.ref = "springRetry" }
-squirrelFoundation = { module = "org.restcomm.fsm:squirrel-foundation", version.ref = "squirrel" }
 springdocOpenapiStarterWebmvcUi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 querydslJpa = { module = "io.github.openfeign.querydsl:querydsl-jpa", version.ref = "querydsl" }
 querydslApt = { module = "io.github.openfeign.querydsl:querydsl-apt", version.ref = "querydsl" }
+squirrelFoundation = { module = "org.squirrelframework:squirrel-foundation", version.ref = "squirrelFoundation"}

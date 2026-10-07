@@ -18,7 +18,5 @@ dependencyManagement {
 dependencies {
     implementation project(':data')
 
-    implementation(libs.squirrelFoundation) {
-        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    }
+    implementation libs.squirrelFoundation
 }
