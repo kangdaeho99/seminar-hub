@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 
-public record CancelContext(
+public record FullCancelContext(
     MemberSeminarItem item,
     List<MemberSeminarItem> requestedItems
 ) implements MemberSeminarItemContext {

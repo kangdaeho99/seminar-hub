@@ -23,4 +23,16 @@ dependencies {
     implementation libs.springContext
 
     implementation libs.squirrelFoundation
+
+    testImplementation libs.junitJupiter
+    testImplementation libs.mockitoCore
+    testRuntimeOnly libs.junitPlatformLauncher
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+
+    def scxmlFile = layout.buildDirectory.file('scxml/member-seminar-item.scxml')
+    systemProperty 'scxml.output', scxmlFile.get().asFile.absolutePath
+    outputs.file(scxmlFile)
 }

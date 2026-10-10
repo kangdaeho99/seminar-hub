@@ -5,7 +5,7 @@ import java.util.List;
 import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus;
 import com.seminarhub.domain.seminar.service.MemberSeminarItemService;
-import com.seminarhub.statemachine.context.CancelContext;
+import com.seminarhub.statemachine.context.FullCancelContext;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
 import com.seminarhub.statemachine.result.TransitionRejectionCode;
 
@@ -15,17 +15,17 @@ import org.squirrelframework.foundation.fsm.AnonymousCondition;
 
 @Component
 @RequiredArgsConstructor
-public class CancelGuard extends AnonymousCondition<TransitionExecutionContext> {
+public class FullCancelGuard extends AnonymousCondition<TransitionExecutionContext> {
 
     private final MemberSeminarItemService memberSeminarItemService;
 
     @Override
     public boolean isSatisfied(TransitionExecutionContext context) {
-        CancelContext cancelContext = (CancelContext) context.getRequest();
+        FullCancelContext fullCancelContext = (FullCancelContext) context.getRequest();
 
         List<MemberSeminarItem> orderItems =
                 memberSeminarItemService.findByMemberSeminarId(
-                        cancelContext.item().getMemberSeminar().getId()
+                        fullCancelContext.item().getMemberSeminar().getId()
                 );
 
         for (MemberSeminarItem orderItem : orderItems) {
@@ -41,7 +41,7 @@ public class CancelGuard extends AnonymousCondition<TransitionExecutionContext> 
 
             boolean requested = false;
 
-            for (MemberSeminarItem requestedItem : cancelContext.requestedItems()) {
+            for (MemberSeminarItem requestedItem : fullCancelContext.requestedItems()) {
                 if (orderItem.getId().equals(requestedItem.getId())) {
                     requested = true;
                     break;

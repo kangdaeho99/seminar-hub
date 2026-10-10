@@ -20,7 +20,7 @@ import com.seminarhub.domain.seminar.service.MemberSeminarService;
 import com.seminarhub.error.BadRequestException;
 import com.seminarhub.error.NotFoundException;
 import com.seminarhub.statemachine.MemberSeminarItemStateMachine;
-import com.seminarhub.statemachine.context.CancelContext;
+import com.seminarhub.statemachine.context.FullCancelContext;
 import com.seminarhub.statemachine.context.ConfirmPaymentContext;
 import com.seminarhub.statemachine.context.MemberSeminarItemContext;
 import com.seminarhub.statemachine.context.PartialCancelContext;
@@ -54,8 +54,8 @@ public class MemberSeminarItemUseCase {
         List<ItemTransitionResult> results = new ArrayList<>(requestedItems.size());
 
         for (MemberSeminarItem item : requestedItems) {
-            results.add(execute(MemberSeminarItemEvent.CANCEL,
-                    new CancelContext(item, requestedItems)));
+            results.add(execute(MemberSeminarItemEvent.FULL_CANCEL,
+                    new FullCancelContext(item, requestedItems)));
         }
 
         return results;

@@ -5,12 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.squirrelframework.foundation.fsm.StateMachineBuilder;
 import org.squirrelframework.foundation.fsm.StateMachineBuilderFactory;
 import com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus;
-import com.seminarhub.statemachine.action.CancelAction;
+import com.seminarhub.statemachine.action.FullCancelAction;
 import com.seminarhub.statemachine.action.ConfirmPaymentAction;
 import com.seminarhub.statemachine.action.PartialCancelAction;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
 import com.seminarhub.statemachine.event.MemberSeminarItemEvent;
-import com.seminarhub.statemachine.guard.CancelGuard;
+import com.seminarhub.statemachine.guard.FullCancelGuard;
 import com.seminarhub.statemachine.guard.ConfirmPaymentGuard;
 import com.seminarhub.statemachine.guard.PartialCancelGuard;
 
@@ -22,8 +22,8 @@ public class MemberSeminarItemStateMachineConfiguration {
 
     private final ConfirmPaymentGuard confirmPaymentGuard;
     private final ConfirmPaymentAction confirmPaymentAction;
-    private final CancelGuard cancelGuard;
-    private final CancelAction cancelAction;
+    private final FullCancelGuard fullCancelGuard;
+    private final FullCancelAction fullCancelAction;
     private final PartialCancelGuard partialCancelGuard;
     private final PartialCancelAction partialCancelAction;
 
@@ -55,9 +55,9 @@ public class MemberSeminarItemStateMachineConfiguration {
         builder.externalTransition()
                 .from(MemberSeminarItemStatus.PAID)
                 .to(MemberSeminarItemStatus.CANCELLED)
-                .on(MemberSeminarItemEvent.CANCEL)
-                .when(cancelGuard)
-                .perform(cancelAction);
+                .on(MemberSeminarItemEvent.FULL_CANCEL)
+                .when(fullCancelGuard)
+                .perform(fullCancelAction);
 
         builder.externalTransition()
                 .from(MemberSeminarItemStatus.PAID)

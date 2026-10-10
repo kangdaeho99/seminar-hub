@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class CancelAction
+public class FullCancelAction
         extends AnonymousAction<
                 MemberSeminarItemStateMachine,
                 MemberSeminarItemStatus,
