@@ -21,6 +21,7 @@ dependencies {
     implementation project(':common')
     implementation project(':data')
     implementation project(':member-seminar-item-state-machine')
+    implementation libs.squirrelFoundation
     implementation libs.springDataJpa
     implementation libs.bootStarterWebmvc
     implementation libs.bootStarterValidation
@@ -31,6 +32,7 @@ dependencies {
 
     testImplementation libs.bootStarterTest
     testRuntimeOnly libs.junitPlatformLauncher
+    testRuntimeOnly libs.h2
 }
 
 tasks.withType(Test).configureEach {

@@ -60,7 +60,7 @@ public class MemberSeminarItem extends AuditMetadata {
         markUpdated();
     }
 
-    public void syncStatus(MemberSeminarItemStatus status) {
+    public void changeStatus(MemberSeminarItemStatus status) {
         this.memberSeminarItemStatus = Objects.requireNonNull(status, "status");
         markUpdated();
     }

@@ -1,5 +1,6 @@
 package com.seminarhub.domain.payment.service;
 import com.seminarhub.domain.payment.domain.Payment;
+import com.seminarhub.domain.payment.enums.PaymentStatus;
 import com.seminarhub.domain.payment.repository.PaymentRepository;
 import com.seminarhub.global.dto.CursorRequest;
 import java.math.BigDecimal;
@@ -13,6 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service @RequiredArgsConstructor @Transactional(readOnly = true)
 public class PaymentService {
     private final PaymentRepository repository;
+    public boolean existsSuccessfulPayment(Long memberSeminarItemId) {
+        return repository.findByMemberSeminarItemIdAndStatus(
+                memberSeminarItemId, PaymentStatus.SUCCESS).isPresent();
+    }
+
     @Transactional public Payment save(Payment e) { return repository.save(e); }
     public Optional<Payment> findById(Long id) { return repository.findByIdAndDeletedAtIsNull(id); }
     public List<Payment> findByIds(List<Long> ids) { return repository.findAllByIdInAndDeletedAtIsNull(ids); }

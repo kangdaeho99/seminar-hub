@@ -41,8 +41,8 @@ public class MemberSeminarItemService {
     }
 
     @Transactional
-    public MemberSeminarItem syncStatus(MemberSeminarItem item, MemberSeminarItemStatus status) {
-        item.syncStatus(status);
+    public MemberSeminarItem changeStatus(MemberSeminarItem item, MemberSeminarItemStatus status) {
+        item.changeStatus(status);
         return item;
     }
 
