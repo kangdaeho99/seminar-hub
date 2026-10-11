@@ -15,10 +15,13 @@ import org.w3c.dom.NodeList;
 
 import com.seminarhub.domain.payment.service.PaymentService;
 import com.seminarhub.domain.seminar.service.MemberSeminarItemService;
+import com.seminarhub.domain.seminar.service.MemberSeminarItemStatusHistoryService;
 import com.seminarhub.statemachine.action.FullCancelAction;
+import com.seminarhub.statemachine.action.CreateAction;
 import com.seminarhub.statemachine.action.ConfirmPaymentAction;
 import com.seminarhub.statemachine.action.PartialCancelAction;
 import com.seminarhub.statemachine.guard.FullCancelGuard;
+import com.seminarhub.statemachine.guard.CreateGuard;
 import com.seminarhub.statemachine.guard.ConfirmPaymentGuard;
 import com.seminarhub.statemachine.guard.PartialCancelGuard;
 
@@ -36,14 +39,17 @@ class MemberSeminarItemScxmlExporterTest {
     void exportsConfiguredStateMachineToScxmlFile() throws Exception {
         PaymentService paymentService = mock(PaymentService.class);
         MemberSeminarItemService itemService = mock(MemberSeminarItemService.class);
+        MemberSeminarItemStatusHistoryService historyService = mock(MemberSeminarItemStatusHistoryService.class);
         MemberSeminarItemStateMachineConfiguration configuration =
                 new MemberSeminarItemStateMachineConfiguration(
+                        new CreateGuard(),
+                        new CreateAction(itemService, historyService),
                         new ConfirmPaymentGuard(paymentService),
-                        new ConfirmPaymentAction(),
+                        new ConfirmPaymentAction(historyService),
                         new FullCancelGuard(itemService),
-                        new FullCancelAction(itemService),
+                        new FullCancelAction(itemService, historyService),
                         new PartialCancelGuard(),
-                        new PartialCancelAction(itemService));
+                        new PartialCancelAction(itemService, historyService));
         MemberSeminarItemScxmlExporter exporter = new MemberSeminarItemScxmlExporter(
                 configuration.memberSeminarItemStateMachineBuilder());
 
@@ -72,6 +78,7 @@ class MemberSeminarItemScxmlExporterTest {
         assertEquals(Set.of("ORDERED", "PAID", "CANCELLED"), stateIds);
 
         Map<String, String> handlers = Map.of(
+                "CREATE", "Create",
                 "CONFIRM_PAYMENT", "ConfirmPayment",
                 "FULL_CANCEL", "FullCancel",
                 "PARTIAL_CANCEL", "PartialCancel");
@@ -90,8 +97,9 @@ class MemberSeminarItemScxmlExporterTest {
             assertEquals(1, scripts.getLength());
             assertEquals(handler + "Action();", scripts.item(0).getTextContent());
         }
-        assertEquals(3, transitions.getLength());
+        assertEquals(4, transitions.getLength());
         assertEquals(Set.of(
+                "ORDERED:CREATE:ORDERED",
                 "ORDERED:CONFIRM_PAYMENT:PAID",
                 "PAID:FULL_CANCEL:CANCELLED",
                 "PAID:PARTIAL_CANCEL:CANCELLED"), transitionDefinitions);
@@ -100,8 +108,8 @@ class MemberSeminarItemScxmlExporterTest {
         assertFalse(xml.contains("instance#"));
         assertTrue(xml.contains("Guard and Action functions require runtime implementations."));
         assertTrue(xml.contains("context-type: TransitionExecutionContext"));
-        assertEquals(3, xml.split("Original transition priority: 1", -1).length - 1);
-        verifyNoInteractions(paymentService, itemService);
+        assertEquals(4, xml.split("Original transition priority: 1", -1).length - 1);
+        verifyNoInteractions(paymentService, itemService, historyService);
 
         System.out.println("SCXML exported to: " + exportedFile);
     }

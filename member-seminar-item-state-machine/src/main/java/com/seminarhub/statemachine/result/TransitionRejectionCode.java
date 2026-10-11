@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TransitionRejectionCode {
 
+    ITEM_ALREADY_CREATED(
+            "이미 생성된 항목입니다."
+    ),
+
     PAYMENT_NOT_CONFIRMED(
             "결제 성공 내역이 없어 입금을 확인할 수 없습니다."
     ),

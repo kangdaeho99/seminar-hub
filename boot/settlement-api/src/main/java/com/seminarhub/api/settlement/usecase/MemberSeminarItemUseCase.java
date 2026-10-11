@@ -14,15 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.squirrelframework.foundation.fsm.StateMachineBuilder;
 
 import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
+import com.seminarhub.domain.seminar.domain.MemberSeminar;
+import com.seminarhub.domain.seminar.domain.Seminar;
 import com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus;
 import com.seminarhub.domain.seminar.service.MemberSeminarItemService;
 import com.seminarhub.domain.seminar.service.MemberSeminarService;
+import com.seminarhub.domain.seminar.service.SeminarService;
 import com.seminarhub.error.BadRequestException;
 import com.seminarhub.error.NotFoundException;
 import com.seminarhub.statemachine.MemberSeminarItemStateMachine;
 import com.seminarhub.statemachine.context.FullCancelContext;
+import com.seminarhub.statemachine.context.CreateContext;
 import com.seminarhub.statemachine.context.ConfirmPaymentContext;
-import com.seminarhub.statemachine.context.MemberSeminarItemContext;
 import com.seminarhub.statemachine.context.PartialCancelContext;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
 import com.seminarhub.statemachine.event.MemberSeminarItemEvent;
@@ -33,6 +36,7 @@ import com.seminarhub.statemachine.result.ItemTransitionResult;
 public class MemberSeminarItemUseCase {
 
     private final MemberSeminarService memberSeminarService;
+    private final SeminarService seminarService;
     private final MemberSeminarItemService memberSeminarItemService;
     private final StateMachineBuilder<
             MemberSeminarItemStateMachine,
@@ -41,11 +45,44 @@ public class MemberSeminarItemUseCase {
             TransitionExecutionContext> stateMachineBuilder;
 
     @Transactional
+    public MemberSeminarItem create(Long orderId, Long seminarId) {
+        if (orderId == null || seminarId == null) {
+            throw new BadRequestException("주문 ID와 세미나 ID가 필요합니다.");
+        }
+        MemberSeminar order = memberSeminarService.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다. id=" + orderId));
+        Seminar seminar = seminarService.findById(seminarId)
+                .orElseThrow(() -> new NotFoundException("세미나를 찾을 수 없습니다. id=" + seminarId));
+        MemberSeminarItem item = MemberSeminarItem.builder()
+                .memberSeminar(order)
+                .seminar(seminar)
+                .build();
+
+        TransitionExecutionContext context = new TransitionExecutionContext(new CreateContext(item));
+        MemberSeminarItemStateMachine stateMachine = stateMachineBuilder.newStateMachine(
+                item.getMemberSeminarItemStatus());
+
+        stateMachine.fire(MemberSeminarItemEvent.CREATE, context);
+
+        ItemTransitionResult result = new ItemTransitionResult(item.getId(), context.getRejection());
+        if (!result.isSuccess()) {
+            throw new BadRequestException(result.getMessage());
+        }
+        return item;
+    }
+
+    @Transactional
     public ItemTransitionResult confirmPayment(Long orderId, Long itemId) {
         List<MemberSeminarItem> requestedItems = findRequestedItems(
                 orderId, Collections.singletonList(itemId));
-        return execute(MemberSeminarItemEvent.CONFIRM_PAYMENT,
-                new ConfirmPaymentContext(requestedItems.getFirst()));
+        MemberSeminarItem item = requestedItems.getFirst();
+        TransitionExecutionContext context = new TransitionExecutionContext(new ConfirmPaymentContext(item));
+        MemberSeminarItemStateMachine stateMachine = stateMachineBuilder.newStateMachine(
+                item.getMemberSeminarItemStatus());
+
+        stateMachine.fire(MemberSeminarItemEvent.CONFIRM_PAYMENT, context);
+
+        return new ItemTransitionResult(item.getId(), context.getRejection());
     }
 
     @Transactional
@@ -54,8 +91,14 @@ public class MemberSeminarItemUseCase {
         List<ItemTransitionResult> results = new ArrayList<>(requestedItems.size());
 
         for (MemberSeminarItem item : requestedItems) {
-            results.add(execute(MemberSeminarItemEvent.FULL_CANCEL,
-                    new FullCancelContext(item, requestedItems)));
+            TransitionExecutionContext context = new TransitionExecutionContext(
+                    new FullCancelContext(item, requestedItems));
+            MemberSeminarItemStateMachine stateMachine = stateMachineBuilder.newStateMachine(
+                    item.getMemberSeminarItemStatus());
+
+            stateMachine.fire(MemberSeminarItemEvent.FULL_CANCEL, context);
+
+            results.add(new ItemTransitionResult(item.getId(), context.getRejection()));
         }
 
         return results;
@@ -67,24 +110,16 @@ public class MemberSeminarItemUseCase {
         List<ItemTransitionResult> results = new ArrayList<>(requestedItems.size());
 
         for (MemberSeminarItem item : requestedItems) {
-            results.add(execute(MemberSeminarItemEvent.PARTIAL_CANCEL,
-                    new PartialCancelContext(item)));
+            TransitionExecutionContext context = new TransitionExecutionContext(new PartialCancelContext(item));
+            MemberSeminarItemStateMachine stateMachine = stateMachineBuilder.newStateMachine(
+                    item.getMemberSeminarItemStatus());
+
+            stateMachine.fire(MemberSeminarItemEvent.PARTIAL_CANCEL, context);
+
+            results.add(new ItemTransitionResult(item.getId(), context.getRejection()));
         }
 
         return results;
-    }
-
-    private ItemTransitionResult execute(
-            MemberSeminarItemEvent event,
-            MemberSeminarItemContext request
-    ) {
-        TransitionExecutionContext context = new TransitionExecutionContext(request);
-        MemberSeminarItemStateMachine stateMachine = stateMachineBuilder.newStateMachine(
-                request.item().getMemberSeminarItemStatus());
-
-        stateMachine.fire(event, context);
-
-        return new ItemTransitionResult(request.item().getId(), context.getRejection());
     }
 
     private List<MemberSeminarItem> findRequestedItems(Long orderId, List<Long> itemIds) {

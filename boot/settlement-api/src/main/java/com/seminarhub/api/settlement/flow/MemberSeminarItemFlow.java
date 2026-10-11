@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import com.seminarhub.api.settlement.usecase.MemberSeminarItemUseCase;
+import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.statemachine.result.ItemTransitionResult;
 
 @Component
@@ -13,6 +14,10 @@ import com.seminarhub.statemachine.result.ItemTransitionResult;
 public class MemberSeminarItemFlow {
 
     private final MemberSeminarItemUseCase useCase;
+
+    public MemberSeminarItem create(Long orderId, Long seminarId) {
+        return useCase.create(orderId, seminarId);
+    }
 
     public ItemTransitionResult confirmPayment(Long orderId, Long itemId) {
         return useCase.confirmPayment(orderId, itemId);

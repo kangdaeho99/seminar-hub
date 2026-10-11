@@ -10,6 +10,7 @@ import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus;
 import com.seminarhub.domain.seminar.enums.MemberSeminarStatus;
 import com.seminarhub.domain.seminar.service.MemberSeminarItemService;
+import com.seminarhub.domain.seminar.service.MemberSeminarItemStatusHistoryService;
 import com.seminarhub.statemachine.MemberSeminarItemStateMachine;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
 import com.seminarhub.statemachine.event.MemberSeminarItemEvent;
@@ -26,6 +27,7 @@ public class FullCancelAction
                 TransitionExecutionContext> {
 
     private final MemberSeminarItemService memberSeminarItemService;
+    private final MemberSeminarItemStatusHistoryService historyService;
 
     @Override
     public void execute(
@@ -45,14 +47,14 @@ public class FullCancelAction
 
         item.changeStatus(to);
 
-        for (MemberSeminarItem orderItem : orderItems) {
-            if (orderItem.getMemberSeminarItemStatus()
-                    != MemberSeminarItemStatus.CANCELLED) {
-                order.changeStatus(MemberSeminarStatus.PARTIAL_CANCELLED);
-                return;
-            }
-        }
+        boolean allCancelled = orderItems.stream()
+                .allMatch(orderItem ->
+                        orderItem.getMemberSeminarItemStatus()
+                                == MemberSeminarItemStatus.CANCELLED);
 
-        order.changeStatus(MemberSeminarStatus.FULL_CANCELED);
+        order.changeStatus(allCancelled
+                ? MemberSeminarStatus.FULL_CANCELED
+                : MemberSeminarStatus.PARTIAL_CANCELLED);
+        historyService.record(item, to);
     }
 }

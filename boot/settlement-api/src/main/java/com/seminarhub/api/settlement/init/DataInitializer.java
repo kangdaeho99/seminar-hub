@@ -1,5 +1,6 @@
 package com.seminarhub.api.settlement.init;
 
+import com.seminarhub.api.settlement.usecase.MemberSeminarItemUseCase;
 import com.seminarhub.domain.member.domain.Member;
 import com.seminarhub.domain.member.repository.MemberRepository;
 import com.seminarhub.domain.seminar.domain.MemberSeminar;
@@ -7,7 +8,6 @@ import com.seminarhub.domain.seminar.domain.MemberSeminarItem;
 import com.seminarhub.domain.seminar.domain.MemberSeminarSettlementDate;
 import com.seminarhub.domain.seminar.domain.Seminar;
 import com.seminarhub.domain.seminar.repository.MemberSeminarRepository;
-import com.seminarhub.domain.seminar.repository.MemberSeminarItemRepository;
 import com.seminarhub.domain.seminar.repository.MemberSeminarSettlementDateRepository;
 import com.seminarhub.domain.seminar.repository.SeminarRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class DataInitializer implements ApplicationRunner {
     private final MemberRepository memberRepository;
     private final SeminarRepository seminarRepository;
     private final MemberSeminarRepository memberSeminarRepository;
-    private final MemberSeminarItemRepository memberSeminarItemRepository;
+    private final MemberSeminarItemUseCase memberSeminarItemUseCase;
     private final MemberSeminarSettlementDateRepository settlementDateRepository;
 
     @Override
@@ -97,13 +97,13 @@ public class DataInitializer implements ApplicationRunner {
 
         MemberSeminar order1 = memberSeminarRepository.save(MemberSeminar.builder().member(member1).build());
         MemberSeminar order2 = memberSeminarRepository.save(MemberSeminar.builder().member(member2).build());
-        List<MemberSeminarItem> items = memberSeminarItemRepository.saveAll(List.of(
-                MemberSeminarItem.builder().memberSeminar(order1).seminar(seminarSpring).build(),
-                MemberSeminarItem.builder().memberSeminar(order2).seminar(seminarSpring).build(),
-                MemberSeminarItem.builder().memberSeminar(order1).seminar(seminarJpa).build(),
-                MemberSeminarItem.builder().memberSeminar(order2).seminar(seminarJpa).build(),
-                MemberSeminarItem.builder().memberSeminar(order1).seminar(seminarConcurrency).build(),
-                MemberSeminarItem.builder().memberSeminar(order2).seminar(seminarConcurrency).build()));
+        List<MemberSeminarItem> items = List.of(
+                memberSeminarItemUseCase.create(order1.getId(), seminarSpring.getId()),
+                memberSeminarItemUseCase.create(order2.getId(), seminarSpring.getId()),
+                memberSeminarItemUseCase.create(order1.getId(), seminarJpa.getId()),
+                memberSeminarItemUseCase.create(order2.getId(), seminarJpa.getId()),
+                memberSeminarItemUseCase.create(order1.getId(), seminarConcurrency.getId()),
+                memberSeminarItemUseCase.create(order2.getId(), seminarConcurrency.getId()));
         log.info("[DataInitializer] [3/4] MemberSeminars saved: 2 orders, 6 items");
 
         List<MemberSeminarSettlementDate> settlementDates = List.of(

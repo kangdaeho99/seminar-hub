@@ -6,11 +6,13 @@ import org.squirrelframework.foundation.fsm.StateMachineBuilder;
 import org.squirrelframework.foundation.fsm.StateMachineBuilderFactory;
 import com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus;
 import com.seminarhub.statemachine.action.FullCancelAction;
+import com.seminarhub.statemachine.action.CreateAction;
 import com.seminarhub.statemachine.action.ConfirmPaymentAction;
 import com.seminarhub.statemachine.action.PartialCancelAction;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
 import com.seminarhub.statemachine.event.MemberSeminarItemEvent;
 import com.seminarhub.statemachine.guard.FullCancelGuard;
+import com.seminarhub.statemachine.guard.CreateGuard;
 import com.seminarhub.statemachine.guard.ConfirmPaymentGuard;
 import com.seminarhub.statemachine.guard.PartialCancelGuard;
 
@@ -20,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberSeminarItemStateMachineConfiguration {
 
+    private final CreateGuard createGuard;
+    private final CreateAction createAction;
     private final ConfirmPaymentGuard confirmPaymentGuard;
     private final ConfirmPaymentAction confirmPaymentAction;
     private final FullCancelGuard fullCancelGuard;
@@ -44,6 +48,13 @@ public class MemberSeminarItemStateMachineConfiguration {
                         MemberSeminarItemEvent.class,
                         TransitionExecutionContext.class
                 );
+
+        builder.externalTransition()
+                .from(MemberSeminarItemStatus.ORDERED)
+                .to(MemberSeminarItemStatus.ORDERED)
+                .on(MemberSeminarItemEvent.CREATE)
+                .when(createGuard)
+                .perform(createAction);
 
         builder.externalTransition()
                 .from(MemberSeminarItemStatus.ORDERED)
