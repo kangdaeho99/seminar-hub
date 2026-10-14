@@ -40,7 +40,7 @@ public class DeliveryBatchConfig {
     private final PlatformTransactionManager transactionManager;
     private final DeliveryService deliveryService;
 
-    private static final int CHUNK_SIZE = 500;
+    static final int CHUNK_SIZE = 500;
 
     @Bean
     public JobParametersValidator deliveryJobParametersValidator() {
@@ -48,16 +48,16 @@ public class DeliveryBatchConfig {
     }
 
     @Bean
-    public Job deliveryStatusUpdateJob() {
-        return new JobBuilder("deliveryStatusUpdateJob", jobRepository)
+    public Job deliveryStatusUpdateAsyncJob() {
+        return new JobBuilder("deliveryStatusUpdateAsyncJob", jobRepository)
                 .validator(deliveryJobParametersValidator())
-                .start(deliveryStatusUpdateStep())
+                .start(deliveryStatusUpdateAsyncStep())
                 .build();
     }
 
     @Bean
-    public Step deliveryStatusUpdateStep() {
-        return new StepBuilder("deliveryStatusUpdateStep", jobRepository)
+    public Step deliveryStatusUpdateAsyncStep() {
+        return new StepBuilder("deliveryStatusUpdateAsyncStep", jobRepository)
                 .<Delivery, Future<Delivery>>chunk(CHUNK_SIZE, transactionManager)
                 .reader(deliveryReader(null, null))
                 .processor(asyncDeliveryProcessor())

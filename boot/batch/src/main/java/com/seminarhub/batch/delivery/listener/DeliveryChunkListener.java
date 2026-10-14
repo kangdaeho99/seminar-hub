@@ -14,7 +14,7 @@ public class DeliveryChunkListener implements ChunkListener {
 
     @Override
     public void afterChunk(ChunkContext context) {
-        log.info("◀◀◀ 청크 종료 (트랜잭션 커밋 직전)");
+        log.info("◀◀◀ 청크 종료 (트랜잭션 커밋 이후)");
     }
 
     @Override
