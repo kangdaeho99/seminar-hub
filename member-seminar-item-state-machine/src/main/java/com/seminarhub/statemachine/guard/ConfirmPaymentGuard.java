@@ -6,7 +6,7 @@ import org.squirrelframework.foundation.fsm.AnonymousCondition;
 
 import com.seminarhub.domain.payment.service.PaymentService;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
-import com.seminarhub.statemachine.result.TransitionRejectionCode;
+import com.seminarhub.statemachine.exception.PaymentNotConfirmedException;
 
 @Component
 @RequiredArgsConstructor
@@ -17,7 +17,8 @@ public class ConfirmPaymentGuard extends AnonymousCondition<TransitionExecutionC
     @Override
     public boolean isSatisfied(TransitionExecutionContext context) {
         if (!paymentService.existsSuccessfulPayment(context.getRequest().item().getId())) {
-            return context.reject(TransitionRejectionCode.PAYMENT_NOT_CONFIRMED);
+            throw new PaymentNotConfirmedException(context.getRequest().item().getId());
+            // return context.reject(TransitionRejectionCode.PAYMENT_NOT_CONFIRMED);
         }
         return true;
     }

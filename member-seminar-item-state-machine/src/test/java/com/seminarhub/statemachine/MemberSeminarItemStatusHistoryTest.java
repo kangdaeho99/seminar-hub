@@ -5,6 +5,8 @@ import static com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus.PAID;
 import static com.seminarhub.statemachine.event.MemberSeminarItemEvent.CONFIRM_PAYMENT;
 import static com.seminarhub.statemachine.event.MemberSeminarItemEvent.CREATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
@@ -33,6 +35,7 @@ import com.seminarhub.statemachine.context.ConfirmPaymentContext;
 import com.seminarhub.statemachine.context.CreateContext;
 import com.seminarhub.statemachine.context.TransitionExecutionContext;
 import com.seminarhub.statemachine.event.MemberSeminarItemEvent;
+import com.seminarhub.statemachine.exception.PaymentNotConfirmedException;
 import com.seminarhub.statemachine.guard.ConfirmPaymentGuard;
 import com.seminarhub.statemachine.guard.CreateGuard;
 import com.seminarhub.statemachine.guard.FullCancelGuard;
@@ -128,13 +131,19 @@ class MemberSeminarItemStatusHistoryTest {
     }
 
     @Test
-    void doesNotRecordWhenGuardDeclines() {
+    void propagatesPaymentGuardExceptionWithoutChangingStatusOrRecordingHistory() {
         MemberSeminarItem item = item(ORDERED);
         TransitionExecutionContext context = context(item);
 
-        configuredBuilder().newStateMachine(ORDERED).fire(CONFIRM_PAYMENT, context);
+        TransitionException exception = assertThrows(TransitionException.class,
+                () -> configuredBuilder().newStateMachine(ORDERED).fire(CONFIRM_PAYMENT, context));
 
-        assertEquals(TransitionRejectionCode.PAYMENT_NOT_CONFIRMED, context.getRejection());
+        PaymentNotConfirmedException rejection = assertInstanceOf(
+                PaymentNotConfirmedException.class, exception.getTargetException());
+        assertEquals(item.getId(), rejection.getItemId());
+        assertEquals(TransitionRejectionCode.PAYMENT_NOT_CONFIRMED, rejection.getCode());
+        assertEquals(TransitionRejectionCode.PAYMENT_NOT_CONFIRMED.getMessage(), rejection.getMessage());
+        assertNull(context.getRejection());
         assertEquals(ORDERED, item.getMemberSeminarItemStatus());
         verifyNoInteractions(historyService);
     }
