@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,8 +162,52 @@ class DeliveryBatchExecutionTest {
         assertThat(step.getWriteCount()).isEqualTo(2);
         assertThat(step.getProcessSkipCount()).isEqualTo(async ? 0 : 1);
         assertThat(step.getWriteSkipCount()).isEqualTo(async ? 1 : 0);
+        verify(processor, times(async ? 1 : 3)).process(argThat(item -> item.getId() == 2L));
         assertThat(writes.stream().flatMap(List::stream).map(Delivery::getId).toList())
                 .containsExactly(1L, 3L);
+    }
+
+    @Test
+    void retriesTransientSyncApiFailuresAndWritesTheRecoveredItem() throws Exception {
+        stubPages(3);
+        AtomicInteger attempts = new AtomicInteger();
+        when(processor.process(any(Delivery.class))).thenAnswer(invocation -> {
+            Delivery item = invocation.getArgument(0);
+            if (item.getId() == 2L && attempts.incrementAndGet() < 3) {
+                throw new DeliveryStatusUpdateException("transient external API failure");
+            }
+            item.updateStatus(DeliveryStatus.SHIPPING);
+            return item;
+        });
+
+        JobExecution execution = execute(syncJob);
+
+        assertThat(execution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+        StepExecution step = execution.getStepExecutions().iterator().next();
+        assertThat(attempts.get()).isEqualTo(3);
+        assertThat(step.getProcessSkipCount()).isZero();
+        assertThat(step.getWriteCount()).isEqualTo(3);
+        assertThat(step.getRollbackCount()).isGreaterThanOrEqualTo(2);
+        assertThat(writes.stream().flatMap(List::stream).map(Delivery::getId).toList())
+                .containsExactly(1L, 2L, 3L);
+        // processorNonTransactional caches successful results across chunk retries.
+        verify(processor, times(1)).process(argThat(item -> item.getId() == 1L));
+    }
+
+    @Test
+    void failsWithoutRetryingOrSkippingUnrelatedSyncExceptions() throws Exception {
+        stubPages(1);
+        when(processor.process(any(Delivery.class)))
+                .thenThrow(new IllegalStateException("unexpected processing failure"));
+
+        JobExecution execution = execute(syncJob);
+
+        assertThat(execution.getStatus()).isEqualTo(BatchStatus.FAILED);
+        StepExecution step = execution.getStepExecutions().iterator().next();
+        assertThat(step.getProcessSkipCount()).isZero();
+        assertThat(step.getWriteCount()).isZero();
+        verify(processor, times(1)).process(any(Delivery.class));
+        assertThat(writes).isEmpty();
     }
 
     private void stubPages(int total) {

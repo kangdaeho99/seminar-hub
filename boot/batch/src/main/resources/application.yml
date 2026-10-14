@@ -34,6 +34,9 @@ spring:
       enabled: false
 
 logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
   level:
     org.springframework.transaction.interceptor: TRACE
     org.springframework.orm.jpa.JpaTransactionManager: DEBUG

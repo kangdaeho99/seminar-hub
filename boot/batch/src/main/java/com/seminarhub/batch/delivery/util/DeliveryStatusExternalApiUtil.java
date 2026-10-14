@@ -12,7 +12,7 @@ public class DeliveryStatusExternalApiUtil {
     private DeliveryStatusExternalApiUtil() {}
 
     public static DeliveryStatus checkDeliveryStatus() {
-        long delay = ThreadLocalRandom.current().nextLong(10, 50);
+        long delay = ThreadLocalRandom.current().nextLong(1, 11);
         
         try {
             log.info(">>>> 외부 배송 API 호출 대기 중... ({}ms)", delay);
@@ -23,7 +23,8 @@ public class DeliveryStatusExternalApiUtil {
         }
 
         double errorProbability = Math.random();
-        if (errorProbability < 0.0000001) {
+        // 0.000001% = 확률 0.00000001
+        if (errorProbability < 0.00000001) {
             throw new DeliveryStatusUpdateException("외부 배송 API 서버 연동 오류 발생");
         }
 

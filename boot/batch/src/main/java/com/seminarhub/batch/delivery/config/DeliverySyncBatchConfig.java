@@ -1,5 +1,6 @@
 package com.seminarhub.batch.delivery.config;
 
+import com.seminarhub.batch.delivery.exception.DeliveryStatusUpdateException;
 import com.seminarhub.batch.delivery.listener.DeliveryChunkListener;
 import com.seminarhub.batch.delivery.listener.DeliveryReadListener;
 import com.seminarhub.batch.delivery.listener.DeliverySyncProcessListener;
@@ -10,6 +11,7 @@ import com.seminarhub.batch.delivery.processor.DeliveryItemProcessor;
 import com.seminarhub.batch.delivery.reader.DeliveryKeysetItemReader;
 import com.seminarhub.batch.delivery.writer.DeliveryItemWriter;
 import com.seminarhub.domain.delivery.domain.Delivery;
+import java.util.Map;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
@@ -19,10 +21,17 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class DeliverySyncBatchConfig {
+
+    @Bean
+    public RetryPolicy deliverySyncRetryPolicy() {
+        return new SimpleRetryPolicy(3, Map.of(DeliveryStatusUpdateException.class, true), true);
+    }
 
     @Bean
     public Job deliveryStatusUpdateSyncJob(
@@ -49,6 +58,7 @@ public class DeliverySyncBatchConfig {
                 .writer(deliveryWriter)
                 .faultTolerant()
                 .processorNonTransactional()
+                .retryPolicy(deliverySyncRetryPolicy())
                 .skipPolicy(new DeliverySkipPolicy())
                 .listener(new DeliveryChunkListener())
                 .listener(new DeliveryReadListener())
