@@ -8,6 +8,7 @@ import com.seminarhub.batch.delivery.listener.DeliverySkipListener;
 import com.seminarhub.batch.delivery.listener.DeliveryWriteListener;
 import com.seminarhub.batch.delivery.policy.DeliverySkipPolicy;
 import com.seminarhub.batch.delivery.processor.DeliveryItemProcessor;
+import com.seminarhub.batch.delivery.processor.RetryingDeliveryItemProcessor;
 import com.seminarhub.batch.delivery.reader.DeliveryKeysetItemReader;
 import com.seminarhub.domain.delivery.service.DeliveryService;
 import com.seminarhub.batch.delivery.validator.DeliveryJobParametersValidator;
@@ -105,7 +106,8 @@ public class DeliveryBatchConfig {
 
     @Bean
     public AsyncItemProcessor<Delivery, Delivery> asyncDeliveryProcessor() {
-        AsyncItemProcessor<Delivery, Delivery> processor = new AsyncItemProcessor<>(deliveryProcessor());
+        AsyncItemProcessor<Delivery, Delivery> processor = new AsyncItemProcessor<>(
+                new RetryingDeliveryItemProcessor(deliveryProcessor()));
         processor.setTaskExecutor(deliveryTaskExecutor());
         return processor;
     }

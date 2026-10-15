@@ -22,6 +22,7 @@ dependencies {
     implementation project(':data')
     implementation libs.bootStarterBatchJdbc
     implementation libs.springBatchIntegration
+    implementation libs.springRetry
     implementation libs.bootStarterWebmvc
 
     runtimeOnly libs.postgresql

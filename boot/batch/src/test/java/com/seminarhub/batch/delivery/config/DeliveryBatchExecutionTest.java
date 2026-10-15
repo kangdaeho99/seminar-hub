@@ -162,13 +162,18 @@ class DeliveryBatchExecutionTest {
         assertThat(step.getWriteCount()).isEqualTo(2);
         assertThat(step.getProcessSkipCount()).isEqualTo(async ? 0 : 1);
         assertThat(step.getWriteSkipCount()).isEqualTo(async ? 1 : 0);
-        verify(processor, times(async ? 1 : 3)).process(argThat(item -> item.getId() == 2L));
+        verify(processor, times(3)).process(argThat(item -> item.getId() == 2L));
+        // Writer recovery must reuse cached results, not call the external API again.
+        verify(processor, times(1)).process(argThat(item -> item.getId() == 1L));
+        verify(processor, times(1)).process(argThat(item -> item.getId() == 3L));
+        assertThat(step.getRollbackCount()).isPositive();
         assertThat(writes.stream().flatMap(List::stream).map(Delivery::getId).toList())
                 .containsExactly(1L, 3L);
     }
 
-    @Test
-    void retriesTransientSyncApiFailuresAndWritesTheRecoveredItem() throws Exception {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void retriesTransientApiFailuresAndWritesTheRecoveredItem(boolean async) throws Exception {
         stubPages(3);
         AtomicInteger attempts = new AtomicInteger();
         when(processor.process(any(Delivery.class))).thenAnswer(invocation -> {
@@ -180,31 +185,56 @@ class DeliveryBatchExecutionTest {
             return item;
         });
 
-        JobExecution execution = execute(syncJob);
+        JobExecution execution = execute(async ? asyncJob : syncJob);
 
         assertThat(execution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
         StepExecution step = execution.getStepExecutions().iterator().next();
         assertThat(attempts.get()).isEqualTo(3);
         assertThat(step.getProcessSkipCount()).isZero();
+        assertThat(step.getWriteSkipCount()).isZero();
         assertThat(step.getWriteCount()).isEqualTo(3);
-        assertThat(step.getRollbackCount()).isGreaterThanOrEqualTo(2);
+        if (async) {
+            // Recovered API failures stay inside the Future, outside the chunk transaction.
+            assertThat(step.getRollbackCount()).isZero();
+        } else {
+            assertThat(step.getRollbackCount()).isGreaterThanOrEqualTo(2);
+        }
         assertThat(writes.stream().flatMap(List::stream).map(Delivery::getId).toList())
                 .containsExactly(1L, 2L, 3L);
         // processorNonTransactional caches successful results across chunk retries.
         verify(processor, times(1)).process(argThat(item -> item.getId() == 1L));
     }
 
-    @Test
-    void failsWithoutRetryingOrSkippingUnrelatedSyncExceptions() throws Exception {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void failsWithoutRetryingOrSkippingUnrelatedExceptions(boolean async) throws Exception {
         stubPages(1);
         when(processor.process(any(Delivery.class)))
                 .thenThrow(new IllegalStateException("unexpected processing failure"));
 
-        JobExecution execution = execute(syncJob);
+        JobExecution execution = execute(async ? asyncJob : syncJob);
 
         assertThat(execution.getStatus()).isEqualTo(BatchStatus.FAILED);
         StepExecution step = execution.getStepExecutions().iterator().next();
         assertThat(step.getProcessSkipCount()).isZero();
+        assertThat(step.getWriteSkipCount()).isZero();
+        assertThat(step.getWriteCount()).isZero();
+        verify(processor, times(1)).process(any(Delivery.class));
+        assertThat(writes).isEmpty();
+    }
+
+    @Test
+    void failsWithoutRetryingOrSkippingInterruptedAsyncLookups() throws Exception {
+        stubPages(1);
+        when(processor.process(any(Delivery.class))).thenThrow(
+                new DeliveryStatusUpdateException("lookup interrupted", new InterruptedException()));
+
+        JobExecution execution = execute(asyncJob);
+
+        assertThat(execution.getStatus()).isEqualTo(BatchStatus.FAILED);
+        StepExecution step = execution.getStepExecutions().iterator().next();
+        assertThat(step.getProcessSkipCount()).isZero();
+        assertThat(step.getWriteSkipCount()).isZero();
         assertThat(step.getWriteCount()).isZero();
         verify(processor, times(1)).process(any(Delivery.class));
         assertThat(writes).isEmpty();
