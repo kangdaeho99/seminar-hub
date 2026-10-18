@@ -1,9 +1,12 @@
 package org.example2.Dao;
 
+import java.sql.Connection;
 import java.util.List;
 
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 
 public class UserServiceImpl implements UserService {
     private UserDao userDao;
@@ -57,14 +60,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void upgradeLevels() {
-        List<User> users = userDao.getAll();
-        for (User user : users) {
-            if (userLevelUpgradePolicy.canUpgradeLevel(user)) {
-                // 6.6.3: 같은 타깃 내부 호출은 프록시를 거치지 않아 별도 Advice가 실행되지 않는다.
-                // upgradeLevels() 진입 시 시작/참여한 트랜잭션은 계속 유지된다.
-                upgradeLevel(user);
+        TransactionSynchronizationManager.initSyncrhonization();
+        Connection c = DataSourceUtils.getConnection(dataSource);
+
+        try {
+            List<User> users = userDao.getAll();
+
+            for (User user : users) {
+                if (userLevelUpgradePolicy.canUpgradeLevel(user)) {
+                    // 6.6.3: 같은 타깃 내부 호출은 프록시를 거치지 않아 별도 Advice가 실행되지 않는다.
+                    // upgradeLevels() 진입 시 시작/참여한 트랜잭션은 계속 유지된다.
+                    upgradeLevel(user);
+                }
             }
+            c.commit();
+        } catch(Exceptioon e){
+            c.rollback();;
+            throw e;
+        } finally {
+            DataSourceUtils.releaseConnection(c, dataSource);
+            TransactionSynchronizationManager.unbindResource(this.dataSource);
+            TransactionSynchronizationManager.clearSynchronization(); 
         }
+
+
     }
 
     protected void upgradeLevel(User user) {

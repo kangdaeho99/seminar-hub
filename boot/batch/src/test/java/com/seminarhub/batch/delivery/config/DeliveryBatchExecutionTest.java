@@ -3,10 +3,10 @@ package com.seminarhub.batch.delivery.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,6 +17,7 @@ import com.seminarhub.batch.delivery.processor.DeliveryItemProcessor;
 import com.seminarhub.domain.delivery.domain.Delivery;
 import com.seminarhub.domain.delivery.enums.DeliveryStatus;
 import com.seminarhub.domain.delivery.service.DeliveryService;
+import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.database.JpaItemWriter;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -73,6 +76,12 @@ class DeliveryBatchExecutionTest {
     @MockitoBean(name = "deliveryProcessor", enforceOverride = true)
     private DeliveryItemProcessor processor;
 
+    @MockitoBean
+    private EntityManagerFactory entityManagerFactory;
+
+    @MockitoBean(name = "deliveryWriter", enforceOverride = true)
+    private JpaItemWriter<Delivery> writer;
+
     private final List<Thread> processingThreads = new CopyOnWriteArrayList<>();
     private final List<Boolean> processingTransactions = new CopyOnWriteArrayList<>();
     private final List<List<Delivery>> writes = new ArrayList<>();
@@ -88,13 +97,13 @@ class DeliveryBatchExecutionTest {
             item.updateStatus(DeliveryStatus.SHIPPING);
             return item;
         });
-        when(service.saveAll(anyList())).thenAnswer(invocation -> {
-            List<Delivery> items = invocation.getArgument(0);
-            writes.add(List.copyOf(items));
+        doAnswer(invocation -> {
+            Chunk<Delivery> items = invocation.getArgument(0);
+            writes.add(List.copyOf(items.getItems()));
             writingThreads.add(Thread.currentThread());
             writingTransactions.add(TransactionSynchronizationManager.isActualTransactionActive());
-            return items;
-        });
+            return null;
+        }).when(writer).write(any());
     }
 
     @ParameterizedTest

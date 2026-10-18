@@ -9,7 +9,6 @@ import com.seminarhub.batch.delivery.listener.DeliverySyncWriteListener;
 import com.seminarhub.batch.delivery.policy.DeliverySkipPolicy;
 import com.seminarhub.batch.delivery.processor.DeliveryItemProcessor;
 import com.seminarhub.batch.delivery.reader.DeliveryKeysetItemReader;
-import com.seminarhub.batch.delivery.writer.DeliveryItemWriter;
 import com.seminarhub.domain.delivery.domain.Delivery;
 import java.util.Map;
 import org.springframework.batch.core.job.Job;
@@ -18,6 +17,7 @@ import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.infrastructure.item.database.JpaItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +50,7 @@ public class DeliverySyncBatchConfig {
             PlatformTransactionManager transactionManager,
             DeliveryKeysetItemReader deliveryReader,
             DeliveryItemProcessor deliveryProcessor,
-            DeliveryItemWriter deliveryWriter) {
+            @Qualifier("deliveryWriter") JpaItemWriter<Delivery> deliveryWriter) {
         return new StepBuilder("deliveryStatusUpdateSyncStep", jobRepository)
                 .<Delivery, Delivery>chunk(DeliveryBatchConfig.CHUNK_SIZE, transactionManager)
                 .reader(deliveryReader)

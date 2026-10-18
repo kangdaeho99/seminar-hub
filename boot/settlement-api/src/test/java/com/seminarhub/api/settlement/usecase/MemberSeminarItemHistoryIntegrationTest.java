@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.squirrelframework.foundation.exception.TransitionException;
 
 import com.seminarhub.domain.member.domain.Member;
+import com.seminarhub.api.settlement.flow.MemberSeminarItemFlow;
 import com.seminarhub.domain.member.repository.MemberRepository;
 import com.seminarhub.domain.payment.domain.Payment;
 import com.seminarhub.domain.payment.enums.PaymentStatus;
@@ -59,6 +61,8 @@ class MemberSeminarItemHistoryIntegrationTest {
 
     @Autowired
     private MemberSeminarItemUseCase useCase;
+    @Autowired
+    private MemberSeminarItemFlow flow;
     @Autowired
     private MemberSeminarItemStatusHistoryService historyService;
     @Autowired
@@ -171,6 +175,33 @@ class MemberSeminarItemHistoryIntegrationTest {
                     .getMemberSeminarItemStatus());
             assertEquals(List.of(ORDERED), historyService.findByMemberSeminarItemId(item.getId())
                     .stream().map(MemberSeminarItemStatusHistory::getToStatus).toList());
+        });
+    }
+
+    @Test
+    void partialPaymentFlowPropagatesStorageFailuresAndRollsBackOnlyTheFailingItem() {
+        MemberSeminarItem first = useCase.create(orderId, seminarId);
+        MemberSeminarItem failing = useCase.create(orderId, seminarId);
+        MemberSeminarItem unattempted = useCase.create(orderId, seminarId);
+        for (MemberSeminarItem item : List.of(first, failing, unattempted)) {
+            recordSuccessfulPayment(item.getId());
+        }
+        doThrow(new DataIntegrityViolationException("history insert failed"))
+                .when(historyRepository).save(argThat(history -> history != null
+                        && history.getMemberSeminarItem().getId().equals(failing.getId())));
+
+        assertThrows(TransitionException.class, () -> flow.confirmPaymentsPartial(
+                orderId, List.of(first.getId(), failing.getId(), unattempted.getId())));
+
+        transactions.executeWithoutResult(status -> {
+            assertEquals(PAID, itemRepository.findById(first.getId()).orElseThrow().getMemberSeminarItemStatus());
+            assertEquals(List.of(ORDERED, PAID), historyService.findByMemberSeminarItemId(first.getId())
+                    .stream().map(MemberSeminarItemStatusHistory::getToStatus).toList());
+            for (MemberSeminarItem item : List.of(failing, unattempted)) {
+                assertEquals(ORDERED, itemRepository.findById(item.getId()).orElseThrow().getMemberSeminarItemStatus());
+                assertEquals(List.of(ORDERED), historyService.findByMemberSeminarItemId(item.getId())
+                        .stream().map(MemberSeminarItemStatusHistory::getToStatus).toList());
+            }
         });
     }
 

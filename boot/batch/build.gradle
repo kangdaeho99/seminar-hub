@@ -21,6 +21,7 @@ dependencies {
     implementation project(':common')
     implementation project(':data')
     implementation libs.bootStarterBatchJdbc
+    implementation libs.bootStarterDataJpa
     implementation libs.springBatchIntegration
     implementation libs.springRetry
     implementation libs.bootStarterWebmvc
@@ -29,6 +30,7 @@ dependencies {
 
     testImplementation libs.bootStarterTest
     testRuntimeOnly libs.junitPlatformLauncher
+    testRuntimeOnly libs.h2
 }
 
 tasks.withType(Test).configureEach {

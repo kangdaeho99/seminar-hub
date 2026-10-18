@@ -12,7 +12,7 @@ import com.seminarhub.batch.delivery.processor.RetryingDeliveryItemProcessor;
 import com.seminarhub.batch.delivery.reader.DeliveryKeysetItemReader;
 import com.seminarhub.domain.delivery.service.DeliveryService;
 import com.seminarhub.batch.delivery.validator.DeliveryJobParametersValidator;
-import com.seminarhub.batch.delivery.writer.DeliveryItemWriter;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.Job;
@@ -21,6 +21,7 @@ import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.infrastructure.item.database.JpaItemWriter;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ public class DeliveryBatchConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final DeliveryService deliveryService;
+    private final EntityManagerFactory entityManagerFactory;
 
     static final int CHUNK_SIZE = 500;
 
@@ -113,8 +115,9 @@ public class DeliveryBatchConfig {
     }
 
     @Bean
-    public DeliveryItemWriter deliveryWriter() {
-        return new DeliveryItemWriter(deliveryService);
+    public JpaItemWriter<Delivery> deliveryWriter() {
+        // Existing deliveries are merged when detached; write() flushes and clears the context.
+        return new JpaItemWriter<>(entityManagerFactory);
     }
 
     @Bean

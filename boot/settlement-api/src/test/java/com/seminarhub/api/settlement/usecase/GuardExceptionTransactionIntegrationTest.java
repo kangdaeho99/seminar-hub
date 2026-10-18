@@ -3,10 +3,12 @@ package com.seminarhub.api.settlement.usecase;
 import static com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus.ORDERED;
 import static com.seminarhub.domain.seminar.enums.MemberSeminarItemStatus.PAID;
 import static com.seminarhub.statemachine.result.TransitionRejectionCode.PAYMENT_NOT_CONFIRMED;
+import static com.seminarhub.statemachine.result.TransitionRejectionCode.TRANSITION_NOT_ALLOWED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.seminarhub.api.settlement.flow.MemberSeminarItemFlow;
 import com.seminarhub.domain.member.domain.Member;
@@ -28,6 +30,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import org.springframework.aop.support.AopUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,6 +68,8 @@ import org.squirrelframework.foundation.exception.TransitionException;
 class GuardExceptionTransactionIntegrationTest {
 
     @Autowired private MemberSeminarItemUseCase useCase;
+    @Autowired private MemberSeminarItemFlow flow;
+    @Autowired private MemberSeminarItemPaymentExecutor paymentExecutor;
     @Autowired private BatchCaller batchCaller;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MemberSeminarRepository orderRepository;
@@ -136,6 +142,54 @@ class GuardExceptionTransactionIntegrationTest {
         assertEquals(itemIds.reversed(), results.stream().map(ItemTransitionResult::getItemId).toList());
         assertEquals(100, batchCaller.getAttemptedCount());
         assertPersistedStatusesAndHistory(5);
+    }
+
+    @Test
+    @DisplayName("Production bulk flow: 5 commits survive 95 later guard exceptions")
+    void partialPaymentFlowPreservesCommittedStatusesAndHistory() {
+        assertTrue(AopUtils.isCglibProxy(paymentExecutor));
+
+        List<ItemTransitionResult> results = flow.confirmPaymentsPartial(orderId, itemIds);
+
+        assertFiveSuccessesAndNinetyFiveRejections(results);
+        assertEquals(itemIds, results.stream().map(ItemTransitionResult::getItemId).toList());
+        assertPersistedStatusesAndHistory(5);
+    }
+
+    @Test
+    @DisplayName("REQUIRES_NEW: guard failures do not poison the caller; outer rollback preserves 5 item commits")
+    void partialPaymentFlowIsIndependentOfAnExistingOuterTransaction() {
+        AtomicReference<Long> outerMemberId = new AtomicReference<>();
+        transactions.executeWithoutResult(status -> {
+            outerMemberId.set(memberRepository.save(Member.builder().build()).getId());
+            // Failures first also proves that later successes are still attempted.
+            List<ItemTransitionResult> results = flow.confirmPaymentsPartial(orderId, itemIds.reversed());
+
+            assertFiveSuccessesAndNinetyFiveRejections(results);
+            assertEquals(itemIds.reversed(), results.stream().map(ItemTransitionResult::getItemId).toList());
+            assertFalse(status.isRollbackOnly());
+            status.setRollbackOnly();
+        });
+
+        assertFalse(memberRepository.existsById(outerMemberId.get()));
+        assertPersistedStatusesAndHistory(5);
+    }
+
+    @Test
+    @DisplayName("Duplicate IDs are processed once; a later retry reports disallowed transitions without new history")
+    void partialPaymentFlowDeduplicatesAndPreservesStateMachineRejections() {
+        Long paidItemId = itemIds.getFirst();
+        Long unpaidItemId = itemIds.get(5);
+
+        List<ItemTransitionResult> results = flow.confirmPaymentsPartial(
+                orderId, List.of(paidItemId, unpaidItemId, paidItemId, unpaidItemId));
+
+        assertEquals(List.of(paidItemId, unpaidItemId), results.stream().map(ItemTransitionResult::getItemId).toList());
+        assertTrue(results.getFirst().isSuccess());
+        assertEquals(PAYMENT_NOT_CONFIRMED, results.getLast().getCode());
+        assertEquals(TRANSITION_NOT_ALLOWED,
+                flow.confirmPaymentsPartial(orderId, List.of(paidItemId)).getFirst().getCode());
+        assertPersistedStatusesAndHistory(1);
     }
 
     private void assertFiveSuccessesAndNinetyFiveRejections(List<ItemTransitionResult> results) {
