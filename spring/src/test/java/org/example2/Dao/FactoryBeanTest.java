@@ -42,5 +42,17 @@ public class FactoryBeanTest {
         assertEquals(UserServiceImpl.class, context.getBean("userServiceImpl").getClass());
     }
 
+    @Test
+    public void reuseTransactionProxyFactoryBeanForCoreService() {
+        Object service = context.getBean("coreService");
+        assertInstanceOf(CoreService.class, service);
+        assertInstanceOf(TransactionHandler.class, Proxy.getInvocationHandler(service));
+        assertInstanceOf(TxProxyFactoryBean.class, context.getBean("&coreService"));
+        assertEquals(context.getBean("&userService").getClass(),
+                context.getBean("&coreService").getClass());
+        assertEquals(CoreService.class, context.getType("coreService"));
+        assertEquals(CoreServiceImpl.class, context.getBean("coreServiceTarget").getClass());
+    }
+
 
 }

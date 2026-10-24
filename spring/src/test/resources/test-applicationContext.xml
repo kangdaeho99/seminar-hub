@@ -28,6 +28,21 @@
     <bean id="testUserServiceImpl" class="org.example2.Service.UserServiceTest$TestUserServiceImpl"
           parent="userServiceImpl"/>
 
+    <bean id="coreService" class="org.example2.Dao.TxProxyFactoryBean">
+        <property name="target" ref="coreServiceTarget"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="pattern" value=""/>
+        <property name="serviceInterface" value="org.example2.Dao.CoreService"/>
+    </bean>
+
+    <bean id="coreServiceTarget" class="org.example2.Dao.CoreServiceImpl">
+        <property name="coreDao" ref="coreDao"/>
+    </bean>
+
+    <bean id="coreDao" class="org.example2.Dao.CoreDaoJdbc" init-method="initialize">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean id="mailSender" class="org.example2.Service.MockMailSender"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

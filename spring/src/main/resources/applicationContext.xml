@@ -18,6 +18,24 @@
         <property name="mailFrom" value="noreply@example.com"/>
     </bean>
 
+    <!-- 6.3.5: 팩토리 코드를 수정하지 않고 CoreService에도 같은 트랜잭션 프록시를 적용한다. -->
+    <bean id="coreService" class="org.example2.Dao.TxProxyFactoryBean">
+        <property name="target" ref="coreServiceTarget"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <!-- 모든 메소드 이름은 빈 문자열로 시작하므로 전체 메소드에 트랜잭션이 적용된다. -->
+        <property name="pattern" value=""/>
+        <property name="serviceInterface" value="org.example2.Dao.CoreService"/>
+    </bean>
+
+    <!-- 클라이언트는 이 타깃 대신 coreService 프록시를 주입받는다. -->
+    <bean id="coreServiceTarget" class="org.example2.Dao.CoreServiceImpl">
+        <property name="coreDao" ref="coreDao"/>
+    </bean>
+
+    <bean id="coreDao" class="org.example2.Dao.CoreDaoJdbc" init-method="initialize">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="localhost"/>
         <property name="port" value="25"/>
