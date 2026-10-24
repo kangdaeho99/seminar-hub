@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
@@ -29,6 +30,7 @@ import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_LOGCOUNT_FOR_SI
 import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_GOLD;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -43,9 +45,11 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @Autowired
+    @Qualifier("userService")
     UserService userService;
 
     @Autowired
+    @Qualifier("testUserService")
     UserService testUserService;
 
     @Autowired 
@@ -145,7 +149,7 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() {
-        // 예외 발생용 서비스도 빈으로 등록하여 자동 생성된 프록시를 통해 호출한다.
+        // 예외 발생용 서비스도 팩토리 빈이 생성한 프록시를 통해 호출한다.
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
@@ -164,19 +168,19 @@ public class UserServiceTest {
 
     public static class TestUserServiceImpl extends UserServiceImpl {
         // 외부 테스트 인스턴스 없이 스프링이 생성할 수 있는 public static 내부 클래스다.
-        // UserService 인터페이스의 @Transactional 속성을 읽어 프록시가 적용된다.
+        // TxProxyFactoryBean이 upgradeLevels로 시작하는 메소드에 트랜잭션을 적용한다.
         private final String failOnUserId = "madnite1";
 
         @Override
-        public List<User> getAll() {
+        public void upgradeLevels() {
             assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
-            assertTrue(TransactionSynchronizationManager.isCurrentTransactionReadOnly());
-            for (User user : super.getAll()) {
-                // 읽기 전용 트랜잭션 안에서 강제로 쓰기를 시도한다.
-                // 실제 쓰기 차단 여부는 DB/드라이버에 따라 다르며 H2는 이를 차단하지 않는다.
-                super.update(user);
-            }
-            return null;
+            super.upgradeLevels();
+        }
+
+        @Override
+        public List<User> getAll() {
+            assertFalse(TransactionSynchronizationManager.isActualTransactionActive());
+            return super.getAll();
         }
 
         @Override
@@ -202,11 +206,20 @@ public class UserServiceTest {
     }
 
     @Test
-    public void readOnlyTransactionAttribute() {
+    public void methodOutsidePatternDoesNotStartTransaction() {
         userDao.deleteAll();
         userDao.add(users.get(0));
-        // H2는 쓰기를 차단하지 않으므로 타깃 안에서 읽기 전용 트랜잭션의 적용을 확인한다.
-        testUserService.getAll();
+        // getAll은 upgradeLevels 패턴에 해당하지 않아 트랜잭션을 시작하지 않는다.
+        List<User> result = testUserService.getAll();
+        assertEquals(1, result.size());
+        assertEquals(users.get(0).getId(), result.get(0).getId());
+    }
+
+    @Test
+    public void methodOutsidePatternPreservesTargetException() {
+        userDao.deleteAll();
+        assertThrows(EmptyResultDataAccessException.class,
+                () -> userService.get("missing-user"));
     }
     
     @Test 

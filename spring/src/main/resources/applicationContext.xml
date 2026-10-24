@@ -1,17 +1,17 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <!-- 6.7.1: @Transactional에서 속성을 읽고 해당 메소드를 트랜잭션 대상으로 선정한다.
-         AnnotationTransactionAttributeSource가 속성을 제공하고,
-         TransactionAttributeSourcePointcut과 TransactionInterceptor가 이를 함께 사용한다.
-         매니저의 기본 빈 이름은 transactionManager다. 서비스 빈은 아래에서 별도로 등록한다. -->
-    <tx:annotation-driven/>
+    <!-- userService 조회 시 팩토리가 생성한 트랜잭션 프록시를 반환한다. -->
+    <bean id="userService" class="org.example2.Dao.TxProxyFactoryBean">
+        <property name="target" ref="userServiceImpl"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="pattern" value="upgradeLevels"/>
+        <property name="serviceInterface" value="org.example2.Dao.UserService"/>
+    </bean>
 
-    <bean id="userService" class="org.example2.Dao.UserServiceImpl">
+    <bean id="userServiceImpl" class="org.example2.Dao.UserServiceImpl">
         <property name="userDao" ref="userDao"/>
         <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
         <property name="mailSender" ref="mailSender"/>
@@ -41,6 +41,11 @@
         <property name = "url" value = "jdbc:h2:./springbook" />
         <property name = "username" value = "sa" />
         <property name = "password" value = "" />
+    </bean>
+
+    <bean id = "message"
+        class="org.example2.Dao.MessageFactoryBean">
+        <property name="text" value="Factory Bean" />
     </bean>
 
 </beans>

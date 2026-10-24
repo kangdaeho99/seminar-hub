@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.AnnotationTransactionAttribute
 import org.springframework.transaction.interceptor.TransactionAttributeSourceAdvisor;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
-// applicationContext.xml과 같은 자동 프록시 구성을 Java 설정으로 표현한다.
+// 어노테이션 기반 자동 프록시를 사용하는 별도의 Java 설정 예제다.
 @Configuration
 public class DaoFactory {
     
