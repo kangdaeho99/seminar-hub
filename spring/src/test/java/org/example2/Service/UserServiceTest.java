@@ -7,14 +7,17 @@ import org.example2.Dao.DefaultUserLevelUpgradePolicy;
 import org.example2.Dao.Level;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
+import org.example2.Dao.UserLevelUpgradePolicy;
 import org.example2.Dao.UserService;
 import org.example2.Dao.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -45,6 +48,9 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @Autowired
+    ApplicationContext context;
+
+    @Autowired
     @Qualifier("userService")
     UserService userService;
 
@@ -60,6 +66,9 @@ public class UserServiceTest {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    UserLevelUpgradePolicy userLevelUpgradePolicy;
 
     List<User> users;
 
@@ -148,14 +157,24 @@ public class UserServiceTest {
     }
 
     @Test
+    @DirtiesContext // 팩토리의 타깃을 변경했으므로 테스트 후 컨텍스트를 다시 만들도록 한다.
     public void upgradeAllOrNothing() {
-        // 예외 발생용 서비스도 팩토리 빈이 생성한 프록시를 통해 호출한다.
+        TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
+        testUserService.setUserDao(userDao);
+        testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
+        testUserService.setMailSender(mockMailSender);
+
+        // &를 붙이면 프록시가 아니라 프록시를 생성하는 팩토리 빈을 가져온다.
+        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserService);
+        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
 
-        assertThrows(TestUserServiceException.class, testUserService::upgradeLevels);
+        assertThrows(TestUserServiceException.class, txUserService::upgradeLevels);
         for (User user : users) {
             checkLevelUpgraded(user, false);
         }
@@ -168,8 +187,12 @@ public class UserServiceTest {
 
     public static class TestUserServiceImpl extends UserServiceImpl {
         // 외부 테스트 인스턴스 없이 스프링이 생성할 수 있는 public static 내부 클래스다.
-        // TxProxyFactoryBean이 upgradeLevels로 시작하는 메소드에 트랜잭션을 적용한다.
-        private final String failOnUserId = "madnite1";
+        // ProxyFactoryBean의 어드바이저가 upgrade*에 해당하는 메소드에 트랜잭션을 적용한다.
+        private final String failOnUserId;
+
+        public TestUserServiceImpl(String failOnUserId) {
+            this.failOnUserId = failOnUserId;
+        }
 
         @Override
         public void upgradeLevels() {
@@ -209,7 +232,7 @@ public class UserServiceTest {
     public void methodOutsidePatternDoesNotStartTransaction() {
         userDao.deleteAll();
         userDao.add(users.get(0));
-        // getAll은 upgradeLevels 패턴에 해당하지 않아 트랜잭션을 시작하지 않는다.
+        // getAll은 upgrade* 패턴에 해당하지 않아 트랜잭션을 시작하지 않는다.
         List<User> result = testUserService.getAll();
         assertEquals(1, result.size());
         assertEquals(users.get(0).getId(), result.get(0).getId());

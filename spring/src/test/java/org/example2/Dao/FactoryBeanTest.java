@@ -2,11 +2,14 @@ package org.example2.Dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-
-import java.lang.reflect.Proxy;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,21 +39,27 @@ public class FactoryBeanTest {
     public void getTransactionProxyFromFactoryBean() {
         Object service = context.getBean("userService");
         assertInstanceOf(UserService.class, service);
-        assertInstanceOf(TransactionHandler.class, Proxy.getInvocationHandler(service));
-        assertInstanceOf(TxProxyFactoryBean.class, context.getBean("&userService"));
-        assertEquals(UserService.class, context.getType("userService"));
+        assertTrue(AopUtils.isJdkDynamicProxy(service));
+        Advised proxy = assertInstanceOf(Advised.class, service);
+        assertSame(context.getBean("transactionAdvisor"), proxy.getAdvisors()[0]);
+        assertInstanceOf(ProxyFactoryBean.class, context.getBean("&userService"));
+        assertTrue(UserService.class.isAssignableFrom(context.getType("userService")));
         assertEquals(UserServiceImpl.class, context.getBean("userServiceImpl").getClass());
     }
 
     @Test
-    public void reuseTransactionProxyFactoryBeanForCoreService() {
+    public void reuseTransactionAdviceForCoreService() {
         Object service = context.getBean("coreService");
         assertInstanceOf(CoreService.class, service);
-        assertInstanceOf(TransactionHandler.class, Proxy.getInvocationHandler(service));
-        assertInstanceOf(TxProxyFactoryBean.class, context.getBean("&coreService"));
+        assertTrue(AopUtils.isJdkDynamicProxy(service));
+        Advised proxy = assertInstanceOf(Advised.class, service);
+        assertSame(context.getBean("transactionAdvice"), proxy.getAdvisors()[0].getAdvice());
+        Advised userServiceProxy = assertInstanceOf(Advised.class, context.getBean("userService"));
+        assertSame(userServiceProxy.getAdvisors()[0].getAdvice(), proxy.getAdvisors()[0].getAdvice());
+        assertInstanceOf(ProxyFactoryBean.class, context.getBean("&coreService"));
         assertEquals(context.getBean("&userService").getClass(),
                 context.getBean("&coreService").getClass());
-        assertEquals(CoreService.class, context.getType("coreService"));
+        assertTrue(CoreService.class.isAssignableFrom(context.getType("coreService")));
         assertEquals(CoreServiceImpl.class, context.getBean("coreServiceTarget").getClass());
     }
 

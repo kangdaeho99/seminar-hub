@@ -6,7 +6,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-// 이전 절의 수동 구현 비교용이다. 실제 빈 설정에서는 TransactionInterceptor를 사용한다.
+// XML의 ProxyFactoryBean들이 공유하는 트랜잭션 어드바이스다.
 public class TransactionAdvice implements MethodInterceptor {
 
     private PlatformTransactionManager transactionManager;
@@ -25,7 +25,7 @@ public class TransactionAdvice implements MethodInterceptor {
             this.transactionManager.commit(status);
             return ret;
         } catch (RuntimeException e) {
-            // 타깃에서 발생한 예외가 그대로 전달되므로 예외 포장을 풀 필요가 없다.
+            // 스프링이 InvocationTargetException의 포장을 풀어 원래 타깃 예외를 전달한다.
             this.transactionManager.rollback(status);
             throw e;
         }

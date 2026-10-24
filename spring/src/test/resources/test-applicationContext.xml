@@ -5,11 +5,26 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <bean id="userService" class="org.example2.Dao.TxProxyFactoryBean">
-        <property name="target" ref="userServiceImpl"/>
+    <bean id="transactionAdvice" class="org.example2.Dao.TransactionAdvice">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="pattern" value="upgradeLevels"/>
-        <property name="serviceInterface" value="org.example2.Dao.UserService"/>
+    </bean>
+
+    <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+        <property name="mappedName" value="upgrade*"/>
+    </bean>
+
+    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="transactionAdvice"/>
+        <property name="pointcut" ref="transactionPointcut"/>
+    </bean>
+
+    <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target" ref="userServiceImpl"/>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionAdvisor</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="userServiceImpl" class="org.example2.Dao.UserServiceImpl">
@@ -18,7 +33,7 @@
         <property name="mailSender" ref="mailSender"/>
     </bean>
 
-    <!-- 예외 발생용 타깃에도 동일한 팩토리 빈으로 트랜잭션 프록시를 적용한다. -->
+    <!-- 예외 발생용 타깃도 ProxyFactoryBean 설정을 상속해 같은 어드바이저를 사용한다. -->
     <bean id="testUserService" parent="userService">
         <property name="target" ref="testUserServiceImpl"/>
     </bean>
@@ -26,13 +41,18 @@
     <!-- public static 내부 클래스는 외부 클래스$내부 클래스 이름으로 등록한다.
          parent는 빈 정의의 의존성 설정을 상속하며, 테스트용 타깃은 별도로 생성된다. -->
     <bean id="testUserServiceImpl" class="org.example2.Service.UserServiceTest$TestUserServiceImpl"
-          parent="userServiceImpl"/>
+          parent="userServiceImpl">
+        <constructor-arg value="madnite1"/>
+    </bean>
 
-    <bean id="coreService" class="org.example2.Dao.TxProxyFactoryBean">
+    <!-- 포인트컷으로 메소드를 제한하지 않고 같은 어드바이스를 전체 메소드에 적용한다. -->
+    <bean id="coreService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target" ref="coreServiceTarget"/>
-        <property name="transactionManager" ref="transactionManager"/>
-        <property name="pattern" value=""/>
-        <property name="serviceInterface" value="org.example2.Dao.CoreService"/>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionAdvice</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="coreServiceTarget" class="org.example2.Dao.CoreServiceImpl">

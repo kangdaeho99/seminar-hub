@@ -17,7 +17,7 @@ public class UppercaseHandler implements InvocationHandler {
     // }
 
     Object target; // 어떤 종류의 인터페이스를 구현한 타깃에도 적용 가능하도록 Object 타입으로 수정
-    private UppercaseHandler(Object target){
+    public UppercaseHandler(Object target){
         this.target = target;
     }
 
