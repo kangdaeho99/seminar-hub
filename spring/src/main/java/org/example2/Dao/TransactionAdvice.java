@@ -6,7 +6,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-// XML의 ProxyFactoryBean들이 공유하는 트랜잭션 어드바이스다.
+// XML에 등록된 어드바이저들이 공유하며, 자동 생성된 프록시에서 실행하는 트랜잭션 어드바이스다.
 public class TransactionAdvice implements MethodInterceptor {
 
     private PlatformTransactionManager transactionManager;

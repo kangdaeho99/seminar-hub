@@ -7,6 +7,8 @@ import java.lang.reflect.Method;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
@@ -15,6 +17,31 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 
 public class PointCutTest {
+    @ParameterizedTest(name = "포인트컷 표현식: {0}")
+    @CsvSource({
+            "'execution(* *(..))', true, true, true, true, true, true",
+            "'execution(* org.example2.learningtest.Target.*(..))', true, true, true, true, true, false",
+            "'execution(* org.example2.learningtest.TargetInterface.*(..))', true, true, true, true, false, false",
+            "'execution(* hello())', true, false, false, false, false, false",
+            "'execution(* hello(java.lang.String))', false, true, false, false, false, false",
+            "'execution(* *(int,int))', false, false, true, true, false, false",
+            "'execution(int *(..))', false, false, true, true, false, false",
+            "'execution(* method())', false, false, false, false, true, true",
+            "'execution(* *(..) throws java.lang.RuntimeException)', false, false, true, false, false, true"
+    })
+    public void expressionMatchesSixCandidateMethods(String expression, boolean hello,
+            boolean helloWithString, boolean minus, boolean plus, boolean targetMethod,
+            boolean beanMethod) throws NoSuchMethodException {
+        // 각 행은 Target의 다섯 메소드와 Bean의 method()에 대한 선정 결과다.
+        // throws 조건은 실제 예외 발생 여부가 아니라 메소드의 예외 선언을 비교한다.
+        checkExpression(expression, Target.class, "hello", hello);
+        checkExpression(expression, Target.class, "hello", helloWithString, String.class);
+        checkExpression(expression, Target.class, "minus", minus, int.class, int.class);
+        checkExpression(expression, Target.class, "plus", plus, int.class, int.class);
+        checkExpression(expression, Target.class, "method", targetMethod);
+        checkExpression(expression, Bean.class, "method", beanMethod);
+    }
+
     @Test
     public void methodSignaturePointcut() throws NoSuchMethodException {
         String signature = "execution(public int org.example2.learningtest.Target.minus(int,int)"

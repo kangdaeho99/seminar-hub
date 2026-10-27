@@ -1,5 +1,6 @@
 package org.example2.Service;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,21 +8,17 @@ import org.example2.Dao.DefaultUserLevelUpgradePolicy;
 import org.example2.Dao.Level;
 import org.example2.Dao.User;
 import org.example2.Dao.UserDao;
-import org.example2.Dao.UserLevelUpgradePolicy;
 import org.example2.Dao.UserService;
 import org.example2.Dao.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -34,6 +31,7 @@ import static org.example2.Dao.DefaultUserLevelUpgradePolicy.MIN_RECOCOMEND_FOR_
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -44,18 +42,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations={"classpath:test-applicationContext.xml"}) 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserServiceTest {
 
+    // 같은 타입의 빈은 필드 이름과 일치하는 빈 이름으로 구분해서 주입받는다.
     @Autowired
-    ApplicationContext context;
-
-    @Autowired
-    @Qualifier("userService")
     UserService userService;
 
     @Autowired
-    @Qualifier("testUserService")
     UserService testUserService;
 
     @Autowired 
@@ -67,13 +60,12 @@ public class UserServiceTest {
     @Autowired
     UserDao userDao;
 
-    @Autowired
-    UserLevelUpgradePolicy userLevelUpgradePolicy;
-
     List<User> users;
 
     @BeforeEach
     public void setUp() {
+        // 컨텍스트는 재사용하되 테스트마다 메일 전송 기록은 초기화한다.
+        mockMailSender.getRequests().clear();
         users = Arrays.asList(
             new User("bumjin", "박범진", "springno1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
             new User("joytouch", "김영한", "springno2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, MIN_RECOCOMEND_FOR_GOLD + 10),
@@ -157,24 +149,29 @@ public class UserServiceTest {
     }
 
     @Test
-    @DirtiesContext // 팩토리의 타깃을 변경했으므로 테스트 후 컨텍스트를 다시 만들도록 한다.
+    public void advisorAutoProxyCreator() {
+        // JDK 동적 프록시는 java.lang.reflect.Proxy를 상속한다.
+        assertInstanceOf(Proxy.class, testUserService);
+    }
+
+    @Test
+    public void injectedServicesAreAutomaticallyProxied() {
+        // 구현체를 직접 등록해도 @Autowired로 주입되는 것은 자동 생성된 프록시다.
+        assertTrue(AopUtils.isJdkDynamicProxy(userService));
+        assertEquals(UserServiceImpl.class, AopUtils.getTargetClass(userService));
+        assertTrue(AopUtils.isJdkDynamicProxy(testUserService));
+        assertEquals(TestUserServiceImpl.class, AopUtils.getTargetClass(testUserService));
+    }
+
+    @Test
     public void upgradeAllOrNothing() {
-        TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
-        testUserService.setUserDao(userDao);
-        testUserService.setUserLevelUpgradePolicy(userLevelUpgradePolicy);
-        testUserService.setMailSender(mockMailSender);
-
-        // &를 붙이면 프록시가 아니라 프록시를 생성하는 팩토리 빈을 가져온다.
-        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
 
-        assertThrows(TestUserServiceException.class, txUserService::upgradeLevels);
+        // 컨테이너가 테스트용 서비스에도 자동으로 적용한 트랜잭션을 통해 롤백을 검증한다.
+        assertThrows(TestUserServiceException.class, testUserService::upgradeLevels);
         for (User user : users) {
             checkLevelUpgraded(user, false);
         }
@@ -187,12 +184,9 @@ public class UserServiceTest {
 
     public static class TestUserServiceImpl extends UserServiceImpl {
         // 외부 테스트 인스턴스 없이 스프링이 생성할 수 있는 public static 내부 클래스다.
-        // ProxyFactoryBean의 어드바이저가 upgrade*에 해당하는 메소드에 트랜잭션을 적용한다.
-        private final String failOnUserId;
-
-        public TestUserServiceImpl(String failOnUserId) {
-            this.failOnUserId = failOnUserId;
-        }
+        // *ServiceImpl 클래스 필터를 통과하고, upgrade* 메소드에 트랜잭션이 적용된다.
+        // 네 번째 사용자의 승급에서 실패시켜 앞선 사용자의 변경도 롤백되는지 확인한다.
+        private final String failOnUserId = "madnite1";
 
         @Override
         public void upgradeLevels() {

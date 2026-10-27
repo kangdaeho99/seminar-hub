@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.example2.Dao.CoreDao;
 import org.example2.Dao.CoreService;
+import org.example2.Dao.CoreServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +27,6 @@ public class CoreServiceTest {
     @Autowired
     @Qualifier("coreService")
     CoreService coreService;
-
-    @Autowired
-    @Qualifier("coreServiceTarget")
-    CoreService coreServiceTarget;
 
     @Autowired
     CoreDao coreDao;
@@ -68,6 +65,9 @@ public class CoreServiceTest {
     @Test
     public void targetWithoutProxyLeavesEarlierInsertCommitted() {
         // 같은 구현체라도 타깃을 직접 호출하면 일괄 저장을 묶는 트랜잭션이 없다.
+        // 컨테이너에 등록하면 자동 프록시가 생성되므로 이 비교용 타깃은 직접 만든다.
+        CoreServiceImpl coreServiceTarget = new CoreServiceImpl();
+        coreServiceTarget.setCoreDao(coreDao);
         assertThrows(DuplicateKeyException.class,
                 () -> coreServiceTarget.addAll(List.of("alpha", "alpha")));
 

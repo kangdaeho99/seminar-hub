@@ -5,6 +5,10 @@ import java.lang.reflect.Proxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -94,5 +98,72 @@ public class DynamicProxyTest {
         assertEquals("HELLO TOBY", proxiedHello.sayHello("Toby"));
         assertEquals("HI TOBY", proxiedHello.sayHi("Toby"));
         assertEquals("Thank You Toby", proxiedHello.sayThankYou("Toby")); // 메소드 이름이 포인트컷의 선정조건에 맞지 않으므로, 부가기능(대문자변환)이 적용되지 않는다.
+    }
+
+    @Test
+    public void classNamePointcutAdvisor() {
+        // 기본 클래스 필터는 모든 클래스를 허용하므로, 익명 내부 클래스로 선정 기준을 확장한다.
+        NameMatchMethodPointcut classMethodPointcut = new NameMatchMethodPointcut() {
+            @Override
+            public ClassFilter getClassFilter() {
+                return new ClassFilter() {
+                    @Override
+                    public boolean matches(Class<?> clazz) {
+                        return clazz.getSimpleName().startsWith("HelloT");
+                    }
+                };
+            }
+        };
+        classMethodPointcut.setMappedName("sayH*");
+
+        checkAdvised(new HelloTarget(), classMethodPointcut, true);
+
+        // 메소드 구현은 같아도 타깃 클래스 이름에 따라 어드바이스 적용 여부가 달라진다.
+        class HelloWorld extends HelloTarget {}
+        checkAdvised(new HelloWorld(), classMethodPointcut, false);
+
+        class HelloToby extends HelloTarget {}
+        checkAdvised(new HelloToby(), classMethodPointcut, true);
+    }
+
+    @ParameterizedTest(name = "클래스 이름 패턴: {0}")
+    @CsvSource({
+            "HelloT*, true, false, true",
+            "*World, false, true, false",
+            "*Target*, true, false, false",
+            "HelloToby, false, false, true",
+            "*Service, false, false, false"
+    })
+    public void mappedClassNamePointcutAdvisor(String classNamePattern, boolean expectedTargetAdvised,
+            boolean expectedWorldAdvised, boolean expectedTobyAdvised) {
+        NameMatchClassMethodPointcut pointcut = new NameMatchClassMethodPointcut();
+        pointcut.setMappedClassName(classNamePattern);
+        pointcut.setMappedName("sayH*");
+
+        class HelloWorld extends HelloTarget {}
+        class HelloToby extends HelloTarget {}
+
+        checkAdvised(new HelloTarget(), pointcut, expectedTargetAdvised);
+        checkAdvised(new HelloWorld(), pointcut, expectedWorldAdvised);
+        checkAdvised(new HelloToby(), pointcut, expectedTobyAdvised);
+    }
+
+    private void checkAdvised(Object target, Pointcut pointcut, boolean expectedAdvised) {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(target);
+        pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UppercaseAdvice()));
+        Hello proxiedHello = (Hello) pfBean.getObject();
+
+        if (expectedAdvised) {
+            // 클래스 필터를 통과한 타깃 중 sayH*에 해당하는 메소드만 대문자로 변환된다.
+            assertEquals("HELLO TOBY", proxiedHello.sayHello("Toby"));
+            assertEquals("HI TOBY", proxiedHello.sayHi("Toby"));
+        } else {
+            // 프록시를 생성했어도 클래스 필터에서 탈락하면 모든 메소드의 어드바이스가 제외된다.
+            assertEquals("Hello Toby", proxiedHello.sayHello("Toby"));
+            assertEquals("Hi Toby", proxiedHello.sayHi("Toby"));
+        }
+        // sayThankYou는 메소드 이름 조건을 만족하지 않으므로 항상 원래 결과를 반환한다.
+        assertEquals("Thank You Toby", proxiedHello.sayThankYou("Toby"));
     }
 }
