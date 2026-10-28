@@ -1,25 +1,28 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
                            http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
-
-    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
 
     <bean id="transactionAdvice" class="org.example2.Dao.TransactionAdvice">
         <property name="transactionManager" ref="transactionManager"/>
     </bean>
 
-    <bean id="transactionPointcut" class="org.example2.Dao.NameMatchClassMethodPointcut">
-        <property name="mappedClassName" value="*ServiceImpl"/>
-        <property name="mappedName" value="upgrade*"/>
-    </bean>
+    <!-- 실제 설정과 같은 포인트컷 표현식으로 Spring 프록시의 트랜잭션 처리를 검증한다. -->
+    <aop:config>
+        <aop:pointcut id="transactionPointcut"
+                      expression="execution(* *..*ServiceImpl.upgrade*(..))"/>
+        <aop:pointcut id="coreTransactionPointcut"
+                      expression="execution(* *..CoreServiceImpl.*(..))"/>
 
-    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-        <property name="advice" ref="transactionAdvice"/>
-        <property name="pointcut" ref="transactionPointcut"/>
-    </bean>
+        <aop:advisor id="transactionAdvisor" advice-ref="transactionAdvice"
+                     pointcut-ref="transactionPointcut"/>
+        <aop:advisor id="coreTransactionAdvisor" advice-ref="transactionAdvice"
+                     pointcut-ref="coreTransactionPointcut"/>
+    </aop:config>
 
     <bean id="userService" class="org.example2.Dao.UserServiceImpl">
         <property name="userDao" ref="userDao"/>
@@ -31,17 +34,6 @@
          ServiceImpl로 끝나므로 자동 프록시 대상이며, parent로 서비스의 의존성 설정을 상속한다. -->
     <bean id="testUserService" class="org.example2.Service.UserServiceTest$TestUserServiceImpl"
           parent="userService"/>
-
-    <!-- CoreService의 전체 메소드에 같은 트랜잭션 어드바이스를 자동 적용한다. -->
-    <bean id="coreTransactionPointcut" class="org.example2.Dao.NameMatchClassMethodPointcut">
-        <property name="mappedClassName" value="CoreServiceImpl"/>
-        <property name="mappedName" value="*"/>
-    </bean>
-
-    <bean id="coreTransactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-        <property name="advice" ref="transactionAdvice"/>
-        <property name="pointcut" ref="coreTransactionPointcut"/>
-    </bean>
 
     <bean id="coreService" class="org.example2.Dao.CoreServiceImpl">
         <property name="coreDao" ref="coreDao"/>

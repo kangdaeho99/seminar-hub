@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
  * [ 2023-07-30 daeho.kang ]
  * Description: Test class for SeminarServiceImpl
  */
-//@SpringBootTest(classes = {SeminarServiceImpl.class, SeminarQuerydslRepository.class, LogAdvice.class})
 @SpringBootTest
 @Disabled
 public class SeminarServiceTests {

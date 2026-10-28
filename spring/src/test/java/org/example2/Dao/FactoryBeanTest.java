@@ -7,8 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanIsNotAFactoryException;
@@ -43,8 +47,7 @@ public class FactoryBeanTest {
         assertInstanceOf(UserService.class, service);
         assertTrue(AopUtils.isJdkDynamicProxy(service));
         Advised proxy = assertInstanceOf(Advised.class, service);
-        assertEquals(1, proxy.getAdvisors().length);
-        assertSame(context.getBean("transactionAdvisor"), proxy.getAdvisors()[0]);
+        assertSame(context.getBean("transactionAdvisor"), transactionAdvisor(proxy));
         assertThrows(BeanIsNotAFactoryException.class, () -> context.getBean("&userService"));
         assertTrue(UserService.class.isAssignableFrom(context.getType("userService")));
         assertEquals(UserServiceImpl.class, AopUtils.getTargetClass(service));
@@ -57,11 +60,11 @@ public class FactoryBeanTest {
         assertInstanceOf(CoreService.class, service);
         assertTrue(AopUtils.isJdkDynamicProxy(service));
         Advised proxy = assertInstanceOf(Advised.class, service);
-        assertEquals(1, proxy.getAdvisors().length);
-        assertSame(context.getBean("coreTransactionAdvisor"), proxy.getAdvisors()[0]);
-        assertSame(context.getBean("transactionAdvice"), proxy.getAdvisors()[0].getAdvice());
+        Advisor advisor = transactionAdvisor(proxy);
+        assertSame(context.getBean("coreTransactionAdvisor"), advisor);
+        assertSame(context.getBean("transactionAdvice"), advisor.getAdvice());
         Advised userServiceProxy = assertInstanceOf(Advised.class, context.getBean("userService"));
-        assertSame(userServiceProxy.getAdvisors()[0].getAdvice(), proxy.getAdvisors()[0].getAdvice());
+        assertSame(transactionAdvisor(userServiceProxy).getAdvice(), advisor.getAdvice());
         assertThrows(BeanIsNotAFactoryException.class, () -> context.getBean("&coreService"));
         assertTrue(CoreService.class.isAssignableFrom(context.getType("coreService")));
         assertEquals(CoreServiceImpl.class, AopUtils.getTargetClass(service));
@@ -74,6 +77,15 @@ public class FactoryBeanTest {
         Object policy = context.getBean("userLevelUpgradePolicy");
         assertInstanceOf(DefaultUserLevelUpgradePolicy.class, policy);
         assertFalse(AopUtils.isAopProxy(policy));
+    }
+
+    private Advisor transactionAdvisor(Advised proxy) {
+        // aop:config가 추가하는 기반 어드바이저와 구분해 트랜잭션 어드바이저가 한 번 적용됐는지 확인한다.
+        List<Advisor> advisors = Arrays.stream(proxy.getAdvisors())
+                .filter(advisor -> advisor.getAdvice() instanceof TransactionAdvice)
+                .toList();
+        assertEquals(1, advisors.size());
+        return advisors.get(0);
     }
 
 }

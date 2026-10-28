@@ -20,6 +20,7 @@ dependencies {
     implementation libs.springContextSupport
     implementation libs.angusMail
     implementation libs.springJdbc
+    // XML과 Java Config의 포인트컷 표현식 해석/매칭에 사용한다.
     implementation libs.aspectjWeaver
     implementation libs.h2
     testImplementation libs.junitJupiter

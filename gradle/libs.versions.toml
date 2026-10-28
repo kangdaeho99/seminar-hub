@@ -37,7 +37,6 @@ bootStarterBatchJdbc.module = "org.springframework.boot:spring-boot-starter-batc
 bootStarterJdbc.module = "org.springframework.boot:spring-boot-starter-jdbc"
 bootStarterWebmvc.module = "org.springframework.boot:spring-boot-starter-webmvc"
 bootStarterValidation.module = "org.springframework.boot:spring-boot-starter-validation"
-bootStarterAspectj.module = "org.springframework.boot:spring-boot-starter-aspectj"
 bootStarterWebmvcTest.module = "org.springframework.boot:spring-boot-starter-webmvc-test"
 
 springBatchIntegration.module = "org.springframework.batch:spring-batch-integration"

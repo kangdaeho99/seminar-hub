@@ -1,27 +1,27 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
-
-    <!-- 등록된 Advisor를 찾아 포인트컷에 맞는 빈을 자동으로 프록시로 감싼다. -->
-    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!-- 6-44: 타깃에 의존하지 않는 트랜잭션 어드바이스를 등록한다. -->
     <bean id="transactionAdvice" class="org.example2.Dao.TransactionAdvice">
         <property name="transactionManager" ref="transactionManager"/>
     </bean>
 
-    <!-- 6-52: ServiceImpl로 끝나는 클래스의 upgrade* 메소드에만 트랜잭션을 적용한다. -->
-    <bean id="transactionPointcut" class="org.example2.Dao.NameMatchClassMethodPointcut">
-        <property name="mappedClassName" value="*ServiceImpl"/>
-        <property name="mappedName" value="upgrade*"/>
-    </bean>
+    <!-- 표현식 해석/매칭은 AspectJ 라이브러리가, 프록시 생성과 어드바이스 실행은 Spring이 담당한다. -->
+    <aop:config>
+        <aop:pointcut id="transactionPointcut"
+                      expression="execution(* *..*ServiceImpl.upgrade*(..))"/>
+        <aop:pointcut id="coreTransactionPointcut"
+                      expression="execution(* *..CoreServiceImpl.*(..))"/>
 
-    <!-- 6-46: 어드바이스와 적용 대상을 선정하는 포인트컷을 묶는다. -->
-    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-        <property name="advice" ref="transactionAdvice"/>
-        <property name="pointcut" ref="transactionPointcut"/>
-    </bean>
+        <aop:advisor id="transactionAdvisor" advice-ref="transactionAdvice"
+                     pointcut-ref="transactionPointcut"/>
+        <aop:advisor id="coreTransactionAdvisor" advice-ref="transactionAdvice"
+                     pointcut-ref="coreTransactionPointcut"/>
+    </aop:config>
 
     <!-- 6-53: 구현체를 직접 등록하면 조회하거나 DI 받을 때 자동 생성된 프록시가 전달된다. -->
     <bean id="userService" class="org.example2.Dao.UserServiceImpl">
@@ -29,17 +29,6 @@
         <property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"/>
         <property name="mailSender" ref="mailSender"/>
         <property name="mailFrom" value="noreply@example.com"/>
-    </bean>
-
-    <!-- CoreService의 전체 메소드에 적용하던 트랜잭션도 같은 어드바이스와 자동 프록시로 유지한다. -->
-    <bean id="coreTransactionPointcut" class="org.example2.Dao.NameMatchClassMethodPointcut">
-        <property name="mappedClassName" value="CoreServiceImpl"/>
-        <property name="mappedName" value="*"/>
-    </bean>
-
-    <bean id="coreTransactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-        <property name="advice" ref="transactionAdvice"/>
-        <property name="pointcut" ref="coreTransactionPointcut"/>
     </bean>
 
     <bean id="coreService" class="org.example2.Dao.CoreServiceImpl">
